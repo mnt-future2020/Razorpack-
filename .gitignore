@@ -30,3 +30,9 @@ yarn-error.log*
 
 *.md
 next-env.d.ts
+
+# local Claude Code config
+.claude/
+
+# local MCP config (contains API key)
+mcp.json
