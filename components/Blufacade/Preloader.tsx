@@ -1,64 +1,103 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import React, { useEffect, useState, useRef } from "react";
+import { gsap } from "gsap";
 
 export function Preloader() {
-  const [isVisible, setIsVisible] = useState(false)
+  const [progress, setProgress] = useState(0);
+  const preloaderRef = useRef<HTMLDivElement>(null);
+  const textRef = useRef<HTMLHeadingElement>(null);
+  const barRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Check if preloader has been shown in this session
-    const hasSeenPreloader = sessionStorage.getItem("hasSeenPreloader")
+    // Disable scrolling
+    document.body.style.overflow = "hidden";
+    // Scroll to top to ensure we start at the hero
+    window.scrollTo(0, 0);
 
-    if (!hasSeenPreloader) {
-      // First time in this session - show preloader
-      setIsVisible(true)
-      document.body.style.overflow = "hidden"
-
-      const timer = setTimeout(() => {
-        setIsVisible(false)
-        document.body.style.overflow = "unset"
-        // Mark as seen for this session
-        sessionStorage.setItem("hasSeenPreloader", "true")
-      }, 2800)
-
-      return () => {
-        clearTimeout(timer)
-        document.body.style.overflow = "unset"
+    const tl = gsap.timeline({
+      onComplete: () => {
+        // Slide out animation
+        gsap.to(preloaderRef.current, {
+          yPercent: -100,
+          duration: 1.2,
+          ease: "power4.inOut",
+          onComplete: () => {
+            document.body.style.overflow = "auto";
+            // Dispatch event if other components (like Hero) want to wait for preloader
+            window.dispatchEvent(new Event("preloader-complete"));
+          }
+        });
       }
-    }
-  }, [])
+    });
+
+    // Simulate loading
+    const proxy = { val: 0 };
+    tl.to(proxy, {
+      val: 100,
+      duration: 2.5,
+      ease: "power2.out",
+      onUpdate: () => {
+        setProgress(Math.floor(proxy.val));
+      }
+    });
+
+    // Animate the progress bar width
+    tl.to(barRef.current, {
+      width: "100%",
+      duration: 2.5,
+      ease: "power2.out"
+    }, 0);
+
+    // Subtle scale animation on the massive text
+    tl.fromTo(textRef.current, 
+      { scale: 0.95, opacity: 0 }, 
+      { scale: 1, opacity: 1, duration: 1.5, ease: "power3.out" }, 
+      0
+    );
+
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, []);
 
   return (
-    <AnimatePresence>
-      {isVisible && (
-        <motion.div
-          initial={{ y: 0 }}
-          exit={{ y: "-100%", transition: { duration: 0.8, ease: [0.76, 0, 0.24, 1] } }}
-          className="fixed inset-0 z-9999 flex flex-col items-center justify-center bg-[#014a74] text-white"
-        >
-          <div className="relative flex items-center justify-center overflow-hidden">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="relative flex items-baseline text-6xl md:text-8xl lg:text-9xl font-bold uppercase tracking-tighter"
-            >
-              <span className="text-white">BLU</span>
-              <span className="text-[#f58420]">FACADE</span>
-            </motion.div>
-          </div>
+    <div 
+      ref={preloaderRef}
+      className="fixed inset-0 z-[99999] bg-[#0a1118] text-white flex flex-col justify-between p-6 md:p-8 lg:p-12 overflow-hidden"
+    >
+      {/* Top Info Bar */}
+      <div className="flex justify-between items-start text-xs md:text-sm font-medium text-[#a1a1aa] z-10">
+        <div className="leading-snug">
+          Premium Packaging<br/>
+          Industrial Solutions
+        </div>
+        <div className="leading-snug text-center hidden md:block">
+          Madurai<br/>
+          Tamil Nadu
+        </div>
+        <div className="leading-snug text-right">
+          Loading<br/>
+          <span className="text-white text-base md:text-lg tabular-nums">{progress}%</span>
+        </div>
+      </div>
 
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6 }}
-            className="absolute bottom-12 text-sm md:text-base font-bold tracking-widest uppercase text-[#f58420]"
-          >
-            INSPIRING SKYLINES
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  )
+      {/* Center Massive Logo Text */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full px-6">
+         <h1 
+           ref={textRef}
+           className="text-[15vw] lg:text-[16vw] font-black tracking-tighter leading-none w-full text-center" 
+           style={{ transform: "scaleY(1.2)" }}
+         >
+           <span className="text-white">RAYZOR</span>
+           <span className="text-[#1689cf]">PACK</span>
+         </h1>
+      </div>
+
+      {/* Bottom Progress Line */}
+      <div className="absolute bottom-0 left-0 w-full h-1 bg-[#1b1c19]">
+        <div ref={barRef} className="h-full bg-[#1689cf] w-0" />
+      </div>
+    </div>
+  );
 }

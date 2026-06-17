@@ -63,18 +63,16 @@ export function CaseStudyStrip() {
   return (
     <section
       ref={containerRef}
-      className="bg-surface structural-grid overflow-hidden py-10 md:py-16 relative"
+      className="overflow-hidden pb-10 md:pb-16 pt-4 md:pt-8 relative"
     >
-      {/* Background radial overlay to fade grid lines at edges */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_800px_at_center,transparent,var(--color-surface))] pointer-events-none z-0" />
 
       {/* ─── HEADER ─── */}
       <div className="bento-header px-6 md:px-10 pb-10 md:pb-12 text-center relative z-10">
         <RevealOnScroll effect="fadeIn">
-          <span className="inline-block text-xs font-bold text-brand uppercase tracking-widest mb-4 border border-brand/20 px-3 py-1 rounded-md">
+          <span className="inline-block text-xs font-bold text-[#44B8E8] uppercase tracking-widest mb-4 border border-[#44B8E8]/30 px-3 py-1 rounded-md">
             About Us
           </span>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-heading font-extrabold tracking-tight max-w-4xl mx-auto text-ink">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-heading font-extrabold tracking-tight max-w-4xl mx-auto text-[#2D2D2D]">
             Rayzor Industrial Packaging
           </h2>
           <p className="text-steel text-sm sm:text-base md:text-lg lg:text-xl mt-4 md:mt-6 max-w-2xl mx-auto leading-relaxed font-medium px-2 sm:px-0">
@@ -291,58 +289,6 @@ export function CaseStudyStrip() {
             </div>
           </div>
 
-          {/* Trusted By Marquee (Spans full 12 columns at bottom of bento grid) */}
-          <div className="bento-item lg:col-span-12 flex flex-col justify-center rounded-[2rem] overflow-hidden min-h-[260px] border border-line/45 shadow-[0_8px_30px_rgb(0,0,0,0.02)] transition-all duration-300 hover:shadow-xl relative group p-8 md:p-10">
-            {/* Background World Map Graphic */}
-            <div className="absolute inset-0 z-0 pointer-events-none">
-              <Image
-                src="/images/rayzor/case-study/trusted-leaders-bg.png"
-                alt="Global shipping network background"
-                fill
-                className="object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
-              />
-            </div>
-            {/* Gradient Overlay for Legibility */}
-            <div className="absolute inset-0 bg-black/55 dark:bg-black/75 backdrop-blur-[1px] z-10" />
-
-            <p className="text-sm font-extrabold text-white uppercase tracking-widest text-center mb-8 flex items-center justify-center gap-2 relative z-20">
-              <Lucide.Shield className="w-3.5 h-3.5 text-accent" /> Trusted By Industry Leaders
-            </p>
-            <div className="relative w-full overflow-hidden z-20">
-              <Marquee pauseOnHover className="[--duration:26s] [--gap:1rem]">
-                {clientLogos.map((item) => (
-                  <div
-                    key={item.name}
-                    className="flex items-center justify-center px-6 py-4 mx-2 rounded-2xl bg-white border border-line/35 shadow-[0_2px_12px_rgba(0,0,0,0.02)] hover:border-brand hover:scale-105 transition-all duration-300 group/logo cursor-pointer h-16 w-36"
-                  >
-                    <Image
-                      src={item.logo}
-                      alt={item.name}
-                      width={120}
-                      height={40}
-                      className="max-h-9 w-auto object-contain opacity-90 group-hover/logo:opacity-100 transition-all duration-300"
-                    />
-                  </div>
-                ))}
-              </Marquee>
-              <Marquee pauseOnHover reverse className="[--duration:30s] [--gap:1rem] mt-4">
-                {[...clientLogos].reverse().map((item) => (
-                  <div
-                    key={`r-${item.name}`}
-                    className="flex items-center justify-center px-6 py-4 mx-2 rounded-2xl bg-white border border-line/35 shadow-[0_2px_12px_rgba(0,0,0,0.02)] hover:border-brand hover:scale-105 transition-all duration-300 group/logo cursor-pointer h-16 w-36"
-                  >
-                    <Image
-                      src={item.logo}
-                      alt={item.name}
-                      width={120}
-                      height={40}
-                      className="max-h-9 w-auto object-contain opacity-90 group-hover/logo:opacity-100 transition-all duration-300"
-                    />
-                  </div>
-                ))}
-              </Marquee>
-            </div>
-          </div>
         </div>
       </div>
     </section>

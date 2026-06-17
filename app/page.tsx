@@ -4,13 +4,14 @@ import { HeroSection } from "@/components/Blufacade/HeroSection";
 import { CaseStudyStrip } from "@/components/Blufacade/CaseStudyStrip";
 import { ProductsCarousel } from "@/components/Blufacade/ProductsCarousel";
 import { ServicesSection } from "@/components/Blufacade/ServicesSection";
-import { AboutTextSection } from "@/components/Blufacade/AboutTextSection";
+import { UniqueSection } from "@/components/Blufacade/UniqueSection";
 import { MissionSection } from "@/components/Blufacade/MissionSection";
 import { TestimonialsSection } from "@/components/Blufacade/TestimonialsSection";
 import { ClientLogosSection } from "@/components/Blufacade/ClientLogosSection";
 import { FAQSection } from "@/components/Blufacade/FAQSection";
 import { Footer } from "@/components/Blufacade/Footer";
 import { DemoWrapper } from "@/components/Blufacade/DemoWrapper";
+import { Preloader } from "@/components/Blufacade/Preloader";
 
 export const metadata: Metadata = {
   title: "Rayzorpack | Premium Packaging Solutions & LDPE Films",
@@ -31,15 +32,21 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <DemoWrapper>
+      <Preloader />
       <main className="relative w-full overflow-x-hidden">
         <Header />
-        <div className="pt-16 lg:pt-20">
-          <HeroSection />
-        </div>
-        <CaseStudyStrip />
-        <ProductsCarousel />
+        {/* No top padding — hero goes under the navbar so transparent logo area shows hero behind it */}
+        <HeroSection />
+        {/* About Section - Scroll animation */}
+        <UniqueSection />
+        {/* <CaseStudyStrip /> */}
         <ServicesSection />
+
+        {/* Products — light cream bg */}
+        <ProductsCarousel />
+        {/* Why Choose Us — white bg */}
         <MissionSection />
+        {/* Footer — Parallax Reveal */}
         <Footer />
       </main>
     </DemoWrapper>

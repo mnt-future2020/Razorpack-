@@ -111,36 +111,39 @@ function AccordionItem({
             {item.num}
           </span>
           <h3
-            className="text-lg sm:text-xl md:text-[2rem] font-heading font-bold tracking-tight leading-tight transition-colors duration-300"
-            style={{ color: isActive ? "#1b1c19" : "#1b1c19cc" }}
+            className="accordion-title text-lg sm:text-xl md:text-[2rem] font-heading font-bold tracking-tight leading-tight transition-colors duration-300"
+            style={{ color: isActive ? "var(--acc-active, #1b1c19)" : "var(--acc-inactive, rgba(27,28,25,0.8))" }}
           >
             {item.title}
           </h3>
         </div>
 
-        {/* Toggle Button */}
+        {/* Toggle Button — transitions.dev: icon swap */}
         <div
-          className="w-10 h-10 md:w-11 md:h-11 rounded-md flex items-center justify-center border transition-all duration-400"
+          className="w-10 h-10 md:w-11 md:h-11 rounded-md flex items-center justify-center border transition-all duration-300"
           style={{
-            backgroundColor: isActive ? "#006196" : "#1b1c19",
-            borderColor: isActive ? "#006196" : "#1b1c19",
+            backgroundColor: isActive ? "#006196" : "var(--acc-btn-bg, #1b1c19)",
+            borderColor: isActive ? "#006196" : "var(--acc-btn-bg, #1b1c19)",
             transform: isActive ? "rotate(180deg)" : "rotate(0deg)",
           }}
         >
-          {isActive ? (
-            <X className="w-4 h-4 text-white" />
-          ) : (
-            <ArrowDownRight className="w-4 h-4 text-white" />
-          )}
+          <div className="t-icon-swap" data-state={isActive ? "b" : "a"}>
+            <span className="t-icon flex items-center justify-center" data-icon="a">
+              <ArrowDownRight className="w-4 h-4 text-white" />
+            </span>
+            <span className="t-icon flex items-center justify-center" data-icon="b">
+              <X className="w-4 h-4 text-white" />
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* Collapsible Content — GSAP controlled */}
+      {/* Collapsible Content — GSAP height + transitions.dev panel blur */}
       <div ref={contentRef} className="overflow-hidden">
-        <div ref={innerRef} className="pb-8 pt-2 flex flex-col gap-5">
+        <div ref={innerRef} className="t-panel-slide pb-8 pt-2 flex flex-col gap-5" data-open={isActive ? "true" : "false"} style={{ "--panel-translate-y": "20px" } as React.CSSProperties}>
           {/* Description + CTA */}
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5">
-            <p className="text-steel text-sm sm:text-base md:text-lg leading-relaxed max-w-3xl">
+            <p className="accordion-desc text-sm sm:text-base md:text-lg leading-relaxed max-w-3xl" style={{ color: "var(--acc-desc, #3f4850)" }}>
               {item.description}
             </p>
             <Link
@@ -184,6 +187,77 @@ export function MissionSection() {
 
   useGSAP(
     () => {
+      const section = sectionRef.current;
+      if (!section) return;
+
+      // ── Background color transition: white → dark on scroll ──
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: section,
+          start: "top 70%",
+          end: "top 20%",
+          scrub: 1,
+        },
+      });
+
+      // Section bg: white → dark
+      tl.fromTo(
+        section,
+        { backgroundColor: "#ffffff" },
+        { backgroundColor: "#0f1117", ease: "none" },
+        0,
+      );
+
+      // Heading text: dark → white
+      tl.fromTo(
+        section.querySelector(".mission-title"),
+        { color: "#2D2D2D" },
+        { color: "#ffffff", ease: "none" },
+        0,
+      );
+
+      // Subtitle text: steel → light
+      tl.fromTo(
+        section.querySelector(".mission-subtitle"),
+        { color: "#3f4850" },
+        { color: "rgba(255,255,255,0.6)", ease: "none" },
+        0,
+      );
+
+      // Accordion row borders
+      tl.fromTo(
+        section.querySelectorAll(".accordion-row"),
+        { borderColor: "rgba(191,199,210,0.3)" },
+        { borderColor: "rgba(255,255,255,0.08)", ease: "none" },
+        0,
+      );
+
+      // Accordion text colors via CSS custom properties
+      tl.fromTo(
+        section,
+        {
+          "--acc-active": "#1b1c19",
+          "--acc-inactive": "rgba(27,28,25,0.8)",
+          "--acc-desc": "#3f4850",
+        },
+        {
+          "--acc-active": "#ffffff",
+          "--acc-inactive": "rgba(255,255,255,0.5)",
+          "--acc-desc": "rgba(255,255,255,0.45)",
+          ease: "none",
+        },
+        0,
+      );
+
+      // Toggle button bg via CSS custom property
+      tl.fromTo(
+        section,
+        { "--acc-btn-bg": "#1b1c19" },
+        { "--acc-btn-bg": "rgba(255,255,255,0.1)", ease: "none" },
+        0,
+      );
+
+      // Accordion entrance stagger
       gsap.fromTo(
         ".accordion-row",
         { opacity: 0, x: -30 },
@@ -264,20 +338,20 @@ export function MissionSection() {
     <section
       id="mission"
       ref={sectionRef}
-      className="py-10 md:py-16 px-4 sm:px-6 md:px-8 bg-surface text-ink overflow-hidden relative"
+      className="py-10 md:py-16 px-4 sm:px-6 md:px-8 bg-white text-ink overflow-hidden relative"
     >
       <div className="w-full max-w-7xl mx-auto relative z-10">
         {/* ─── SECTION HEADER with WordRotate ─── */}
         <RevealOnScroll effect="fadeIn">
           <div className="mb-16 text-center">
-            <span className="text-sm font-bold text-brand uppercase tracking-widest flex items-center justify-center gap-2 mb-4">
-              <span className="w-8 h-0.5 bg-brand" /> Why Choose Us{" "}
-              <span className="w-8 h-0.5 bg-brand" />
+            <span className="text-sm font-bold text-[#44B8E8] uppercase tracking-widest flex items-center justify-center gap-2 mb-4">
+              <span className="w-8 h-0.5 bg-[#44B8E8]" /> Why Choose Us{" "}
+              <span className="w-8 h-0.5 bg-[#44B8E8]" />
             </span>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-heading font-extrabold text-ink tracking-tight max-w-3xl mx-auto">
-              Engineering & Quality Standards
+            <h2 className="mission-title text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-heading font-extrabold text-[#2D2D2D] tracking-tight max-w-3xl mx-auto">
+              Engineering & <span className="text-[#44B8E8]">Quality</span> Standards
             </h2>
-            <div className="mt-4 flex items-center justify-center gap-2 text-lg md:text-xl text-steel">
+            <div className="mission-subtitle mt-4 flex items-center justify-center gap-2 text-lg md:text-xl text-steel">
               Built on{" "}
               <WordRotate
                 words={["Precision", "Reliability", "Excellence", "Innovation"]}

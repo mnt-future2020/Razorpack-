@@ -1,327 +1,197 @@
 "use client";
 
+import React, { useRef } from "react";
 import Image from "next/image";
-import Link from "next/link";
-import { useRef, useMemo } from "react";
-import { siteConfig } from "@/config/site";
-import { RevealOnScroll } from "@/components/gsap/reveal-on-scroll";
-import { ArrowRight } from "lucide-react";
-import {
-  motion,
-  useMotionValue,
-  useTransform,
-  useSpring,
-  type MotionValue,
-} from "motion/react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useGSAP } from "@gsap/react";
 
-const serviceImages: Record<string, string> = {
-  "ldpe-film-rolls": "/images/rayzor/services/ldpe-film-rolls.jpg",
-  "ldpe-bags": "/images/rayzor/services/ldpe-bags.jpg",
-  "vci-poly-bags": "/images/rayzor/services/vci-poly-bags.jpg",
-  "stretch-films": "/images/rayzor/services/stretch-films.jpg",
-  "hdpe-bags": "/images/rayzor/services/hdpe-bags.jpg",
-  "bubble-wrap": "/images/rayzor/services/bubble-wrap.jpg",
-};
+gsap.registerPlugin(ScrollTrigger, useGSAP);
 
-const serviceSquares: Record<string, { x: number; y: number; size: number }[]> =
+const SERVICES = [
   {
-    "ldpe-film-rolls": [
-      { x: 5, y: 30, size: 16 },
-      { x: 10, y: 42, size: 10 },
-      { x: 3, y: 52, size: 7 },
-      { x: 80, y: 70, size: 14 },
-      { x: 85, y: 82, size: 9 },
-    ],
-    "ldpe-bags": [
-      { x: 82, y: 55, size: 16 },
-      { x: 88, y: 68, size: 10 },
-      { x: 78, y: 72, size: 7 },
-      { x: 85, y: 42, size: 6 },
-      { x: 90, y: 80, size: 8 },
-    ],
-    "vci-poly-bags": [
-      { x: 4, y: 24, size: 16 },
-      { x: 10, y: 36, size: 10 },
-      { x: 2, y: 44, size: 7 },
-      { x: 78, y: 78, size: 14 },
-      { x: 84, y: 88, size: 8 },
-    ],
-    "stretch-films": [
-      { x: 82, y: 26, size: 14 },
-      { x: 88, y: 38, size: 10 },
-      { x: 78, y: 44, size: 7 },
-      { x: 84, y: 54, size: 5 },
-      { x: 90, y: 60, size: 8 },
-    ],
-    "hdpe-bags": [
-      { x: 6, y: 28, size: 14 },
-      { x: 12, y: 40, size: 10 },
-      { x: 4, y: 50, size: 7 },
-      { x: 82, y: 72, size: 12 },
-      { x: 88, y: 84, size: 8 },
-    ],
-    "bubble-wrap": [
-      { x: 80, y: 30, size: 16 },
-      { x: 86, y: 44, size: 10 },
-      { x: 76, y: 50, size: 7 },
-      { x: 82, y: 60, size: 6 },
-      { x: 88, y: 70, size: 8 },
-    ],
-  };
-
-const GRID_COLS = 12;
-const GRID_ROWS = 8;
-
-/* ------------------------------------------------------------------ */
-/*  PIXEL OVERLAY                                                      */
-/* ------------------------------------------------------------------ */
-
-function PixelOverlay() {
-  const cells = useMemo(() => {
-    const arr: { row: number; col: number }[] = [];
-    for (let r = 0; r < GRID_ROWS; r++) {
-      for (let c = 0; c < GRID_COLS; c++) {
-        arr.push({ row: r, col: c });
-      }
-    }
-    return arr;
-  }, []);
-
-  return (
-    <>
-      <style>{`
-        .svc-pixel-cell {
-          position: absolute;
-          background: rgba(0,0,0,0.8);
-          opacity: 0;
-          transform: scale(0);
-          transition: opacity 0.25s, transform 0.25s;
-          transition-delay: var(--delay-out);
-        }
-        .group:hover .svc-pixel-cell {
-          opacity: 1;
-          transform: scale(1);
-          transition-delay: var(--delay-in) !important;
-        }
-      `}</style>
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={{ zIndex: 5 }}
-      >
-        {cells.map(({ row, col }) => {
-          const delayIn = (row + col) * 0.018;
-          const delayOut = (GRID_ROWS - row + (GRID_COLS - col)) * 0.012;
-          return (
-            <div
-              key={`${row}-${col}`}
-              className="svc-pixel-cell"
-              style={
-                {
-                  left: `${(col / GRID_COLS) * 100}%`,
-                  top: `${(row / GRID_ROWS) * 100}%`,
-                  width: `${100 / GRID_COLS}%`,
-                  height: `${100 / GRID_ROWS}%`,
-                  "--delay-in": `${delayIn}s`,
-                  "--delay-out": `${delayOut}s`,
-                } as React.CSSProperties
-              }
-            />
-          );
-        })}
-      </div>
-    </>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/*  MAGNETIC SQUARE                                                    */
-/* ------------------------------------------------------------------ */
-
-function MagneticSquare({
-  x,
-  y,
-  size,
-  pointerX,
-  pointerY,
-}: {
-  x: number;
-  y: number;
-  size: number;
-  pointerX: MotionValue<number>;
-  pointerY: MotionValue<number>;
-}) {
-  const centerX = x / 100;
-  const centerY = y / 100;
-  const tx = useTransform(pointerX, (px) => (px - centerX) * 40);
-  const ty = useTransform(pointerY, (py) => (py - centerY) * 40);
-  const sx = useSpring(tx, { stiffness: 80, damping: 18, mass: 0.6 });
-  const sy = useSpring(ty, { stiffness: 80, damping: 18, mass: 0.6 });
-
-  return (
-    <motion.div
-      className="pointer-events-none absolute bg-black"
-      style={{
-        left: `${x}%`,
-        top: `${y}%`,
-        width: size,
-        height: size,
-        x: sx,
-        y: sy,
-        zIndex: 6,
-      }}
-    />
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/*  SERVICE CARD                                                       */
-/* ------------------------------------------------------------------ */
-
-function ServiceCard({
-  service,
-  index,
-}: {
-  service: { id: string; title: string; description: string; icon: string };
-  index: number;
-}) {
-  const pointerX = useMotionValue(0.5);
-  const pointerY = useMotionValue(0.5);
-  const cardRef = useRef<HTMLDivElement>(null);
-  const squares = serviceSquares[service.id] || [];
-
-  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    const rect = cardRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    pointerX.set((e.clientX - rect.left) / rect.width);
-    pointerY.set((e.clientY - rect.top) / rect.height);
-  };
-
-  const handlePointerLeave = () => {
-    pointerX.set(0.5);
-    pointerY.set(0.5);
-  };
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{
-        duration: 0.7,
-        delay: index * 0.1,
-        ease: [0.22, 1, 0.36, 1],
-      }}
-    >
-      <Link href={`/services/${service.id}`} className="block">
-        <div
-          ref={cardRef}
-          className="group relative overflow-hidden rounded-md"
-          style={{ aspectRatio: "4/3" }}
-          onPointerMove={handlePointerMove}
-          onPointerLeave={handlePointerLeave}
-        >
-          {/* Background image */}
-          <Image
-            src={
-              serviceImages[service.id] ||
-              "/images/rayzor/services/hero-services.jpg"
-            }
-            alt={service.title}
-            fill
-            className="h-full w-full object-cover"
-            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-          />
-
-          {/* Pixel-block hover overlay */}
-          <PixelOverlay />
-
-          {/* Magnetic squares */}
-          {squares.map((sq, i) => (
-            <MagneticSquare
-              key={i}
-              x={sq.x}
-              y={sq.y}
-              size={sq.size}
-              pointerX={pointerX}
-              pointerY={pointerY}
-            />
-          ))}
-
-          {/* Info bar — full-width bottom, dark overlay */}
-          <div className="absolute bottom-0 left-0 right-0 z-20 bg-linear-to-t from-ink via-ink/90 to-transparent pt-16 pb-5 px-5">
-            <h3 className="font-heading font-bold text-white text-lg leading-snug mb-1">
-              {service.title}
-            </h3>
-            <p className="text-white/50 text-xs leading-relaxed line-clamp-2">
-              {service.description}
-            </p>
-            <div className="flex items-center gap-1.5 text-brand text-xs font-bold mt-3 group-hover:gap-3 transition-all">
-              View Details
-              <ArrowRight className="w-3.5 h-3.5" />
-            </div>
-          </div>
-        </div>
-      </Link>
-    </motion.div>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/*  SECTION                                                            */
-/* ------------------------------------------------------------------ */
+    id: "01",
+    cardTitle: "Core Solutions",
+    cardHeading: "Packaging Solutions",
+    cardText: "We specialize in packaging for various industries, such as axles for trains, car parts, chip cards, revolving door elements, printers, EC cards, spices, hops, coffee, grand pianos, kitchen appliances, printed circuit boards, and more.",
+    bgImage: "/images/rayzor/services/industrial_vci_rolls.png",
+  },
+  {
+    id: "02",
+    cardTitle: "Outsourced Efficiency",
+    cardHeading: "Contract Packaging",
+    cardText: "Streamline your operations with our dedicated contract packaging services. We handle the entire packaging process at our specialized facilities, allowing you to focus on your core manufacturing while we ensure international standards.",
+    bgImage: "/images/rayzor/services/engineering.png",
+  },
+  {
+    id: "03",
+    cardTitle: "Global Transit",
+    cardHeading: "Export Palletization",
+    cardText: "Secure your cargo for international shipping. Our export palletization services utilize heavy-duty wrapping, strapping, and custom pallets to ensure maximum stability and protection against harsh transit conditions across the globe.",
+    bgImage: "/images/rayzor/services/heavy_machinery_logistics.png",
+  },
+  {
+    id: "04",
+    cardTitle: "Moisture Protection",
+    cardHeading: "Vacuum Packaging",
+    cardText: "Advanced protection for highly sensitive equipment. By utilizing specialized barrier foils and extracting all air, we create a completely moisture-free environment that prevents corrosion during long-term storage or overseas transport.",
+    bgImage: "/images/rayzor/services/vci-poly-bags.jpg",
+  },
+];
 
 export function ServicesSection() {
-  const services = siteConfig.services;
+  const containerRef = useRef<HTMLElement>(null);
+
+  useGSAP(
+    () => {
+      const mm = gsap.matchMedia();
+
+      // ── ALL DEVICES: pinned scroll with card transitions ──
+      mm.add("(min-width: 0px)", () => {
+        const section = containerRef.current;
+        if (!section) return;
+
+        gsap.set(".card-1", { y: "100vh", opacity: 0 });
+        gsap.set(".card-2", { y: "100vh", opacity: 0 });
+        gsap.set(".card-3", { y: "100vh", opacity: 0 });
+        gsap.set(".bg-panel-1", { opacity: 0 });
+        gsap.set(".bg-panel-2", { opacity: 0 });
+        gsap.set(".bg-panel-3", { opacity: 0 });
+
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: section,
+            start: "top top",
+            end: "+=400%",
+            pin: true,
+            scrub: 1,
+          },
+        });
+
+        // Hold Service 0
+        tl.to({}, { duration: 1 });
+
+        // Transition 0 → 1
+        tl.addLabel("trans1")
+          .to(".card-0", { y: "-100vh", opacity: 0, duration: 1, ease: "power2.inOut" }, "trans1")
+          .to(".bg-panel-0", { opacity: 0, duration: 1, ease: "power2.inOut" }, "trans1")
+          .to(".bg-panel-1", { opacity: 1, duration: 1, ease: "power2.inOut" }, "trans1")
+          .to(".card-1", { y: "0vh", opacity: 1, duration: 1, ease: "power2.inOut" }, "trans1");
+
+        // Hold Service 1
+        tl.to({}, { duration: 1 });
+
+        // Transition 1 → 2
+        tl.addLabel("trans2")
+          .to(".card-1", { y: "-100vh", opacity: 0, duration: 1, ease: "power2.inOut" }, "trans2")
+          .to(".bg-panel-1", { opacity: 0, duration: 1, ease: "power2.inOut" }, "trans2")
+          .to(".bg-panel-2", { opacity: 1, duration: 1, ease: "power2.inOut" }, "trans2")
+          .to(".card-2", { y: "0vh", opacity: 1, duration: 1, ease: "power2.inOut" }, "trans2");
+
+        // Hold Service 2
+        tl.to({}, { duration: 1 });
+
+        // Transition 2 → 3
+        tl.addLabel("trans3")
+          .to(".card-2", { y: "-100vh", opacity: 0, duration: 1, ease: "power2.inOut" }, "trans3")
+          .to(".bg-panel-2", { opacity: 0, duration: 1, ease: "power2.inOut" }, "trans3")
+          .to(".bg-panel-3", { opacity: 1, duration: 1, ease: "power2.inOut" }, "trans3")
+          .to(".card-3", { y: "0vh", opacity: 1, duration: 1, ease: "power2.inOut" }, "trans3");
+
+        // Hold Service 3
+        tl.to({}, { duration: 1 });
+
+        // Parallax on backgrounds
+        gsap.to(".parallax-bg", {
+          yPercent: 15,
+          ease: "none",
+          scrollTrigger: {
+            trigger: section,
+            start: "top top",
+            end: "+=400%",
+            scrub: true,
+          },
+        });
+      });
+
+      return () => mm.revert();
+    },
+    { scope: containerRef },
+  );
 
   return (
-    <section
-      id="services"
-      className="relative bg-surface py-10 md:py-16 overflow-hidden"
-    >
-      <div className="relative z-10 w-full px-4 sm:px-6 md:px-8">
-        {/* ─── SECTION HEADER ─── */}
-        <div className="mb-8 md:mb-16 text-center">
-          <span className="inline-block text-[10px] md:text-xs font-bold text-brand uppercase tracking-widest mb-3 md:mb-4 border border-brand/20 px-3 py-1 rounded-md">
-            Our Services
-          </span>
-          <h2 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-heading font-extrabold text-ink tracking-tight max-w-3xl mx-auto">
-            Industrial Packaging Solutions
+    <section ref={containerRef} className="relative w-full h-[100svh] bg-[#1b1c19] overflow-hidden">
+      
+      {/* ══════════ UNIVERSAL PINNED LAYOUT ══════════ */}
+      
+      {/* Background Layers */}
+      <div className="absolute inset-0 w-full h-full pointer-events-none bg-[#1b1c19]">
+        {SERVICES.map((service, i) => (
+          <div
+            key={`bg-${service.id}`}
+            className={`bg-panel-${i} absolute inset-0 w-full h-full overflow-hidden`}
+            style={{ zIndex: i }}
+          >
+            <div className="absolute inset-0 w-full h-full scale-[1.15] origin-center">
+              <Image
+                src={service.bgImage}
+                alt={service.cardTitle}
+                fill
+                sizes="100vw"
+                className="parallax-bg object-cover brightness-[0.55]"
+                priority={i === 0}
+              />
+            </div>
+            {/* Darker gradient on mobile so text is legible */}
+            <div className="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-[#1b1c19]/95 via-[#1b1c19]/60 lg:via-[#1b1c19]/50 to-transparent" />
+          </div>
+        ))}
+      </div>
+
+      {/* Foreground Content — always side-by-side on desktop */}
+      <div className="relative z-10 w-full h-full max-w-[1600px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20 flex flex-row items-center pointer-events-none">
+
+        {/* Left: heading — vertically centered */}
+        <div className="w-[38%] lg:w-[40%] xl:w-[42%]">
+          <h2
+            className="text-[#fbf9f4] font-bold tracking-tight leading-[1.1]"
+            style={{ fontSize: "clamp(1.5rem, 3.5vw, 3.5rem)" }}
+          >
+            Our Service <br />
+            <span className="text-[#1689cf]">and Sectors</span>
           </h2>
-          <p className="text-steel text-sm md:text-base mt-3 md:mt-4 max-w-xl mx-auto px-2">
-            Engineered for durability — from LDPE film rolls to VCI anti-corrosion solutions
-          </p>
         </div>
 
-        {/* ─── HERO IMAGE ─── */}
-        <RevealOnScroll effect="fadeIn">
-          <div className="relative w-full aspect-4/3 sm:aspect-3/1 md:aspect-16/5 rounded-md overflow-hidden mb-8 md:mb-16 border border-line">
-            <Image
-              src="/images/rayzor/services/hero-services.jpg"
-              alt="Rayzor Industrial Packaging facility"
-              fill
-              className="object-cover object-center"
-              sizes="100vw"
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-ink/90 via-ink/50 to-transparent" />
-            <div className="absolute inset-0 z-10 flex flex-col justify-center p-6 md:p-12">
-              <span className="inline-block px-3 py-1 mb-3 md:mb-4 w-fit rounded-md bg-brand text-white text-[10px] md:text-xs font-bold uppercase tracking-widest">
-                Our Services
-              </span>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-heading font-extrabold text-white leading-[1.1] tracking-tight max-w-lg">
-                How we protect
-                <br />
-                your components
-                <br />
-                across the world
-              </h2>
+        {/* Right: Cards — vertically centered */}
+        <div className="relative w-[62%] lg:w-[60%] xl:w-[55%] h-full flex justify-end items-center">
+          {SERVICES.map((service, i) => (
+            <div
+              key={`card-${service.id}`}
+              className={`card-${i} absolute w-full max-w-[400px] lg:max-w-[440px] xl:max-w-[520px] 2xl:max-w-[580px] bg-[#fbf9f4] p-4 lg:p-6 xl:p-10 2xl:p-12 shadow-2xl pointer-events-auto`}
+              style={{ zIndex: i }}
+            >
+              <div className="absolute top-0 right-0 w-10 h-10 lg:w-14 lg:h-14 xl:w-20 xl:h-20 bg-[#1689cf]" />
+              <div className="relative z-10">
+                <span
+                  className="text-[#1689cf] mb-2 lg:mb-3 block font-bold uppercase tracking-wider"
+                  style={{ fontSize: "clamp(0.6rem, 1vw, 1rem)" }}
+                >
+                  {service.cardTitle}
+                </span>
+                <h3
+                  className="font-semibold text-[#1b1c19] leading-tight mb-2 lg:mb-4 xl:mb-6 tracking-tight"
+                  style={{ fontSize: "clamp(1rem, 2.5vw, 2.5rem)" }}
+                >
+                  {service.cardHeading}
+                </h3>
+                <p
+                  className="text-[#30312e] leading-relaxed font-medium"
+                  style={{ fontSize: "clamp(0.6rem, 1vw, 1rem)" }}
+                >
+                  {service.cardText}
+                </p>
+              </div>
             </div>
-          </div>
-        </RevealOnScroll>
-
-        {/* ─── 3×2 Service cards grid ─── */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {services.map((service, index) => (
-            <ServiceCard key={service.id} service={service} index={index} />
           ))}
         </div>
       </div>
