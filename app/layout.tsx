@@ -1,6 +1,6 @@
 import type React from "react";
 import type { Metadata } from "next";
-import { IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
+import { Jost, IBM_Plex_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
@@ -8,10 +8,10 @@ import { DynamicMetadata } from "@/components/DynamicMetadata";
 import FloatingContactButtons from "@/components/FloatingContactButtons";
 import { cn } from "@/lib/utils";
 
-const ibmPlexSans = IBM_Plex_Sans({
+const jost = Jost({
   subsets: ["latin", "latin-ext"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-ibm-plex-sans",
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
+  variable: "--font-jost",
 });
 
 const ibmPlexMono = IBM_Plex_Mono({
@@ -21,7 +21,7 @@ const ibmPlexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Rayzorpack | Premium Packaging Solutions & LDPE Films",
+  title: "Rayzor Industrial Packaging Pvt Ltd | Premium Packaging Solutions & LDPE Films",
   description:
     "Rayzor Industrial Packaging Pvt Ltd is the leading manufacturer of premium packaging materials, LDPE Film Rolls, and Poly Bags in Madurai, Tamil Nadu.",
   generator: "Next.js",
@@ -31,17 +31,17 @@ export const metadata: Metadata = {
   manifest: "/site.webmanifest",
   metadataBase: new URL("https://www.rayzorpack.com"),
   openGraph: {
-    title: "Rayzorpack | Premium Packaging Solutions",
+    title: "Rayzor Industrial Packaging Pvt Ltd | Premium Packaging Solutions",
     description:
       "Leading manufacturer of premium packaging materials, LDPE Film Rolls, and Poly Bags.",
     url: "https://www.rayzorpack.com",
-    siteName: "Rayzorpack",
+    siteName: "Rayzor Industrial Packaging Pvt Ltd",
     type: "website",
     locale: "en_IN",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Rayzorpack | Premium Packaging Solutions",
+    title: "Rayzor Industrial Packaging Pvt Ltd | Premium Packaging Solutions",
     description:
       "Leading manufacturer of premium packaging materials, LDPE Film Rolls, and Poly Bags.",
   },
@@ -53,7 +53,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={cn(ibmPlexSans.variable, ibmPlexMono.variable)}>
+    <html lang="en" className={cn(jost.variable, ibmPlexMono.variable)}>
       <head>
         <link rel="manifest" href="/site.webmanifest" />
         <meta name="theme-color" content="#1689cf" />
@@ -64,7 +64,7 @@ export default function RootLayout({
       >
         <DynamicMetadata />
         {children}
-        {/* <FloatingContactButtons /> */}
+        <FloatingContactButtons />
         <Toaster />
         <Analytics />
       </body>

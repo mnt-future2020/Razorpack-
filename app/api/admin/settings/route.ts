@@ -85,7 +85,7 @@ export async function PUT(request: NextRequest) {
     await connectDB();
 
     const body = await request.json();
-    const { siteName, siteTagline, logo, favicon } = body;
+    const { siteName, siteNameAccent, siteTagline, logo, favicon } = body;
 
     // Get current settings to access old file paths
     const currentSettings = await Settings.findOne({ id: "default" });
@@ -116,6 +116,7 @@ export async function PUT(request: NextRequest) {
       { id: "default" },
       {
         ...(siteName && { siteName }),
+        ...(siteNameAccent !== undefined && { siteNameAccent }),
         ...(siteTagline !== undefined && { siteTagline }),
         ...(logoPath !== undefined && { logo: logoPath }),
         ...(faviconPath !== undefined && { favicon: faviconPath }),
@@ -163,8 +164,8 @@ export async function POST() {
 
     const defaultSettings = {
       id: "default",
-      siteName: "Blufacade",
-      siteTagline: "Expert Facade Construction Services",
+      siteName: "Rayzor Industrial Packaging Pvt Ltd",
+      siteTagline: "Premium Packaging Solutions & LDPE Films",
       logo: null,
       favicon: null,
       isActive: true,

@@ -1,7 +1,7 @@
 {
-  "name": "Blufacade",
-  "short_name": "Blufacade",
-  "description": "Professional NDIS disability support services",
+  "name": "Rayzor Industrial Packaging Pvt Ltd",
+  "short_name": "Rayzorpack",
+  "description": "Premium Packaging Solutions & LDPE Films",
   "icons": [
     {
       "src": "/android-chrome-192x192.png",
@@ -14,7 +14,7 @@
       "type": "image/png"
     }
   ],
-  "theme_color": "#8CC63F",
+  "theme_color": "#26A8E0",
   "background_color": "#ffffff",
   "display": "standalone",
   "start_url": "/",

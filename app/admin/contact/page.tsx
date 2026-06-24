@@ -570,7 +570,7 @@ export default function ContactPage() {
                 id="pageTitle"
                 value={contactInfo.pageTitle}
                 onChange={(e) => handleInputChange("pageTitle", e.target.value)}
-                placeholder="Get in Touch with Blufacade"
+                placeholder="Get in Touch with Rayzor Industrial Packaging Pvt Ltd"
                 className="mt-2"
               />
             </div>

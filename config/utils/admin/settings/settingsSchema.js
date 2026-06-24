@@ -13,12 +13,17 @@ const settingsSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
-      default: "Blufacade",
+      default: "Rayzor Industrial Packaging Pvt Ltd",
+    },
+    siteNameAccent: {
+      type: String,
+      trim: true,
+      default: "PACK",
     },
     siteTagline: {
       type: String,
       trim: true,
-      default: "Expert Facade Construction Services",
+      default: "Premium Packaging Solutions & LDPE Films",
     },
     logo: {
       type: String,
@@ -52,8 +57,8 @@ const Settings =
 // Default settings data for Blufacade
 const defaultSettingsData = {
   id: "default",
-  siteName: "Blufacade",
-  siteTagline: "Expert Facade Construction Services",
+  siteName: "Rayzor Industrial Packaging Pvt Ltd",
+  siteTagline: "Premium Packaging Solutions & LDPE Films",
   logo: null,
   favicon: null,
   isActive: true,

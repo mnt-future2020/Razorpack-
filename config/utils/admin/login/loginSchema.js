@@ -172,14 +172,14 @@ adminSchema.statics.findByCredentials = async function (email, password) {
 // Static method to create initial admin
 adminSchema.statics.createInitialAdmin = async function () {
   try {
-    const existingAdmin = await this.findOne({ email: "admin@blufacade.com" })
+    const existingAdmin = await this.findOne({ email: "admin@rayzorpack.com" })
 
     if (!existingAdmin) {
       const initialAdmin = new this({
-        firstName: "Blufacade",
+        firstName: "Rayzorpack",
         lastName: "Admin",
-        email: "admin@blufacade.com",
-        password: "Blufacade@2025",
+        email: "admin@rayzorpack.com",
+        password: "Rayzorpack@2025",
         phone: "9994162996",
         location: "Chennai, India",
         role: "Super Admin",
@@ -188,7 +188,7 @@ adminSchema.statics.createInitialAdmin = async function () {
       })
 
       await initialAdmin.save()
-      console.log("Initial admin created successfully for Blufacade")
+      console.log("Initial admin created successfully for Rayzorpack")
       return initialAdmin
     } else {
       console.log("Initial admin already exists")

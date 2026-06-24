@@ -22,9 +22,9 @@ export default function BannersPage() {
   const pageOptions = [
     { key: "home", label: "Home" },
     { key: "about", label: "About Us" },
+    { key: "products", label: "Products" },
     { key: "services", label: "Services" },
     { key: "portfolio", label: "Portfolio" },
-    { key: "blog", label: "Blog" },
     { key: "careers", label: "Careers" },
     { key: "contact", label: "Contact" },
   ];
@@ -44,6 +44,12 @@ export default function BannersPage() {
     { imageUrl: "", title: "", highlight: "", tagline: "", description: "", primaryCtaLabel: "", primaryCtaHref: "", secondaryCtaLabel: "", secondaryCtaHref: "" },
     { imageUrl: "", title: "", highlight: "", tagline: "", description: "", primaryCtaLabel: "", primaryCtaHref: "", secondaryCtaLabel: "", secondaryCtaHref: "" },
   ]);
+
+  // Page hero text fields (for non-home pages)
+  const [heroLabel, setHeroLabel] = useState("");
+  const [heroHeadingLine1, setHeroHeadingLine1] = useState("");
+  const [heroHeadingLine2, setHeroHeadingLine2] = useState("");
+  const [heroDescription, setHeroDescription] = useState("");
 
   const [loading, setLoading] = useState<boolean>(false);
   const { toast } = useToast();
@@ -66,9 +72,19 @@ export default function BannersPage() {
           images?: string[];
           slides?: any[];
           status?: string;
+          label?: string;
+          headingLine1?: string;
+          headingLine2?: string;
+          description?: string;
         };
         setImageUrl(b.image || "");
         setStatus(b.status || "active");
+
+        // Load hero text fields for non-home pages
+        setHeroLabel(b.label || "");
+        setHeroHeadingLine1(b.headingLine1 || "");
+        setHeroHeadingLine2(b.headingLine2 || "");
+        setHeroDescription(b.description || "");
 
         // For home page, load multiple images and ensure we have 3 slots
         if (key === "home" && b.images && b.images.length > 0) {
@@ -95,11 +111,13 @@ export default function BannersPage() {
         setImageUrl("");
         setHomeImages(key === "home" ? ["", "", ""] : []);
         setStatus("active");
+        setHeroLabel(""); setHeroHeadingLine1(""); setHeroHeadingLine2(""); setHeroDescription("");
       }
     } catch (e) {
       setImageUrl("");
       setHomeImages(key === "home" ? ["", "", ""] : []);
       setStatus("active");
+      setHeroLabel(""); setHeroHeadingLine1(""); setHeroHeadingLine2(""); setHeroDescription("");
     } finally {
       setLoading(false);
     }
@@ -204,6 +222,11 @@ export default function BannersPage() {
         if (file) {
           form.append("image", file);
         }
+        // Hero text fields
+        if (heroLabel) form.append("label", heroLabel);
+        if (heroHeadingLine1) form.append("headingLine1", heroHeadingLine1);
+        if (heroHeadingLine2) form.append("headingLine2", heroHeadingLine2);
+        if (heroDescription) form.append("description", heroDescription);
       }
 
       const res = await axios.post(`/api/admin/banners`, form, {
@@ -310,6 +333,62 @@ export default function BannersPage() {
                     Tip: If you don't select a new image, the existing banner
                     image will be kept.
                   </p>
+                  <p className="text-xs text-[#26A8E0] font-medium mt-1">
+                    Recommended: 1600 × 1000px (landscape, 16:10 ratio)
+                  </p>
+
+                  {/* Hero Text Fields */}
+                  <div className="mt-6 space-y-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-1 h-6 bg-[#26A8E0] rounded-full" />
+                      <div>
+                        <h3 className="font-bold text-base text-[#221E1F]">Hero Content</h3>
+                        <p className="text-xs text-gray-400 mt-0.5">Manage the hero section text for this page</p>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="text-[11px] font-semibold uppercase tracking-wider text-gray-400 mb-1.5 block">Label</label>
+                      <input
+                        className="w-full border border-gray-200 rounded-lg px-3.5 py-2 text-sm focus:border-[#26A8E0] focus:ring-1 focus:ring-[#26A8E0]/20 outline-none transition-colors"
+                        placeholder="e.g. Our Services"
+                        value={heroLabel}
+                        onChange={(e) => setHeroLabel(e.target.value)}
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="text-[11px] font-semibold uppercase tracking-wider text-gray-400 mb-1.5 block">Heading Line 1</label>
+                        <input
+                          className="w-full border border-gray-200 rounded-lg px-3.5 py-2 text-sm focus:border-[#26A8E0] focus:ring-1 focus:ring-[#26A8E0]/20 outline-none transition-colors"
+                          placeholder="e.g. SOLUTIONS"
+                          value={heroHeadingLine1}
+                          onChange={(e) => setHeroHeadingLine1(e.target.value)}
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[11px] font-semibold uppercase tracking-wider text-gray-400 mb-1.5 block">Heading Line 2</label>
+                        <input
+                          className="w-full border border-gray-200 rounded-lg px-3.5 py-2 text-sm focus:border-[#26A8E0] focus:ring-1 focus:ring-[#26A8E0]/20 outline-none transition-colors"
+                          placeholder="e.g. SECTORS"
+                          value={heroHeadingLine2}
+                          onChange={(e) => setHeroHeadingLine2(e.target.value)}
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="text-[11px] font-semibold uppercase tracking-wider text-gray-400 mb-1.5 block">Description</label>
+                      <textarea
+                        className="w-full border border-gray-200 rounded-lg px-3.5 py-2 text-sm focus:border-[#26A8E0] focus:ring-1 focus:ring-[#26A8E0]/20 outline-none transition-colors resize-none"
+                        rows={3}
+                        placeholder="Hero section description text..."
+                        value={heroDescription}
+                        onChange={(e) => setHeroDescription(e.target.value)}
+                      />
+                    </div>
+                  </div>
                 </>
               )}
 

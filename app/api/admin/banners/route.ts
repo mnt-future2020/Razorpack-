@@ -87,6 +87,12 @@ export async function POST(request: NextRequest) {
     const title = ((formData.get("title") as string) || "").trim();
     const status = (formData.get("status") as string) || "active";
 
+    // Page hero text fields
+    const label = ((formData.get("label") as string) || "").trim();
+    const headingLine1 = ((formData.get("headingLine1") as string) || "").trim();
+    const headingLine2 = ((formData.get("headingLine2") as string) || "").trim();
+    const description = ((formData.get("description") as string) || "").trim();
+
     if (!pageKey) {
       return NextResponse.json(
         { success: false, message: "pageKey is required" },
@@ -181,6 +187,12 @@ export async function POST(request: NextRequest) {
       image: finalImageUrl || (finalImages.length > 0 ? finalImages[0] : ""),
       status,
     };
+
+    // Add hero text fields if provided
+    if (label) payload.label = label;
+    if (headingLine1) payload.headingLine1 = headingLine1;
+    if (headingLine2) payload.headingLine2 = headingLine2;
+    if (description) payload.description = description;
 
     if (finalImages.length > 0) {
       payload.images = finalImages;

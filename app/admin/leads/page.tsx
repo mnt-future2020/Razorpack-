@@ -331,7 +331,7 @@ export default function LeadManager() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold text-[#221E1F]">Lead Manager</h1>
-          <p className="text-gray-600 mt-1">Manage enquiries and potential clients for Blufacade</p>
+          <p className="text-gray-600 mt-1">Manage enquiries and potential clients for Rayzor Industrial Packaging Pvt Ltd</p>
         </div>
         <div className="flex gap-3">
           <Button onClick={handleExportCSV} variant="outline">

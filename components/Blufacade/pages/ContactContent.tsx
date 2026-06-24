@@ -156,7 +156,7 @@ export function ContactContent() {
                 {/* Radio Group */}
                 <div className="sm:col-span-2 mt-4 mb-3">
                   <label className="block text-[15px] font-medium text-white mb-5">
-                    Where did you hear about Rayzorpack? *
+                    Where did you hear about Rayzor Industrial Packaging Pvt Ltd? *
                   </label>
                   <div className="flex flex-wrap gap-x-10 gap-y-4">
                     {["LinkedIn", "Word of mouth", "Online search", "Other"].map((source) => (
@@ -230,43 +230,45 @@ export function ContactContent() {
               </div>
 
               <div className="space-y-6">
-                <a href="tel:+919087787879" className="flex items-center gap-6 p-6 md:p-8 rounded-2xl bg-stone-50 border border-stone-200 hover:shadow-xl hover:bg-white transition-all duration-300 group">
+                {/* Phone */}
+                <a href={`tel:${contactInfo?.primaryPhone || "+919087787879"}`} className="flex items-center gap-6 p-6 md:p-8 rounded-2xl bg-stone-50 border border-stone-200 hover:shadow-xl hover:bg-white transition-all duration-300 group">
                   <div className="w-14 h-14 shrink-0 rounded-full bg-white shadow-sm flex items-center justify-center text-[var(--brand-blue)] group-hover:bg-[var(--brand-blue)] group-hover:text-white transition-colors duration-300">
                     <Phone className="w-6 h-6" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-[#1a1a1a] text-lg mb-1">Phone</h3>
-                    <p className="text-[#8c827a] font-medium">+91 90877 87875<br/>+91 90877 87876<br/>+91 90877 87879</p>
+                    <p className="text-[#8c827a] font-medium">
+                      {contactInfo?.primaryPhone || "+91 90877 87879"}
+                      {contactInfo?.secondaryPhone && <><br/>{contactInfo.secondaryPhone}</>}
+                      {contactInfo?.whatsappNumber && contactInfo.whatsappNumber !== contactInfo.primaryPhone && <><br/>{contactInfo.whatsappNumber}</>}
+                    </p>
                   </div>
                 </a>
 
-                <a href="mailto:sales@rayzorpack.com" className="flex items-center gap-6 p-6 md:p-8 rounded-2xl bg-stone-50 border border-stone-200 hover:shadow-xl hover:bg-white transition-all duration-300 group">
+                {/* Email */}
+                <a href={`mailto:${contactInfo?.email || "sales@rayzorpack.com"}`} className="flex items-center gap-6 p-6 md:p-8 rounded-2xl bg-stone-50 border border-stone-200 hover:shadow-xl hover:bg-white transition-all duration-300 group">
                   <div className="w-14 h-14 shrink-0 rounded-full bg-white shadow-sm flex items-center justify-center text-[var(--brand-blue)] group-hover:bg-[var(--brand-blue)] group-hover:text-white transition-colors duration-300">
                     <Mail className="w-6 h-6" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-[#1a1a1a] text-lg mb-1">Email</h3>
-                    <p className="text-[#8c827a] font-medium break-all">sales@rayzorpack.com</p>
+                    <p className="text-[#8c827a] font-medium break-all">{contactInfo?.email || "sales@rayzorpack.com"}</p>
                   </div>
                 </a>
 
+                {/* Address */}
                 <div className="flex items-start gap-6 p-6 md:p-8 rounded-2xl bg-stone-50 border border-stone-200 hover:shadow-xl hover:bg-white transition-all duration-300 group">
                   <div className="w-14 h-14 shrink-0 rounded-full bg-white shadow-sm flex items-center justify-center text-[var(--brand-blue)] group-hover:bg-[var(--brand-blue)] group-hover:text-white transition-colors duration-300">
                     <MapPin className="w-6 h-6" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-[#1a1a1a] text-lg mb-2">Head Office</h3>
+                    <h3 className="font-semibold text-[#1a1a1a] text-lg mb-2">Office</h3>
                     <p className="text-[#8c827a] text-[15px] font-medium leading-relaxed">
-                      No: 298 A1, M.M Nagar,<br />
-                      Thiruppalai, Madurai - 625014<br />
-                      Tamil Nadu, India
-                    </p>
-                    
-                    <h3 className="font-semibold text-[#1a1a1a] text-lg mt-6 mb-2">Factory</h3>
-                    <p className="text-[#8c827a] text-[15px] font-medium leading-relaxed">
-                      Automobile Co Operative Industrial Estate,<br />
-                      No:A9, Kappalur, Madurai-625008<br />
-                      Tamil Nadu, India
+                      {contactInfo?.address || "No: 298 A1, M.M Nagar, Thiruppalai"}
+                      {contactInfo?.city && <><br />{contactInfo.city}</>}
+                      {contactInfo?.state && <> - {contactInfo.postcode || ""}</>}
+                      {contactInfo?.state && <><br />{contactInfo.state}, {contactInfo.country || "India"}</>}
+                      {!contactInfo?.city && !contactInfo?.state && <><br />Madurai - 625014<br />Tamil Nadu, India</>}
                     </p>
                   </div>
                 </div>

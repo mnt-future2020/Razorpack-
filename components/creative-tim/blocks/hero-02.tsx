@@ -12,7 +12,7 @@ const slides = [
       "Tailor-made VCI films under the Rustoxy brand shield automotive, electronics and food-industry components from corrosion — no oiling required.",
     image:
       "/images/rayzor/hero-carousel/Gemini_Generated_Image_trp8hltrp8hltrp8.png",
-    alt: "VCI anti-corrosion film roll by Rayzorpack",
+    alt: "VCI anti-corrosion film roll by Rayzor Industrial Packaging Pvt Ltd",
     cta: { label: "send us!", href: "/contact" },
     partners: [
       { name: "Foxconn", role: "Electronics OEM" },
@@ -27,7 +27,7 @@ const slides = [
       "Durable, moisture-resistant film rolls, pouches, bags and sheets — manufactured in-house at our Madurai facility for over two decades.",
     image:
       "/images/rayzor/hero-carousel/Gemini_Generated_Image_i2qvi0i2qvi0i2qv.png",
-    alt: "LDPE pallet wrap on wooden pallet by Rayzorpack",
+    alt: "LDPE pallet wrap on wooden pallet by Rayzor Industrial Packaging Pvt Ltd",
     cta: { label: "send us!", href: "/contact" },
     partners: [
       { name: "Mobis", role: "Automotive OEM" },

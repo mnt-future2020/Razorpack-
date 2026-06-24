@@ -152,7 +152,7 @@ export function UniqueSection() {
         </div>
 
         <div className="mob-image relative w-full aspect-video rounded-xl overflow-hidden mb-5 sm:mb-8">
-          <Image src="/images/rayzor/about/unique-hero.png" alt="Rayzorpack Manufacturing" fill className="object-cover" sizes="100vw" />
+          <Image src="/images/rayzor/about/unique-hero.png" alt="Rayzor Industrial Packaging Pvt Ltd Manufacturing" fill className="object-cover" sizes="100vw" />
         </div>
 
         <div className="mob-cards grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
@@ -190,7 +190,7 @@ export function UniqueSection() {
       <div className="hidden lg:block h-screen pt-24">
         <div className="absolute bottom-10 xl:bottom-16 left-0 w-full h-[68%] z-10">
           <div ref={imageRef} className="relative h-full z-10 overflow-hidden shadow-xl t-resize" style={{ transformOrigin: "left center" }}>
-            <Image src="/images/rayzor/about/unique-hero.png" alt="Rayzorpack Manufacturing" fill className="object-cover object-center" priority />
+            <Image src="/images/rayzor/about/unique-hero.png" alt="Rayzor Industrial Packaging Pvt Ltd Manufacturing" fill className="object-cover object-center" priority />
           </div>
           <div ref={cardsContainerRef} className="absolute top-0 right-4 xl:right-8 w-[58%] h-full z-0 flex flex-col justify-center px-0" style={{ opacity: 0 }} data-open="false">
             <div ref={bentoRef} className="t-avatar-group grid grid-cols-2 grid-rows-2 gap-4 xl:gap-5 h-full max-h-[680px] my-auto" onMouseLeave={() => setShifts(null, "out")}>
@@ -235,7 +235,7 @@ export function UniqueSection() {
         {/* Big scrolling text — desktop only */}
         <div className="t-stagger absolute bottom-[75%] translate-y-[50%] left-0 w-max z-20 pointer-events-none">
           <div ref={textRef} className="relative flex items-center">
-            <h2 className="t-stagger-line t-stagger-line--1 font-heading font-black uppercase whitespace-nowrap tracking-tighter mix-blend-multiply drop-shadow-[0_4px_10px_rgba(255,255,255,0.3)] flex" style={{ fontSize: "clamp(3rem, 8vw, 10rem)", lineHeight: "0.85" }}>
+            <h2 className="t-stagger-line t-stagger-line--1 font-heading font-black uppercase whitespace-nowrap tracking-tighter mix-blend-multiply drop-shadow-[0_4px_10px_rgba(255,255,255,0.3)] flex" style={{ fontSize: "clamp(3rem, 8vw, 8rem)", lineHeight: "0.85" }}>
               {"WHAT MAKES US ".split("").map((char, i) => (
                 <span key={i} className="about-char inline-block text-[var(--brand-dark)]" style={{ display: char === " " ? "inline" : "inline-block" }}>{char === " " ? "\u00A0" : char}</span>
               ))}

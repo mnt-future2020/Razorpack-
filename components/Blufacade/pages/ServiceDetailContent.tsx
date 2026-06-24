@@ -1,12 +1,14 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { Check, Phone, ChevronLeft, ChevronRight, MessageCircle } from "lucide-react"; // Replaced WhatsAppIcon with MessageCircle if needed, or keeping WhatsAppIcon
-import { WhatsAppIcon } from "@/components/ui/whatsapp-icon";
+import React, { useState, useRef } from "react";
 import Image from "next/image";
-import { useState, useCallback } from "react";
-import { useContact } from "@/hooks/use-contact";
+import Link from "next/link";
+import { ChevronDown, Check, Phone, ArrowRight } from "lucide-react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useGSAP } from "@gsap/react";
+
+gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 interface ServiceData {
   _id?: string;
@@ -18,193 +20,332 @@ interface ServiceData {
   features: string[];
   slug: string;
   status?: string;
-  views?: number;
-  seoTitle?: string;
-  seoDescription?: string;
-  seoKeywords?: string;
-  // Dynamic Fields
   category?: string;
   applications?: string[];
   technicalSpecs?: { label: string; value: string }[];
 }
 
-interface ServiceDetailContentProps {
-  serviceData: ServiceData;
+interface AccordionItemProps {
+  title: string;
+  children: React.ReactNode;
+  defaultOpen?: boolean;
 }
 
-export function ServiceDetailContent({
-  serviceData,
-}: ServiceDetailContentProps) {
-  const { contactInfo } = useContact();
-  const [selectedImage, setSelectedImage] = useState(serviceData.image || "/placeholder.svg");
-  const [imageLoading, setImageLoading] = useState(true);
-  const [imageError, setImageError] = useState(false);
+function AccordionItem({ title, children, defaultOpen = false }: AccordionItemProps) {
+  const [open, setOpen] = useState(defaultOpen);
+
+  return (
+    <div className="sdt-border border-t border-[#e8e8e8]">
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center justify-between py-5 text-left"
+      >
+        <span className="sdt-accordion-title text-[var(--brand-dark)] font-semibold text-sm tracking-wide">
+          {title}
+        </span>
+        <ChevronDown
+          className={`sdt-chevron w-4 h-4 text-[#999] transition-transform duration-300 ${
+            open ? "rotate-180" : ""
+          }`}
+        />
+      </button>
+      <div
+        className={`overflow-hidden transition-all duration-300 ${
+          open ? "max-h-[600px] pb-6" : "max-h-0"
+        }`}
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
+
+export function ServiceDetailContent({ serviceData }: { serviceData: ServiceData }) {
+  const sectionRef = useRef<HTMLElement>(null);
+  const [selectedImage, setSelectedImage] = useState(0);
+
+  // ── Background color transition: white → dark on scroll ──
+  useGSAP(
+    () => {
+      const section = sectionRef.current;
+      if (!section) return;
+
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: section,
+          start: "top 70%",
+          end: "top 20%",
+          scrub: 1,
+        },
+      });
+
+      tl.fromTo(section, { backgroundColor: "#ffffff" }, { backgroundColor: "#0f1117", ease: "none" }, 0);
+      tl.fromTo(section.querySelectorAll(".sdt-heading"), { color: "var(--brand-dark)" }, { color: "#ffffff", ease: "none" }, 0);
+      tl.fromTo(section.querySelectorAll(".sdt-desc"), { color: "#666666" }, { color: "rgba(255,255,255,0.6)", ease: "none" }, 0);
+      tl.fromTo(section.querySelectorAll(".sdt-pill"), { backgroundColor: "#f5f5f5", color: "var(--brand-dark)" }, { backgroundColor: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.7)", ease: "none" }, 0);
+      tl.fromTo(section.querySelectorAll(".sdt-pill-accent"), { backgroundColor: "rgba(38,168,224,0.1)", color: "var(--brand-blue)" }, { backgroundColor: "rgba(38,168,224,0.15)", color: "var(--brand-blue)", ease: "none" }, 0);
+      tl.fromTo(section.querySelectorAll(".sdt-border"), { borderColor: "#e8e8e8" }, { borderColor: "rgba(255,255,255,0.1)", ease: "none" }, 0);
+      tl.fromTo(section.querySelectorAll(".sdt-accordion-title"), { color: "var(--brand-dark)" }, { color: "#ffffff", ease: "none" }, 0);
+      tl.fromTo(section.querySelectorAll(".sdt-text"), { color: "#555555" }, { color: "rgba(255,255,255,0.6)", ease: "none" }, 0);
+      tl.fromTo(section.querySelectorAll(".sdt-img-bg"), { borderColor: "#f0f0f0" }, { borderColor: "rgba(255,255,255,0.08)", ease: "none" }, 0);
+      tl.fromTo(section.querySelectorAll(".sdt-chevron"), { color: "#999999" }, { color: "rgba(255,255,255,0.4)", ease: "none" }, 0);
+      tl.fromTo(section.querySelectorAll(".sdt-step-num"), { color: "var(--brand-blue)" }, { color: "var(--brand-blue)", ease: "none" }, 0);
+      tl.fromTo(section.querySelectorAll(".sdt-step-title"), { color: "var(--brand-dark)" }, { color: "#ffffff", ease: "none" }, 0);
+      tl.fromTo(section.querySelectorAll(".sdt-step-desc"), { color: "#888888" }, { color: "rgba(255,255,255,0.4)", ease: "none" }, 0);
+    },
+    { scope: sectionRef }
+  );
 
   const allImages = [
     serviceData.image,
     ...(serviceData.gallery || []),
-  ].filter((img) => img && img.trim() !== "");
+  ].filter(Boolean);
 
-  const currentIndex = allImages.indexOf(selectedImage);
+  if (allImages.length === 0) {
+    allImages.push("/images/placeholder.svg");
+  }
 
-  const handlePrevImage = useCallback(() => {
-    const newIndex = currentIndex > 0 ? currentIndex - 1 : allImages.length - 1;
-    setSelectedImage(allImages[newIndex]);
-    setImageLoading(true);
-    setImageError(false);
-  }, [currentIndex, allImages]);
+  const features = serviceData.features?.length > 0
+    ? serviceData.features
+    : [
+        "End-to-end packaging solutions",
+        "In-house manufacturing & quality control",
+        "Custom specifications to match your needs",
+        "Dedicated project coordination team",
+        "Pan-India & international service coverage",
+      ];
 
-  const handleNextImage = useCallback(() => {
-    const newIndex = currentIndex < allImages.length - 1 ? currentIndex + 1 : 0;
-    setSelectedImage(allImages[newIndex]);
-    setImageLoading(true);
-    setImageError(false);
-  }, [currentIndex, allImages]);
+  const applications = serviceData.applications?.length > 0
+    ? serviceData.applications
+    : [
+        "Automotive Industry",
+        "Electronics & Electrical",
+        "Heavy Machinery",
+        "Aerospace & Defense",
+        "Export & Shipping",
+        "Warehousing & Storage",
+      ];
 
-  const handleThumbnailClick = (image: string) => {
-    setSelectedImage(image);
-    setImageLoading(true);
-    setImageError(false);
-  };
+  // Strip HTML from description for plain text display
+  const plainDescription = serviceData.description.replace(/<[^>]+>/g, "");
 
   return (
-    <section className="py-20 bg-white">
-      <div className="container mx-auto px-4">
-        <div className="max-w-4xl mx-auto">
-          {/* Content */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="space-y-12"
-          >
-            <div>
-              <h1 className="text-3xl lg:text-4xl font-bold text-[#014a74] mb-4">
-                {serviceData.serviceName}
-              </h1>
-              {serviceData.shortDescription && (
-                <p className="text-xl text-gray-500 font-medium leading-relaxed mb-6 text-justify">
-                  {serviceData.shortDescription}
-                </p>
-              )}
+    <section ref={sectionRef} className="bg-white">
+      <div className="max-w-[1400px] mx-auto px-5 md:px-10 lg:px-16 xl:px-20 py-12 md:py-16 lg:py-20">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-14 xl:gap-20 items-start">
 
-              <div
-                className="prose prose-lg max-w-none text-gray-600 text-justify
-                  prose-headings:text-[#014a74] prose-headings:font-bold
-                  prose-p:leading-relaxed prose-p:text-justify
-                  prose-li:text-gray-600
-                  prose-strong:text-[#014a74]
-                  prose-a:text-[#f58420] hover:prose-a:text-[#014a74]"
-                dangerouslySetInnerHTML={{ __html: serviceData.description }}
+          {/* ═══════════════════════════════
+              LEFT — Image Gallery (sticky)
+          ═══════════════════════════════ */}
+          <div className="space-y-3 lg:sticky lg:top-24">
+            {/* Main Image */}
+            <div className="sdt-img-bg relative w-full aspect-[4/3] bg-white rounded-lg overflow-hidden border border-[#f0f0f0]">
+              <Image
+                src={allImages[selectedImage]}
+                alt={serviceData.serviceName}
+                fill
+                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                priority
               />
             </div>
 
-             {/* Service Details Grid */}
-             <div className="grid sm:grid-cols-2 gap-6">
-                 {serviceData.category && (
-                   <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
-                      <span className="block text-sm text-gray-400 font-semibold mb-1 uppercase tracking-wider">Category</span>
-                      <span className="text-[#014a74] font-medium">{serviceData.category}</span>
-                   </div>
-                )}
-             </div>
-
-            {/* Applications */}
-            {serviceData.applications && serviceData.applications.length > 0 && (
-              <div>
-                <h3 className="text-xl font-bold text-[#014a74] mb-4">
-                  Applications & Use Cases
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                   {serviceData.applications.map((app: string, idx: number) => (
-                      <span key={idx} className="px-4 py-2 bg-[#fefaf6] text-[#014a74] border border-[#f58420]/20 rounded-full text-sm font-medium">
-                         {app}
-                      </span>
-                   ))}
-                </div>
+            {/* Thumbnail Grid */}
+            {allImages.length > 1 && (
+              <div className="grid grid-cols-4 gap-2.5">
+                {allImages.slice(0, 4).map((img, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setSelectedImage(idx)}
+                    className={`relative aspect-square bg-white rounded-md overflow-hidden border transition-all duration-200 ${
+                      selectedImage === idx
+                        ? "ring-2 ring-[var(--brand-blue)] ring-offset-2 border-transparent"
+                        : "border-[#f0f0f0] hover:opacity-80"
+                    }`}
+                  >
+                    <Image
+                      src={img}
+                      alt={`${serviceData.serviceName} ${idx + 1}`}
+                      fill
+                      className="object-cover"
+                      sizes="120px"
+                    />
+                  </button>
+                ))}
               </div>
             )}
 
-             {/* Technical Specs */}
-            {serviceData.technicalSpecs && serviceData.technicalSpecs.length > 0 && (
-              <div>
-                <h3 className="text-xl font-bold text-[#014a74] mb-4">
-                  Technical Specifications
-                </h3>
-                <div className="border border-gray-200 rounded-xl overflow-hidden">
-                   {serviceData.technicalSpecs.map((spec: any, idx: number) => (
-                      <div key={idx} className={`flex items-center p-4 ${idx !== (serviceData.technicalSpecs?.length || 0) - 1 ? 'border-b border-gray-100' : ''}`}>
-                         <span className="w-1/3 font-semibold text-gray-700">{spec.label}</span>
-                         <span className="w-2/3 text-gray-600">{spec.value}</span>
-                      </div>
-                   ))}
-                </div>
+            {allImages.length > 4 && (
+              <div className="grid grid-cols-4 gap-2.5">
+                {allImages.slice(4, 8).map((img, idx) => (
+                  <button
+                    key={idx + 4}
+                    onClick={() => setSelectedImage(idx + 4)}
+                    className={`relative aspect-square bg-white rounded-md overflow-hidden border transition-all duration-200 ${
+                      selectedImage === idx + 4
+                        ? "ring-2 ring-[var(--brand-blue)] ring-offset-2 border-transparent"
+                        : "border-[#f0f0f0] hover:opacity-80"
+                    }`}
+                  >
+                    <Image
+                      src={img}
+                      alt={`${serviceData.serviceName} ${idx + 5}`}
+                      fill
+                      className="object-cover"
+                      sizes="120px"
+                    />
+                  </button>
+                ))}
               </div>
             )}
+          </div>
 
-            {/* Features */}
-            {serviceData.features && serviceData.features.length > 0 && (
-              <div className="bg-[#fefaf6] p-8 rounded-2xl border border-[#014a74]/10">
-                <h3 className="text-xl font-bold text-[#014a74] mb-6">
-                  Key Features
-                </h3>
-                <ul className="space-y-4">
-                  {serviceData.features.map((feature, index) => (
-                    <li key={index} className="flex items-start gap-3">
-                      <div className="mt-1 p-1 bg-[#f58420] rounded-full shrink-0">
-                        <Check className="h-3 w-3 text-white" />
-                      </div>
-                      <span className="text-gray-700 font-medium leading-relaxed">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
+          {/* ═══════════════════════════════
+              RIGHT — Service Info
+          ═══════════════════════════════ */}
+          <div className="flex flex-col">
+            {/* Category badge */}
+            <span className="sdt-label text-[var(--brand-blue)] text-[11px] font-bold uppercase tracking-[0.2em] mb-3">
+              {serviceData.category || "Packaging Service"}
+            </span>
 
-             {/* Service Locations */}
-             {serviceData.serviceLocations && serviceData.serviceLocations.length > 0 && (
-                <div className="text-sm text-gray-500 pt-4 border-t border-gray-100">
-                   <p className="mb-2"><span className="font-semibold text-[#014a74]">Available In:</span></p>
-                   <div className="flex flex-wrap gap-x-4 gap-y-1">
-                      {serviceData.serviceLocations.map((loc: any, idx: number) => (
-                         <span key={idx}>{loc.region} {loc.cities ? `(${loc.cities})` : ''}</span>
-                      ))}
-                   </div>
-                </div>
-             )}
+            {/* Service Name */}
+            <h1 className="sdt-heading font-heading font-extrabold text-[var(--brand-dark)] text-2xl md:text-3xl lg:text-[2.1rem] xl:text-4xl tracking-tight leading-[1.15] mb-5">
+              {serviceData.serviceName}
+            </h1>
+
+            {/* Quick info pills */}
+            <div className="flex flex-wrap gap-2 mb-6">
+              <span className="sdt-pill px-3 py-1.5 bg-[#f5f5f5] text-[var(--brand-dark)] text-[11px] font-semibold rounded-full uppercase tracking-wider">
+                In-House Production
+              </span>
+              <span className="sdt-pill px-3 py-1.5 bg-[#f5f5f5] text-[var(--brand-dark)] text-[11px] font-semibold rounded-full uppercase tracking-wider">
+                Pan-India Delivery
+              </span>
+              <span className="sdt-pill-accent px-3 py-1.5 bg-[var(--brand-blue)]/10 text-[var(--brand-blue)] text-[11px] font-semibold rounded-full uppercase tracking-wider">
+                {serviceData.category || "Premium Service"}
+              </span>
+            </div>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 pt-4">
-              <a 
+            <div className="space-y-3 mb-8">
+              <Link
                 href="/contact"
-                className="flex-1"
+                className="flex items-center justify-center gap-2 w-full bg-[var(--brand-dark)] text-white py-4 rounded-lg font-bold text-sm uppercase tracking-wider hover:bg-[#333] transition-colors"
               >
-                <Button
-                  size="lg"
-                  className="w-full bg-[#014a74] hover:bg-[#012d47] text-white h-14 text-base font-semibold shadow-lg hover:shadow-xl transition-all"
-                >
-                  <Phone className="h-5 w-5 mr-2" />
-                  Contact Us
-                </Button>
-              </a>
-              <a 
-                href={`https://wa.me/${contactInfo?.whatsappNumber?.replace(/\s+/g, '') || ""}?text=${encodeURIComponent(`I'm interested in ${serviceData.serviceName}`)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1"
+                Get a Free Consultation
+              </Link>
+              <a
+                href="tel:+919087787879"
+                className="flex items-center justify-center gap-2 w-full bg-white text-[var(--brand-dark)] py-4 rounded-lg font-bold text-sm uppercase tracking-wider border border-[#e0e0e0] hover:border-[var(--brand-blue)] hover:text-[var(--brand-blue)] transition-colors"
               >
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="w-full border-2 border-[#014a74] text-[#014a74] hover:bg-[#014a74] hover:text-white h-14 text-base font-semibold transition-all"
-                >
-                  <WhatsAppIcon className="h-5 w-5 mr-2" />
-                  Get a Quote
-                </Button>
+                <Phone className="w-4 h-4" />
+                Call: +91 90877 87879
               </a>
             </div>
-          </motion.div>
+
+            {/* Description */}
+            <p className="sdt-desc text-[#666] text-sm md:text-[15px] leading-[1.8] mb-6">
+              {plainDescription}
+            </p>
+
+            {/* ─── Accordion Sections ─── */}
+
+            {/* Key Features */}
+            <AccordionItem title="Key Features" defaultOpen>
+              <div className="space-y-3">
+                {features.map((feature, idx) => (
+                  <div key={idx} className="flex items-start gap-3">
+                    <div className="w-5 h-5 rounded-full bg-[var(--brand-blue)]/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Check className="w-3 h-3 text-[var(--brand-blue)]" />
+                    </div>
+                    <span className="sdt-text text-[#555] text-sm leading-relaxed">{feature}</span>
+                  </div>
+                ))}
+              </div>
+            </AccordionItem>
+
+            {/* Technical Specifications */}
+            {serviceData.technicalSpecs && serviceData.technicalSpecs.length > 0 && (
+              <AccordionItem title="Technical Specifications">
+                <div className="space-y-0">
+                  {serviceData.technicalSpecs.map((spec, idx) => (
+                    <div
+                      key={idx}
+                      className={`flex justify-between items-center py-3 ${
+                        idx !== serviceData.technicalSpecs!.length - 1
+                          ? "border-b border-[#f0f0f0]"
+                          : ""
+                      }`}
+                    >
+                      <span className="sdt-accordion-title text-[#333] text-sm font-medium">{spec.label}</span>
+                      <span className="sdt-text text-[#888] text-sm">{spec.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </AccordionItem>
+            )}
+
+            {/* Applications & Sectors */}
+            <AccordionItem title="Applications & Sectors">
+              <div className="flex flex-wrap gap-2">
+                {applications.map((app, idx) => (
+                  <span
+                    key={idx}
+                    className="sdt-pill px-4 py-2 bg-[#f5f5f5] text-[#555] text-xs font-medium rounded-full"
+                  >
+                    {app}
+                  </span>
+                ))}
+              </div>
+            </AccordionItem>
+
+            {/* Our Process */}
+            <AccordionItem title="Our Process">
+              <div className="space-y-4">
+                {[
+                  { step: "01", title: "Consultation", desc: "We analyze your requirements and recommend the optimal packaging solution." },
+                  { step: "02", title: "Material Selection", desc: "Our experts choose the right polymer grade and specifications for your application." },
+                  { step: "03", title: "Execution", desc: "In-house manufacturing with strict quality control at every stage." },
+                  { step: "04", title: "Delivery", desc: "On-time dispatch with 99% on-schedule delivery across India and internationally." },
+                ].map((item, idx) => (
+                  <div key={idx} className="flex items-start gap-4">
+                    <span className="sdt-step-num text-[var(--brand-blue)] font-heading font-bold text-lg flex-shrink-0 w-8">
+                      {item.step}
+                    </span>
+                    <div>
+                      <span className="sdt-step-title text-[var(--brand-dark)] font-semibold text-sm block mb-0.5">{item.title}</span>
+                      <span className="sdt-step-desc text-[#888] text-xs leading-relaxed">{item.desc}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </AccordionItem>
+
+            {/* Why Choose Us */}
+            <AccordionItem title="Why Choose Us">
+              <div className="space-y-3">
+                {[
+                  "20+ years of industrial packaging expertise",
+                  "In-house production hub in Madurai, Tamil Nadu",
+                  "Strict quality standards & certifications",
+                  "Custom solutions tailored to your supply chain",
+                  "Pan-India delivery with 99% on-time rate",
+                  "Dedicated project coordination team",
+                ].map((point, idx) => (
+                  <div key={idx} className="flex items-start gap-3">
+                    <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Check className="w-3 h-3 text-green-600" />
+                    </div>
+                    <span className="sdt-text text-[#555] text-sm leading-relaxed">{point}</span>
+                  </div>
+                ))}
+              </div>
+            </AccordionItem>
+
+            {/* Bottom border */}
+            <div className="sdt-border border-t border-[#e8e8e8]" />
+          </div>
         </div>
       </div>
     </section>

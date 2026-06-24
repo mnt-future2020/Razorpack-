@@ -54,13 +54,13 @@ export function AboutContent() {
             </h2>
             <div className="space-y-4 text-gray-600 leading-relaxed text-justify">
               <p>
-                At Blufacade, we specialize in delivering innovative, high-quality facade solutions 
+                At Rayzor Industrial Packaging Pvt Ltd, we specialize in delivering innovative, high-quality facade solutions 
                 that redefine the visual identity and performance of modern buildings. With a strong 
                 commitment to design excellence, engineering precision, and timely execution, we help 
                 transform architectural visions into iconic realities.
               </p>
               <p>
-                Backed by a team of experienced professionals, Blufacade offers end-to-end facade 
+                Backed by a team of experienced professionals, Rayzor Industrial Packaging Pvt Ltd offers end-to-end facade 
                 services—from concept and design coordination to fabrication, installation, and 
                 project management. Our expertise spans a wide range of facade systems, including 
                 glass facades, aluminium cladding, curtain wall systems, louvers, glazing solutions, 

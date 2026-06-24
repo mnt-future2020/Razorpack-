@@ -156,7 +156,7 @@ export function ServicesGrid() {
             return (
               <h2
                 key={i}
-                className={`svc-heading-char inline-block text-[clamp(4rem,9vw,9rem)] font-medium tracking-tighter uppercase leading-[0.9] ${
+                className={`svc-heading-char inline-block text-[clamp(3.5rem,8vw,7.5rem)] font-medium tracking-tighter uppercase leading-[0.9] ${
                   isBlue ? "text-[var(--brand-blue)]" : "text-[#36312d] svc-heading-dark"
                 }`}
               >
@@ -181,7 +181,7 @@ export function ServicesGrid() {
                 <div className="grid grid-cols-1 md:grid-cols-[32%_1fr] gap-x-[12%] gap-y-6 md:gap-y-8 relative z-20 pointer-events-none">
                   {/* Row 1: Number and Title */}
                   <div className="flex items-start">
-                    <span className="svc-num text-[clamp(5rem,9vw,8rem)] font-light text-[#f0e8df] leading-[0.8] select-none tracking-tighter">
+                    <span className="svc-num text-[clamp(4rem,8vw,6.5rem)] font-bold text-[#f0e8df] leading-[0.8] select-none tracking-tighter">
                       {String(index + 1).padStart(2, "0")}
                     </span>
                   </div>
@@ -206,9 +206,9 @@ export function ServicesGrid() {
                   </div>
 
                   <div className="flex flex-col justify-center h-full">
-                    {/* Description */}
+                    {/* Description — truncated for card view */}
                     <p className="svc-desc text-[#8c827a] font-normal text-sm md:text-[15px] leading-relaxed max-w-[400px] mb-6">
-                      {service.description}
+                      {(service.shortDescription || service.description?.replace(/<[^>]+>/g, '') || "").slice(0, 150)}{(service.shortDescription || service.description || "").length > 150 ? "..." : ""}
                     </p>
 
                     {/* Features List */}

@@ -69,7 +69,7 @@ export function PageBanner({ title, breadcrumb, backgroundImage }: PageBannerPro
           <h1 
             className="text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight drop-shadow-md"
             dangerouslySetInnerHTML={{ 
-              __html: title.replace(/(Blufacade|Services|Portfolio|Contact)/g, '<span class="text-[#f58420]">$1</span>') 
+              __html: title.replace(/(Rayzor Industrial Packaging Pvt Ltd|Services|Portfolio|Contact)/g, '<span class="text-[#f58420]">$1</span>') 
             }} 
           />
         </motion.div>

@@ -134,7 +134,7 @@ export function ProductsGrid({ initialProducts }: { initialProducts: ProductLigh
             return (
               <h2
                 key={i}
-                className={`prd-heading-char inline-block text-[clamp(4rem,9vw,9rem)] font-medium tracking-tighter uppercase leading-[0.9] ${
+                className={`prd-heading-char inline-block text-[clamp(3.5rem,8vw,7.5rem)] font-medium tracking-tighter uppercase leading-[0.9] ${
                   isBlue ? "text-[var(--brand-blue)]" : "text-[#36312d] prd-heading-dark"
                 }`}
               >

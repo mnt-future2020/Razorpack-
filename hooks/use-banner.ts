@@ -7,6 +7,11 @@ interface Banner {
   image?: string;
   images?: string[];
   title?: string;
+  label?: string;
+  headingLine1?: string;
+  headingLine2?: string;
+  description?: string;
+  mobileImage?: string;
   status: string;
 }
 

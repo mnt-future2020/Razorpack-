@@ -11,13 +11,13 @@ export async function GET() {
     let seoData = await SEO.find({}).sort({ lastUpdated: -1 });
     
     if (seoData.length === 0) {
-      // Create default SEO data for Blufacade
+      // Create default SEO data for Rayzor Industrial Packaging Pvt Ltd
       const defaultSEOData = [
         {
           id: "home",
           pageName: "Home Page",
-          title: "Blufacade - Premium Facade Construction & Cladding Solutions",
-          description: "Blufacade offers premium facade construction services including ACP cladding, structural glazing, aluminium doors & windows, and modern architectural solutions in Chennai, India.",
+          title: "Rayzor Industrial Packaging Pvt Ltd - Premium Facade Construction & Cladding Solutions",
+          description: "Rayzor Industrial Packaging Pvt Ltd offers premium facade construction services including ACP cladding, structural glazing, aluminium doors & windows, and modern architectural solutions in Chennai, India.",
           keywords: "facade construction, ACP cladding, structural glazing, aluminium windows, facade contractor Chennai, building facade, modern architecture, HPL cladding, spider glazing",
           lastUpdated: new Date(),
           isActive: true,
@@ -25,8 +25,8 @@ export async function GET() {
         {
           id: "about",
           pageName: "About Us",
-          title: "About Blufacade - Leading Facade Construction Company in Chennai",
-          description: "Learn about Blufacade, a trusted facade construction company with 15+ years of experience. We specialize in innovative architectural solutions and premium cladding services.",
+          title: "About Rayzor Industrial Packaging Pvt Ltd - Leading Facade Construction Company in Chennai",
+          description: "Learn about Rayzor Industrial Packaging Pvt Ltd, a trusted facade construction company with 15+ years of experience. We specialize in innovative architectural solutions and premium cladding services.",
           keywords: "about blufacade, facade company Chennai, experienced facade contractor, architectural solutions, premium cladding services, building exterior specialists",
           lastUpdated: new Date(),
           isActive: true,
@@ -43,7 +43,7 @@ export async function GET() {
         {
           id: "portfolio",
           pageName: "Portfolio",
-          title: "Blufacade Portfolio - Our Completed Facade Projects",
+          title: "Rayzor Industrial Packaging Pvt Ltd Portfolio - Our Completed Facade Projects",
           description: "View our portfolio of completed facade projects showcasing modern architecture, innovative designs, and quality craftsmanship across residential and commercial buildings.",
           keywords: "facade portfolio, completed projects, facade gallery, architectural projects, building facades, construction portfolio, modern facades, commercial facades",
           lastUpdated: new Date(),
@@ -52,8 +52,8 @@ export async function GET() {
         {
           id: "contact",
           pageName: "Contact Us",
-          title: "Contact Blufacade - Get Expert Facade Solutions Today",
-          description: "Contact Blufacade for premium facade construction services in Chennai, Madurai, and Dindigul. Call 9994162996 or email blufacadein@gmail.com for consultation.",
+          title: "Contact Rayzor Industrial Packaging Pvt Ltd - Get Expert Facade Solutions Today",
+          description: "Contact Rayzor Industrial Packaging Pvt Ltd for premium facade construction services in Chennai, Madurai, and Dindigul. Call 9994162996 or email blufacadein@gmail.com for consultation.",
           keywords: "contact blufacade, facade inquiry, Chennai facade contractor, facade consultation, building exterior services, ACP cladding quote, glazing services Chennai",
           lastUpdated: new Date(),
           isActive: true,
@@ -71,7 +71,7 @@ export async function GET() {
 
       await SEO.bulkWrite(bulkOps);
       seoData = await SEO.find({}).sort({ lastUpdated: -1 });
-      console.log("✅ SEO data initialized for Blufacade");
+      console.log("✅ SEO data initialized for Rayzor Industrial Packaging Pvt Ltd");
     }
     
     return NextResponse.json({

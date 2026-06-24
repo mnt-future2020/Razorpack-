@@ -1203,7 +1203,7 @@ export default function PortfolioPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, seoTitle: e.target.value })
                   }
-                  placeholder="e.g., ABC Tower Facade Project | Blufacade Portfolio"
+                  placeholder="e.g., ABC Tower Facade Project | Rayzor Industrial Packaging Pvt Ltd Portfolio"
                   maxLength={200}
                   className="mt-2"
                 />

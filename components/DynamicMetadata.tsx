@@ -33,7 +33,7 @@ export function DynamicMetadata() {
 
     // Update document title with siteName and siteTagline
     if (settings?.siteName || settings?.siteTagline) {
-      const siteName = settings.siteName || "Blufacade"
+      const siteName = settings.siteName || "Rayzor Industrial Packaging Pvt Ltd"
       const tagline = settings.siteTagline || "Premium Facade & Cladding Solutions"
       document.title = `${siteName} | ${tagline}`
     }

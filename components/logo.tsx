@@ -19,8 +19,8 @@ export function Logo({ className = "" }: { className?: string }) {
         />
       ) : (
         <Image
-          src="/images/logo/Blufacade Logo PNG (1)-Photoroom.png"
-          alt="Blufacade Logo"
+          src="/images/rayzor/logo/Rayzor Final Logo File-03.png"
+          alt="Rayzor Industrial Packaging Pvt Ltd Logo"
           width={48}
           height={48}
           className="h-10 w-10 sm:h-12 sm:w-12 object-contain"
@@ -28,8 +28,9 @@ export function Logo({ className = "" }: { className?: string }) {
         />
       )}
       <div className="flex flex-col">
-        <span className="text-[#1E3A5F] font-bold text-base sm:text-lg leading-tight">
-          {settings?.siteName?.split(" ")[0] || "Blufacade"}
+        <span className="font-bold text-base sm:text-lg leading-tight">
+          <span className="text-[var(--brand-dark)]">Rayzor</span>
+          <span className="text-[var(--brand-blue)]">pack</span>
         </span>
       </div>
     </div>

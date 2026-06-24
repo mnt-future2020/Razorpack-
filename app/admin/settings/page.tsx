@@ -19,8 +19,9 @@ import {
 export default function SettingsPage() {
   const { toast } = useToast();
 
-  const [siteName, setSiteName] = useState("Blufacade");
-  const [siteTagline, setSiteTagline] = useState("Expert Facade Construction Services");
+  const [siteName, setSiteName] = useState("Rayzor Industrial Packaging Pvt Ltd");
+  const [siteNameAccent, setSiteNameAccent] = useState("PACK");
+  const [siteTagline, setSiteTagline] = useState("Premium Packaging Solutions & LDPE Films");
   const [logo, setLogo] = useState<string | null>(null);
   const [favicon, setFavicon] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -34,8 +35,9 @@ export default function SettingsPage() {
         const result = await response.json();
 
         if (result.success && result.data) {
-          setSiteName(result.data.siteName || "Blufacade");
-          setSiteTagline(result.data.siteTagline || "Expert Facade Construction Services");
+          setSiteName(result.data.siteName || "Rayzor Industrial Packaging Pvt Ltd");
+          setSiteNameAccent(result.data.siteNameAccent || "PACK");
+          setSiteTagline(result.data.siteTagline || "Premium Packaging Solutions & LDPE Films");
           setLogo(result.data.logo || null);
           setFavicon(result.data.favicon || null);
         }
@@ -60,6 +62,7 @@ export default function SettingsPage() {
         },
         body: JSON.stringify({
           siteName,
+          siteNameAccent,
           siteTagline,
           logo,
           favicon,
@@ -102,8 +105,8 @@ export default function SettingsPage() {
       const result = await response.json();
 
       if (result.success) {
-        setSiteName("Blufacade");
-        setSiteTagline("Expert Facade Construction Services");
+        setSiteName("Rayzor Industrial Packaging Pvt Ltd");
+        setSiteTagline("Premium Packaging Solutions & LDPE Films");
         setLogo(null);
         setFavicon(null);
 
@@ -219,6 +222,22 @@ export default function SettingsPage() {
               />
               <p className="text-xs text-gray-500">
                 This will appear in the browser title and throughout the website
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              <Label className="text-sm font-semibold text-gray-700">
+                Logo Accent Text (Colored Part)
+              </Label>
+              <Input
+                type="text"
+                value={siteNameAccent}
+                onChange={(e) => setSiteNameAccent(e.target.value)}
+                placeholder="e.g. PACK"
+                className="w-full"
+              />
+              <p className="text-xs text-gray-500">
+                The part of the site name shown in brand blue. E.g. for &quot;RAYZOR<span className="text-[#26A8E0] font-bold">PACK</span>&quot;, enter &quot;PACK&quot;
               </p>
             </div>
 

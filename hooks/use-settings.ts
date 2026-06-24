@@ -4,6 +4,7 @@ import useSWR from "swr"
 
 interface SiteSettings {
   siteName: string
+  siteNameAccent: string
   siteTagline: string
   logo: string | null
   favicon: string | null

@@ -34,7 +34,7 @@ const blogSchema = new mongoose.Schema(
     },
     author: {
       type: String,
-      default: "Blufacade Team",
+      default: "Rayzor Industrial Packaging Pvt Ltd Team",
     },
     tags: {
       type: [String],

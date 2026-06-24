@@ -36,8 +36,8 @@ export function useSEOMeta({ pageId, fallback }: SEOMetaOptions) {
   
   useEffect(() => {
     // Set initial values with fallback
-    const initialTitle = fallback?.title || 'Blufacade | Premium Facade & Architectural Solutions'
-    const initialDesc = fallback?.description || 'Blufacade specializes in innovative, high-quality facade solutions including ACP cladding, structural glazing, aluminium doors & windows, HPL, and spider glazing systems.'
+    const initialTitle = fallback?.title || 'Rayzor Industrial Packaging Pvt Ltd | Premium Facade & Architectural Solutions'
+    const initialDesc = fallback?.description || 'Rayzor Industrial Packaging Pvt Ltd specializes in innovative, high-quality facade solutions including ACP cladding, structural glazing, aluminium doors & windows, HPL, and spider glazing systems.'
     const initialKeys = fallback?.keywords || 'facade solutions, ACP cladding, structural glazing, aluminium windows, architectural solutions, building facades'
     
     // Always set fallback values first

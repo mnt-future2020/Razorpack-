@@ -112,6 +112,7 @@ export default function ProductsPage() {
     shortDescription: "",
     description: "",
     features: "",
+    technicalSpecs: [] as Array<{ label: string; value: string }>,
     applications: [] as string[],
     image: "",
     gallery: [] as string[],
@@ -180,6 +181,7 @@ export default function ProductsPage() {
       shortDescription: product.shortDescription || "",
       description: product.description,
       features: product.features.join(", "),
+      technicalSpecs: product.technicalSpecs || [],
       applications: product.applications || [],
       image: product.image,
       gallery: product.gallery || [],
@@ -354,6 +356,7 @@ export default function ProductsPage() {
       shortDescription: "",
       description: "",
       features: "",
+      technicalSpecs: [],
       applications: [],
       image: "",
       gallery: [],
@@ -1005,6 +1008,7 @@ export default function ProductsPage() {
               <h3 className="text-lg font-semibold text-[#221E1F]">Image</h3>
               <div>
                 <Label>Product Image *</Label>
+                <p className="text-xs text-[#26A8E0] font-medium mt-1">Recommended: 1600 × 1000px (landscape, 16:10 ratio)</p>
                 <div className="mt-2 border-2 border-dashed rounded-lg p-4">
                   {formData.image ? (
                     <div className="relative h-48">
@@ -1117,7 +1121,7 @@ export default function ProductsPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, seoTitle: e.target.value })
                   }
-                  placeholder="e.g., VCI Film Rolls | Rayzorpack"
+                  placeholder="e.g., VCI Film Rolls | Rayzor Industrial Packaging Pvt Ltd"
                   maxLength={200}
                   className="mt-2"
                 />

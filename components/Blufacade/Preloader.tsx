@@ -86,7 +86,7 @@ export function Preloader() {
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full px-6">
          <h1 
            ref={textRef}
-           className="text-[15vw] lg:text-[16vw] font-black tracking-tighter leading-none w-full text-center" 
+           className="text-[12vw] lg:text-[13vw] font-black tracking-[-0.06em] leading-none w-full text-center" 
            style={{ transform: "scaleY(1.2)" }}
          >
            <span className="text-white">RAYZOR</span>

@@ -276,7 +276,7 @@ export function HeroSection() {
                                     <span
                                       className="block leading-[0.92] tracking-[-0.04em] hero-text-line origin-left"
                                       style={{
-                                        fontSize: "clamp(2rem, 7vw, 7rem)",
+                                        fontSize: "clamp(2rem, 6.5vw, 6rem)",
                                         fontWeight: 800,
                                       }}
                                     >

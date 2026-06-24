@@ -113,7 +113,7 @@ async function sendAdminFeedbackNotification(
     <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; background-color: #f8fafc;">
       <div style="background: linear-gradient(135deg, #8CC63F 0%, #6BA32D 100%); padding: 30px; text-align: center;">
         <h1 style="color: white; margin: 0; font-size: 28px;">New Feedback Received</h1>
-        <p style="color: #E8F5E0; margin: 10px 0 0 0; font-size: 16px;">Blufacade Admin Panel</p>
+        <p style="color: #E8F5E0; margin: 10px 0 0 0; font-size: 16px;">Rayzor Industrial Packaging Pvt Ltd Admin Panel</p>
       </div>
       
       <div style="padding: 30px; background-color: white; margin: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
@@ -166,7 +166,7 @@ async function sendAdminFeedbackNotification(
 
         <div style="text-align: center; margin-top: 40px; padding-top: 30px; border-top: 2px solid #e5e7eb;">
           <p style="color: #6b7280; margin: 0; font-size: 14px;">
-            This email was automatically generated from the Blufacade website.<br>
+            This email was automatically generated from the Rayzor Industrial Packaging Pvt Ltd website.<br>
             Feedback ID: #${feedbackData._id}<br>
             Received at: ${new Date().toLocaleString("en-AU", { timeZone: "Australia/Sydney" })}
           </p>
@@ -197,7 +197,7 @@ async function sendCustomerFeedbackConfirmation(
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f8fafc;">
       <div style="background: linear-gradient(135deg, #8CC63F 0%, #6BA32D 100%); padding: 30px; text-align: center;">
         <h1 style="color: white; margin: 0; font-size: 28px;">Thank You for Your Feedback!</h1>
-        <p style="color: #E8F5E0; margin: 10px 0 0 0; font-size: 16px;">Blufacade</p>
+        <p style="color: #E8F5E0; margin: 10px 0 0 0; font-size: 16px;">Rayzor Industrial Packaging Pvt Ltd</p>
       </div>
       
       <div style="padding: 30px; background-color: white; margin: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
@@ -227,14 +227,14 @@ async function sendCustomerFeedbackConfirmation(
         <div style="background-color: #fef3c7; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
           <h3 style="color: #1f2937; margin: 0 0 15px 0;">We Value Your Voice</h3>
           <p style="color: #4b5563; line-height: 1.6; margin: 0;">
-            At Blufacade, we are committed to providing the highest quality facade solutions. Your feedback, whether it's a compliment, suggestion, or concern, helps us understand how we can better serve you and our community.
+            At Rayzor Industrial Packaging Pvt Ltd, we are committed to providing the highest quality facade solutions. Your feedback, whether it's a compliment, suggestion, or concern, helps us understand how we can better serve you and our community.
           </p>
         </div>
 
         <div style="text-align: center; margin-top: 40px; padding-top: 30px; border-top: 2px solid #e5e7eb;">
           <p style="color: #6b7280; margin: 0; font-size: 14px;">
             Best regards,<br>
-            Blufacade Team<br>
+            Rayzor Industrial Packaging Pvt Ltd Team<br>
             Quality Care, Compassionate Support
           </p>
         </div>
@@ -245,7 +245,7 @@ async function sendCustomerFeedbackConfirmation(
   const mailOptions = {
     from: `"${smtpConfig.fromName}" <${smtpConfig.fromEmail}>`,
     to: feedbackData.email,
-    subject: "Thank You for Your Feedback - Blufacade",
+    subject: "Thank You for Your Feedback - Rayzor Industrial Packaging Pvt Ltd",
     html: emailHTML,
   };
 

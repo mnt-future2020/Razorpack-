@@ -52,7 +52,7 @@ export const sendTestEmail = async (smtpConfig, testEmailData) => {
     const mailOptions = {
       from: `"${smtpConfig.fromName}" <${smtpConfig.fromEmail}>`,
       to: testEmailData.email,
-      subject: 'SMTP Test Email - Blufacade',
+      subject: 'SMTP Test Email - Rayzor Industrial Packaging Pvt Ltd',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #8CC63F;">SMTP Test Email</h2>
@@ -62,12 +62,12 @@ export const sendTestEmail = async (smtpConfig, testEmailData) => {
             ${testEmailData.message}
           </div>
           <p style="color: #6b7280; font-size: 14px;">
-            This is a test email sent from Blufacade admin panel to verify SMTP configuration.
+            This is a test email sent from Rayzor Industrial Packaging Pvt Ltd admin panel to verify SMTP configuration.
           </p>
           <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">
           <p style="color: #9ca3af; font-size: 12px;">
             Sent at: ${new Date().toLocaleString()}<br>
-            From: Blufacade Admin Panel
+            From: Rayzor Industrial Packaging Pvt Ltd Admin Panel
           </p>
         </div>
       `

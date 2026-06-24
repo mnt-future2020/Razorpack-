@@ -1,8 +1,8 @@
 export const siteConfig = {
-  name: "Rayzorpack",
+  name: "Rayzor Industrial Packaging Pvt Ltd",
   tagline: "Industrial Packaging Solutions",
   description:
-    "Rayzor Industrial Packaging Pvt Ltd is the leading manufacturer of premium packaging materials, LDPE Film Rolls, and Poly Bags in Madurai, Tamil Nadu.",
+    "Rayzor Industrial Packaging Pvt Ltd — where expertise meets innovation. For over two decades, we've been the driving force behind tailor-made packaging solutions from our production hub in Madurai, Tamil Nadu, India.",
   url: "https://www.rayzorpack.com",
 
   contact: {

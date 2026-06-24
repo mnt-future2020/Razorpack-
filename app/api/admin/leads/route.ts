@@ -147,7 +147,7 @@ async function sendLeadEmails(lead: any) {
     <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; background-color: #f8fafc;">
       <div style="background: linear-gradient(135deg, #014a74 0%, #012d47 100%); padding: 30px; text-align: center;">
         <h1 style="color: white; margin: 0; font-size: 28px;">New Lead Submission</h1>
-        <p style="color: #e2e8f0; margin: 10px 0 0 0; font-size: 16px;">Blufacade Admin Panel</p>
+        <p style="color: #e2e8f0; margin: 10px 0 0 0; font-size: 16px;">Rayzor Industrial Packaging Pvt Ltd Admin Panel</p>
       </div>
       <div style="padding: 30px; background-color: white; margin: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
          <h2 style="color: #014a74; border-bottom: 2px solid #f58420; padding-bottom: 10px;">Enquiry Details</h2>
@@ -168,15 +168,15 @@ async function sendLeadEmails(lead: any) {
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f8fafc;">
       <div style="background: linear-gradient(135deg, #014a74 0%, #012d47 100%); padding: 30px; text-align: center;">
         <h1 style="color: white; margin: 0; font-size: 28px;">Thank You for Contacting Us!</h1>
-        <p style="color: #e2e8f0; margin: 10px 0 0 0; font-size: 16px;">Blufacade - Inspiring Skylines</p>
+        <p style="color: #e2e8f0; margin: 10px 0 0 0; font-size: 16px;">Rayzor Industrial Packaging Pvt Ltd - Inspiring Skylines</p>
       </div>
       <div style="padding: 30px; background-color: white; margin: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
         <p>Hi ${lead.firstName},</p>
-        <p>Thank you for reaching out to Blufacade. We have received your enquiry regarding "<strong>${lead.subject}</strong>" and our team will get back to you shortly.</p>
+        <p>Thank you for reaching out to Rayzor Industrial Packaging Pvt Ltd. We have received your enquiry regarding "<strong>${lead.subject}</strong>" and our team will get back to you shortly.</p>
         <div style="background-color: #fefaf6; padding: 15px; border-radius: 8px; border-left: 4px solid #f58420; margin: 20px 0;">
           <p style="margin: 0; font-style: italic;">"${lead.message}"</p>
         </div>
-        <p>Best regards,<br>The Blufacade Team</p>
+        <p>Best regards,<br>The Rayzor Industrial Packaging Pvt Ltd Team</p>
       </div>
     </div>
   `;
@@ -191,7 +191,7 @@ async function sendLeadEmails(lead: any) {
     transporter.sendMail({
       from: `"${smtpConfig.fromName}" <${smtpConfig.fromEmail}>`,
       to: lead.email,
-      subject: "Thank you for contacting Blufacade",
+      subject: "Thank you for contacting Rayzor Industrial Packaging Pvt Ltd",
       html: customerHtml,
     }),
   ]);

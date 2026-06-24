@@ -3,6 +3,8 @@
 import React, { useRef } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { useSettings } from "@/hooks/use-settings";
+import { useContact } from "@/hooks/use-contact";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
@@ -11,6 +13,8 @@ gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 export function Footer() {
   const containerRef = useRef<HTMLElement>(null);
+  const { settings } = useSettings();
+  const { contactInfo } = useContact();
 
   useGSAP(() => {
     const section = containerRef.current;
@@ -82,23 +86,23 @@ export function Footer() {
               <div className="flex gap-4">
                 <span className="font-bold text-[#1b1c19] w-4 mt-0.5">L</span>
                 <p className="text-[#1b1c19] font-medium text-sm md:text-base leading-snug">
-                  No: 298 A1, M.M Nagar,<br/>
-                  Thiruppalai, Madurai - 625014<br/>
-                  Tamil Nadu, India
+                  {contactInfo?.address || "No: 298 A1, M.M Nagar, Thiruppalai"}
+                  {contactInfo?.city ? <><br/>{contactInfo.city} - {contactInfo.postcode || ""}</> : <><br/>Madurai - 625014</>}
+                  {contactInfo?.state ? <><br/>{contactInfo.state}, {contactInfo.country || "India"}</> : <><br/>Tamil Nadu, India</>}
                 </p>
               </div>
 
               <div className="flex gap-4 items-center">
                 <span className="font-bold text-[#1b1c19] w-4">P</span>
-                <a href="tel:+919087787879" className="text-[#1b1c19] font-medium text-sm md:text-base hover:text-[var(--brand-blue)] transition-colors">
-                  +91 90877 87879
+                <a href={`tel:${contactInfo?.primaryPhone || "+919087787879"}`} className="text-[#1b1c19] font-medium text-sm md:text-base hover:text-[var(--brand-blue)] transition-colors">
+                  {contactInfo?.primaryPhone || "+91 90877 87879"}
                 </a>
               </div>
 
               <div className="flex gap-4 items-center">
                 <span className="font-bold text-[#1b1c19] w-4">E</span>
-                <a href="mailto:sales@rayzorpack.com" className="text-[#1b1c19] font-medium text-sm md:text-base hover:text-[var(--brand-blue)] transition-colors">
-                  sales@rayzorpack.com
+                <a href={`mailto:${contactInfo?.email || "sales@rayzorpack.com"}`} className="text-[#1b1c19] font-medium text-sm md:text-base hover:text-[var(--brand-blue)] transition-colors">
+                  {contactInfo?.email || "sales@rayzorpack.com"}
                 </a>
               </div>
 
@@ -143,7 +147,7 @@ export function Footer() {
       </div>
 
       {/* ─── BLACK PARALLAX REVEAL SECTION ─── */}
-      <div className="parallax-container relative w-full overflow-hidden z-0 bg-black">
+      <div className="parallax-container relative w-full overflow-hidden z-0 bg-[#0a1118]">
         <div className="parallax-content relative w-full flex flex-col justify-end p-6 md:p-8 lg:p-12 pb-4 md:pb-6 pt-16 md:pt-24 lg:pt-32">
           
           {/* Stationary Background Image */}
@@ -155,14 +159,28 @@ export function Footer() {
           <div className="absolute inset-0 w-full h-full bg-[#0a1118]/85 -z-10" />
 
              {/* Massive Typography matching Logo Colors */}
-             <h1 className="text-[15vw] lg:text-[16vw] font-black tracking-tighter leading-none w-full text-center opacity-95 mb-1" style={{ transform: "scaleY(1.2)" }}>
-               <span className="text-white">RAYZOR</span>
-               <span className="text-[var(--brand-blue)]">PACK</span>
+             <h1 className="text-[12vw] lg:text-[13vw] font-black tracking-[-0.06em] leading-none w-full text-center opacity-95 mb-1 uppercase" style={{ transform: "scaleY(1.2)" }}>
+               {(() => {
+                 const name = settings?.siteName || "RAYZORPACK";
+                 const accent = settings?.siteNameAccent || "PACK";
+                 const upperName = name.toUpperCase();
+                 const upperAccent = accent.toUpperCase();
+                 const idx = upperName.lastIndexOf(upperAccent);
+                 if (idx > 0) {
+                   return (
+                     <>
+                       <span className="text-white">{upperName.slice(0, idx)}</span>
+                       <span className="text-[var(--brand-blue)]">{upperName.slice(idx)}</span>
+                     </>
+                   );
+                 }
+                 return <span className="text-white">{upperName}</span>;
+               })()}
              </h1>
 
           {/* Very Bottom Copyright Links */}
           <div className="w-full flex flex-col md:flex-row justify-between items-center text-[#a1a1aa] text-xs md:text-sm gap-4">
-            <span>All rights reserved © Rayzorpack {new Date().getFullYear()}</span>
+            <span>All rights reserved © {settings?.siteName || "Rayzor Industrial Packaging Pvt Ltd"} {new Date().getFullYear()}</span>
             <div className="flex gap-6 md:gap-8">
               <Link href="/privacy" className="hover:text-white transition-colors">Privacy policy</Link>
               <Link href="/terms" className="hover:text-white transition-colors">Terms of services</Link>

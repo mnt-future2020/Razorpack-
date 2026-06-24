@@ -96,7 +96,7 @@ async function sendAdminNotification(smtpConfig: any, lead: any) {
     <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; background-color: #f8fafc;">
       <div style="background: linear-gradient(135deg, #014a74 0%, #012d47 100%); padding: 30px; text-align: center;">
         <h1 style="color: white; margin: 0; font-size: 28px;">New Lead Submission</h1>
-        <p style="color: #e2e8f0; margin: 10px 0 0 0; font-size: 16px;">Blufacade Admin Panel</p>
+        <p style="color: #e2e8f0; margin: 10px 0 0 0; font-size: 16px;">Rayzor Industrial Packaging Pvt Ltd Admin Panel</p>
       </div>
       
       <div style="padding: 30px; background-color: white; margin: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
@@ -133,7 +133,7 @@ async function sendAdminNotification(smtpConfig: any, lead: any) {
 
         <div style="text-align: center; margin-top: 40px; padding-top: 30px; border-top: 2px solid #e5e7eb;">
           <p style="color: #6b7280; margin: 0; font-size: 14px;">
-            This email was automatically generated from the Blufacade website.<br>
+            This email was automatically generated from the Rayzor Industrial Packaging Pvt Ltd website.<br>
             Lead ID: #${lead._id}
           </p>
         </div>
@@ -164,14 +164,14 @@ async function sendCustomerConfirmation(smtpConfig: any, lead: any) {
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f8fafc;">
       <div style="background: linear-gradient(135deg, #014a74 0%, #012d47 100%); padding: 30px; text-align: center;">
         <h1 style="color: white; margin: 0; font-size: 28px;">Thank You for Contacting Us!</h1>
-        <p style="color: #e2e8f0; margin: 10px 0 0 0; font-size: 16px;">Blufacade - Inspiring Skylines</p>
+        <p style="color: #e2e8f0; margin: 10px 0 0 0; font-size: 16px;">Rayzor Industrial Packaging Pvt Ltd - Inspiring Skylines</p>
       </div>
       
       <div style="padding: 30px; background-color: white; margin: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
         <div style="text-align: center; margin-bottom: 30px;">
           <h2 style="color: #014a74; margin: 0 0 15px 0;">Hi ${lead.firstName}!</h2>
           <p style="color: #4b5563; line-height: 1.6; margin: 0;">
-            Thank you for reaching out to Blufacade. We have received your enquiry and our team will get back to you shortly.
+            Thank you for reaching out to Rayzor Industrial Packaging Pvt Ltd. We have received your enquiry and our team will get back to you shortly.
           </p>
         </div>
 
@@ -185,7 +185,7 @@ async function sendCustomerConfirmation(smtpConfig: any, lead: any) {
         <div style="text-align: center; margin-top: 40px; padding-top: 30px; border-top: 2px solid #e5e7eb;">
           <p style="color: #6b7280; margin: 0; font-size: 14px;">
             Best regards,<br>
-            The Blufacade Team<br>
+            The Rayzor Industrial Packaging Pvt Ltd Team<br>
             Inspiring Skylines
           </p>
         </div>
@@ -196,7 +196,7 @@ async function sendCustomerConfirmation(smtpConfig: any, lead: any) {
   const mailOptions = {
     from: `"${smtpConfig.fromName}" <${smtpConfig.fromEmail}>`,
     to: lead.email,
-    subject: "Thank You for Your Enquiry - Blufacade",
+    subject: "Thank You for Your Enquiry - Rayzor Industrial Packaging Pvt Ltd",
     html: emailHTML,
   };
 

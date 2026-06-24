@@ -39,6 +39,23 @@ const bannerSchema = new mongoose.Schema(
       ],
       default: [],
     },
+    // Page hero text fields (for services, products, about, etc.)
+    label: {
+      type: String,
+      trim: true,
+    },
+    headingLine1: {
+      type: String,
+      trim: true,
+    },
+    headingLine2: {
+      type: String,
+      trim: true,
+    },
+    description: {
+      type: String,
+      trim: true,
+    },
     mobileImage: {
       type: String,
       trim: true,

@@ -32,7 +32,7 @@ export default function FloatingContactButtons() {
   }
 
   const handleWhatsAppClick = () => {
-    const message = "Hi! I'm interested in your facade solutions. Please provide more details.";
+    const message = "Hi! I'm interested in your industrial packaging solutions. Please provide more details.";
     const whatsappNumber = contactInfo?.whatsappNumber || "";
     if (!whatsappNumber) return;
     const whatsappUrl = `https://wa.me/${whatsappNumber.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`;
@@ -88,7 +88,7 @@ export default function FloatingContactButtons() {
                 >
                   <Button
                     onClick={handleCallClick}
-                    className="bg-[#014a74] hover:bg-[#013a5a] text-white rounded-full w-12 h-12 shadow-lg"
+                    className="bg-[var(--brand-dark)] hover:bg-[#013a5a] text-white rounded-full w-12 h-12 shadow-lg"
                     aria-label="Call us"
                   >
                     <Phone className="h-5 w-5" />
@@ -109,7 +109,7 @@ export default function FloatingContactButtons() {
             className={`rounded-full w-14 h-14 shadow-2xl transition-all duration-300 ${
               isExpanded 
                 ? 'bg-gray-600 hover:bg-gray-700' 
-                : 'bg-[#f58420] hover:bg-[#e07310]'
+                : 'bg-[var(--brand-blue)] hover:bg-[#e07310]'
             }`}
             aria-label={isExpanded ? "Close contact menu" : "Open contact menu"}
             aria-expanded={isExpanded}
@@ -189,11 +189,11 @@ export default function FloatingContactButtons() {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 10 }}
                 transition={{ duration: 0.2 }}
-                className="absolute right-16 top-1/2 transform -translate-y-1/2 bg-[#014a74] text-white px-4 py-2 rounded-lg text-sm whitespace-nowrap shadow-xl"
+                className="absolute right-16 top-1/2 transform -translate-y-1/2 bg-[var(--brand-dark)] text-white px-4 py-2 rounded-lg text-sm whitespace-nowrap shadow-xl"
                 role="tooltip"
               >
                 WhatsApp: {contactInfo.whatsappNumber}
-                <div className="absolute right-0 top-1/2 transform translate-x-1 -translate-y-1/2 w-0 h-0 border-l-4 border-l-[#014a74] border-t-4 border-t-transparent border-b-4 border-b-transparent" aria-hidden="true"></div>
+                <div className="absolute right-0 top-1/2 transform translate-x-1 -translate-y-1/2 w-0 h-0 border-l-4 border-l-[var(--brand-dark)] border-t-4 border-t-transparent border-b-4 border-b-transparent" aria-hidden="true"></div>
               </motion.div>
             )}
           </AnimatePresence>
@@ -219,7 +219,7 @@ export default function FloatingContactButtons() {
               onMouseLeave={() => setShowCallTooltip(false)}
               onFocus={() => setShowCallTooltip(true)}
               onBlur={() => setShowCallTooltip(false)}
-              className="bg-[#014a74] hover:bg-[#f58420] text-white rounded-full w-14 h-14 shadow-2xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#f58420] focus:ring-offset-2 relative overflow-hidden"
+              className="bg-[var(--brand-dark)] hover:bg-[var(--brand-blue)] text-white rounded-full w-14 h-14 shadow-2xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[var(--brand-blue)] focus:ring-offset-2 relative overflow-hidden"
               aria-label={`Call us: ${contactInfo.primaryPhone}`}
             >
               <motion.div
@@ -238,7 +238,7 @@ export default function FloatingContactButtons() {
               
               {/* Pulse effect */}
               <motion.div
-                className="absolute inset-0 bg-[#f58420] rounded-full"
+                className="absolute inset-0 bg-[var(--brand-blue)] rounded-full"
                 initial={{ scale: 1, opacity: 0 }}
                 animate={{ scale: 1.5, opacity: [0, 0.3, 0] }}
                 transition={{ 
@@ -257,11 +257,11 @@ export default function FloatingContactButtons() {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 10 }}
                 transition={{ duration: 0.2 }}
-                className="absolute right-16 top-1/2 transform -translate-y-1/2 bg-[#014a74] text-white px-4 py-2 rounded-lg text-sm whitespace-nowrap shadow-xl"
+                className="absolute right-16 top-1/2 transform -translate-y-1/2 bg-[var(--brand-dark)] text-white px-4 py-2 rounded-lg text-sm whitespace-nowrap shadow-xl"
                 role="tooltip"
               >
                 Call: {contactInfo.primaryPhone}
-                <div className="absolute right-0 top-1/2 transform translate-x-1 -translate-y-1/2 w-0 h-0 border-l-4 border-l-[#014a74] border-t-4 border-t-transparent border-b-4 border-b-transparent" aria-hidden="true"></div>
+                <div className="absolute right-0 top-1/2 transform translate-x-1 -translate-y-1/2 w-0 h-0 border-l-4 border-l-[var(--brand-dark)] border-t-4 border-t-transparent border-b-4 border-b-transparent" aria-hidden="true"></div>
               </motion.div>
             )}
           </AnimatePresence>

@@ -156,7 +156,7 @@ export default function SEOManagerPage() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold text-[#221E1F]">SEO Manager</h1>
-          <p className="text-gray-600 mt-2">Optimize SEO for Blufacade website pages - manage meta titles, descriptions, and keywords</p>
+          <p className="text-gray-600 mt-2">Optimize SEO for Rayzor Industrial Packaging Pvt Ltd website pages - manage meta titles, descriptions, and keywords</p>
         </div>
       </div>
 

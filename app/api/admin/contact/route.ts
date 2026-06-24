@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
         mapEmbedCode: "",
         latitude: "12.9716",
         longitude: "80.2466",
-        pageTitle: "Get in Touch with Blufacade",
+        pageTitle: "Get in Touch with Rayzor Industrial Packaging Pvt Ltd",
         pageDescription: "Ready to transform your building's exterior? Contact our expert team today and let us bring your architectural vision to life with premium facade solutions.",
         officeTitle: "Visit Our Office",
         officeDescription: "Conveniently located in Chennai, our office is your gateway to premium facade construction services tailored to your architectural needs.",
