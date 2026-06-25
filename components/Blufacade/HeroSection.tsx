@@ -139,7 +139,7 @@ export function HeroSection() {
         const lines = slide.querySelectorAll(".hero-text-line");
         const cta = slide.querySelector(".hero-cta");
         const tagline = slide.querySelector(".hero-tagline");
-        const stagger = slide.querySelector(".t-stagger");
+        const descLine = slide.querySelector(".hero-desc-line");
 
         if (index === current) {
           // Active Slide: Animate IN with GSAP
@@ -156,30 +156,21 @@ export function HeroSection() {
             },
           );
           gsap.fromTo(
-            [cta, tagline],
+            [descLine, cta, tagline],
             { y: 40, opacity: 0 },
             {
               y: 0,
               opacity: 1,
               duration: 1,
-              delay: 0.6,
-              stagger: 0.2,
+              delay: 0.4,
+              stagger: 0.15,
               ease: "power3.out",
             },
           );
-
-          // transitions.dev: texts reveal — trigger stagger entrance
-          stagger?.classList.remove("is-hiding");
-          stagger?.classList.add("is-shown");
         } else {
           // Inactive Slide: Reset immediately
           gsap.set(lines, { y: "115%", opacity: 0, rotateZ: 4 });
-          gsap.set([cta, tagline], { y: 40, opacity: 0 });
-
-          // transitions.dev: hide stagger text
-          stagger?.classList.add("is-hiding");
-          stagger?.classList.remove("is-shown");
-          setTimeout(() => stagger?.classList.remove("is-hiding"), 200);
+          gsap.set([descLine, cta, tagline], { y: 40, opacity: 0 });
         }
       });
 
@@ -256,13 +247,12 @@ export function HeroSection() {
                       <div className="w-full flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 sm:gap-8 lg:gap-16">
                         {/* ─── LEFT: Title block ─── */}
                         <div className="max-w-full sm:max-w-[85%] md:max-w-[65%] lg:max-w-[55%] 2xl:max-w-[50%]">
-                          {/* transitions.dev: texts reveal wrapper */}
-                          <div className="t-stagger">
+                          <div className="hero-text-wrapper">
                             {/* Title: first line lighter, highlight bold */}
-                            <h1 className="t-stagger-line t-stagger-line--1 font-heading text-white drop-shadow-[0_4px_24px_rgba(0,0,0,0.6)]">
+                            <h1 className="font-heading text-white drop-shadow-[0_4px_24px_rgba(0,0,0,0.6)]">
                               <div className="overflow-hidden pb-1 -mb-1">
                                 <span
-                                  className="block leading-[1.05] tracking-[-0.02em] hero-text-line origin-left"
+                                  className="block leading-[1.05] tracking-[-0.02em] hero-text-line origin-left opacity-0"
                                   style={{
                                     fontSize: "clamp(1.15rem, 3.5vw, 3.5rem)",
                                     fontWeight: 400,
@@ -278,7 +268,7 @@ export function HeroSection() {
                                     className="overflow-hidden pb-2 sm:pb-3 -mb-2 sm:-mb-3 pt-0.5 sm:pt-1"
                                   >
                                     <span
-                                      className="block leading-[0.92] tracking-[-0.04em] hero-text-line origin-left"
+                                      className="block leading-[0.92] tracking-[-0.04em] hero-text-line origin-left opacity-0"
                                       style={{
                                         fontSize: "clamp(2rem, 6.5vw, 6rem)",
                                         fontWeight: 800,
@@ -291,8 +281,8 @@ export function HeroSection() {
                               </div>
                             </h1>
 
-                            {/* Description — transitions.dev: text-swap */}
-                            <p className="t-stagger-line t-stagger-line--2 mt-3 sm:mt-5 md:mt-6 text-white/60 text-xs sm:text-sm md:text-base max-w-[90%] sm:max-w-md leading-relaxed">
+                            {/* Description */}
+                            <p className="hero-desc-line opacity-0 mt-3 sm:mt-5 md:mt-6 text-white/60 text-xs sm:text-sm md:text-base max-w-[90%] sm:max-w-md leading-relaxed">
                               <span
                                 ref={
                                   index === current ? swapDescRef : undefined
@@ -305,7 +295,7 @@ export function HeroSection() {
                           </div>
 
                           {/* CTA */}
-                          <div className="mt-5 sm:mt-8 md:mt-10 lg:mt-14 hero-cta">
+                          <div className="mt-5 sm:mt-8 md:mt-10 lg:mt-14 hero-cta opacity-0">
                             <Link
                               href={s.primaryCta.href}
                               className="group/cta inline-flex items-center gap-0 text-white"
@@ -321,7 +311,7 @@ export function HeroSection() {
                         </div>
 
                         {/* ─── RIGHT: Tagline with shimmer ─── */}
-                        <div className="hidden lg:flex flex-shrink-0 max-w-[35%] xl:max-w-[30%] 2xl:max-w-[25%] justify-end pb-8 lg:pb-12 hero-tagline">
+                        <div className="hidden lg:flex flex-shrink-0 max-w-[35%] xl:max-w-[30%] 2xl:max-w-[25%] justify-end pb-8 lg:pb-12 hero-tagline opacity-0">
                           <div className="border-l-[2.5px] border-white/15 pl-6 xl:pl-8">
                             <p
                               className="font-heading leading-[1.3] tracking-[-0.01em] drop-shadow-[0_2px_12px_rgba(0,0,0,0.5)]"
