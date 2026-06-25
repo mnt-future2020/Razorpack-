@@ -23,7 +23,7 @@ export function AboutBusinessAreas() {
         {/* LEFT COLUMN: Large Heading */}
         <div className="w-full md:w-[45%] lg:w-[40%] pr-8 lg:pr-16 mb-16 md:mb-0 relative">
           <div className="md:sticky md:top-40">
-            <h2 className="font-serif font-light text-[clamp(3rem,6vw,5.5rem)] leading-[1.1] tracking-tight text-white">
+            <h2 className="font-heading font-light text-[clamp(3rem,6vw,5.5rem)] leading-[1.1] tracking-tight text-white">
               What truly <br />
               <span className="italic">matters to us</span>
             </h2>
@@ -44,7 +44,7 @@ export function AboutBusinessAreas() {
               />
             </div>
             <div className="flex flex-col">
-              <h3 className="font-serif text-3xl lg:text-4xl text-white font-light mb-4 tracking-tight">
+              <h3 className="font-heading text-3xl lg:text-4xl text-white font-light mb-4 tracking-tight">
                 Tailor-Made Solutions
               </h3>
               <p className="text-white/70 text-sm md:text-base leading-relaxed max-w-[500px] font-light">
@@ -68,7 +68,7 @@ export function AboutBusinessAreas() {
               />
             </div>
             <div className="flex flex-col">
-              <h3 className="font-serif text-3xl lg:text-4xl text-white font-light mb-4 tracking-tight">
+              <h3 className="font-heading text-3xl lg:text-4xl text-white font-light mb-4 tracking-tight">
                 Premium Quality
               </h3>
               <p className="text-white/70 text-sm md:text-base leading-relaxed max-w-[500px] font-light">
@@ -92,7 +92,7 @@ export function AboutBusinessAreas() {
               />
             </div>
             <div className="flex flex-col">
-              <h3 className="font-serif text-3xl lg:text-4xl text-white font-light mb-4 tracking-tight">
+              <h3 className="font-heading text-3xl lg:text-4xl text-white font-light mb-4 tracking-tight">
                 Made in India
               </h3>
               <p className="text-white/70 text-sm md:text-base leading-relaxed max-w-[500px] font-light">

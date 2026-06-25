@@ -230,38 +230,40 @@ export function GalleryHero() {
       }}
     >
       <div className="absolute inset-0 overflow-hidden z-0 pointer-events-none">
-        {/* ─── Three Column Grid ─── */}
+        {/* ─── Responsive Grid: 2 columns on mobile, 3 on desktop ─── */}
         <div
-        className="absolute grid grid-cols-3"
-        style={{
-          /* Extend beyond viewport so images crop at top/bottom like reference */
-          top: "-30%",
-          left: "0",
-          right: "0",
-          height: "200%",
-          gap: "4px",
-          padding: "0",
-        }}
-      >
-        <SlidingColumn
-          images={col1}
-          direction="down"
-          columnClass="gallery-col-1-strip"
-          initialOffset="-20%"
-        />
-        <SlidingColumn
-          images={col2}
-          direction="up"
-          columnClass="gallery-col-2-strip"
-          initialOffset="-30%"
-        />
-        <SlidingColumn
-          images={col3}
-          direction="down"
-          columnClass="gallery-col-3-strip"
-          initialOffset="-15%"
-        />
-      </div>
+          className="absolute grid grid-cols-2 md:grid-cols-3"
+          style={{
+            /* Extend beyond viewport so images crop at top/bottom like reference */
+            top: "-30%",
+            left: "0",
+            right: "0",
+            height: "200%",
+            gap: "4px",
+            padding: "0",
+          }}
+        >
+          <SlidingColumn
+            images={col1}
+            direction="down"
+            columnClass="gallery-col-1-strip"
+            initialOffset="-20%"
+          />
+          <SlidingColumn
+            images={col2}
+            direction="up"
+            columnClass="gallery-col-2-strip"
+            initialOffset="-30%"
+          />
+          <div className="hidden md:block w-full h-full relative">
+            <SlidingColumn
+              images={col3}
+              direction="down"
+              columnClass="gallery-col-3-strip"
+              initialOffset="-15%"
+            />
+          </div>
+        </div>
 
       {/* ─── Dark Overlay ─── */}
       <div
@@ -274,16 +276,15 @@ export function GalleryHero() {
       </div>
 
       {/* ─── Centered Title ─── */}
-      <div className="absolute inset-0 z-20 flex flex-col items-center justify-center pointer-events-none">
-        <div className="gallery-hero-title-wrapper">
+      <div className="absolute inset-0 z-20 flex flex-col items-center justify-center pointer-events-none px-4">
+        <div className="gallery-hero-title-wrapper w-full max-w-5xl mx-auto flex justify-center">
           <h1
-            className="gallery-hero-title font-heading text-white text-center uppercase select-none"
+            className="gallery-hero-title font-heading text-white text-center uppercase select-none text-[3.5rem] sm:text-[5rem] md:text-[7rem] lg:text-[9rem] leading-[1.1] md:leading-[1]"
             style={{
-              fontSize: "clamp(4rem, 10vw, 9rem)",
               fontWeight: 900,
               letterSpacing: "-0.02em",
-              lineHeight: 1,
-              textShadow: "0 4px 40px rgba(0,0,0,0.4)",
+              textShadow: "0 4px 40px rgba(0,0,0,0.6)",
+              wordBreak: "keep-all",
             }}
           >
             OUR WORKS

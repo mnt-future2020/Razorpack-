@@ -234,12 +234,12 @@ export function OurWorksSection() {
               {/* Row 2 — up to 2 cards centered */}
               {bottomRow.length > 0 && (
                 <div
-                  className="grid grid-cols-1 md:grid-cols-2 mx-auto w-full"
+                  className="grid grid-cols-1 md:grid-cols-2 mx-auto w-full max-w-full md:max-w-[var(--desktop-max-w)]"
                   style={{
                     gap: "16px",
-                    // Align perfectly with the grid columns above
-                    maxWidth: bottomRow.length === 2 ? "calc(66.666% + 5px)" : "calc(33.333% - 5px)",
-                  }}
+                    // Align perfectly with the grid columns above (only on desktop)
+                    "--desktop-max-w": bottomRow.length === 2 ? "calc(66.666% + 5px)" : "calc(33.333% - 5px)",
+                  } as React.CSSProperties}
                 >
                   {bottomRow.map((work, idx) => (
                     <WorkCard key={`${blockIndex}-bottom-${idx}`} {...work} />

@@ -207,7 +207,7 @@ export function Footer() {
               <Link href="/privacy-policy" className="hover:text-white transition-colors">Privacy policy</Link>
               <Link href="/terms-conditions" className="hover:text-white transition-colors">Terms of services</Link>
             </div>
-            <span>Website by MNT</span>
+            <span>Developed by MNT</span>
           </div>
 
         </div>

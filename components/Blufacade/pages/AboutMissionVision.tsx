@@ -30,7 +30,7 @@ const CARDS = [
     number: "03",
     title: "Quality & Collaboration",
     description: "Our in-house production, coupled with strict quality standards, certifications, and reliable suppliers, ensures flexibility and reliability. Whether on the phone or on-site, our dedicated team collaborates with you, providing fast and optimal solutions for your packaging needs.",
-    bgColor: "bg-[#38bdf8]", // Bright primary brand blue
+    bgColor: "bg-[var(--brand-blue)]", // Brand blue
     bgImage: "/images/card_bg_orange.png",
   },
 ]

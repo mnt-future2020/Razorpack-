@@ -485,13 +485,13 @@ export function Header() {
           {/* ─── MOBILE: right side with hamburger ─── */}
           <div
             className="lg:hidden flex flex-1 items-center justify-end px-3 sm:px-4 transition-colors duration-500"
-            style={{ backgroundColor: isTop ? "transparent" : "#ffffff" }}
+            style={{ backgroundColor: useLightText ? "transparent" : isTop ? "transparent" : "#ffffff" }}
           >
             <button
               onClick={() => setMenuOpen(!menuOpen)}
               className="p-1.5 sm:p-2 transition-colors duration-500"
               style={{
-                color: isTop ? "var(--brand-white)" : "var(--brand-dark)",
+                color: useLightText ? "var(--brand-white)" : "var(--brand-dark)",
               }}
               aria-label="Menu"
             >
