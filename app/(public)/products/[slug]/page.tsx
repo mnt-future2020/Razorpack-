@@ -5,11 +5,14 @@ import { PageHero } from "@/components/Blufacade/pages/PageHero";
 import { ProductDetailClient } from "@/components/Blufacade/pages/ProductDetailClient";
 import connectDB from "@/config/models/connectDB";
 import Product from "@/config/utils/admin/products/productSchema";
+import { Metadata } from "next";
+import { cache } from "react";
+
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-// Fetch single product by slug from DB
-async function getProductBySlug(slug: string) {
+// Cached fetcher to deduplicate between generateMetadata and page render
+const getProductBySlug = cache(async (slug: string) => {
   try {
     await connectDB();
     const product = await Product.findOne({ slug, isDeleted: false }).lean();
@@ -19,10 +22,35 @@ async function getProductBySlug(slug: string) {
   }
 
   return null;
-}
+});
 
 interface PageProps {
   params: Promise<{ slug: string }>;
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const resolvedParams = await params;
+  const productData = await getProductBySlug(resolvedParams.slug);
+
+  if (!productData) {
+    return {
+      title: "Product Not Found - Rayzor Industrial Packaging Pvt Ltd",
+      description: "The requested product could not be found.",
+    };
+  }
+
+  return {
+    title:
+      productData.seoTitle ||
+      `${productData.productName} | Rayzor Industrial Packaging Pvt Ltd`,
+    description:
+      productData.seoDescription ||
+      productData.shortDescription ||
+      productData.description?.replace(/<[^>]+>/g, "").substring(0, 160),
+    keywords:
+      productData.seoKeywords ||
+      `${productData.productName}, ${productData.category || "industrial packaging"}, VCI protection, LDPE packaging`,
+  };
 }
 
 export default async function ProductDetailPage({ params }: PageProps) {
