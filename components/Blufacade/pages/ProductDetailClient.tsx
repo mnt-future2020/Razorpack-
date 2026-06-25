@@ -256,9 +256,16 @@ export function ProductDetailClient({ product }: { product: ProductData }) {
             </div>
 
             {/* Description */}
-            <p className="pdt-desc text-[#666] text-sm md:text-[15px] leading-[1.8] mb-6">
-              {product.description}
-            </p>
+            {product.description.includes("<") ? (
+              <div
+                className="pdt-desc text-[#666] text-sm md:text-[15px] leading-[1.8] mb-6 prose prose-sm max-w-none prose-p:text-inherit prose-p:leading-[1.8] prose-strong:text-inherit"
+                dangerouslySetInnerHTML={{ __html: product.description }}
+              />
+            ) : (
+              <p className="pdt-desc text-[#666] text-sm md:text-[15px] leading-[1.8] mb-6">
+                {product.description}
+              </p>
+            )}
 
             {/* ─── Accordion Sections ─── */}
 
