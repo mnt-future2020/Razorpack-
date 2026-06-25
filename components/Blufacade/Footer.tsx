@@ -204,8 +204,8 @@ export function Footer() {
           <div className="w-full flex flex-col md:flex-row justify-between items-center text-[#a1a1aa] text-xs md:text-sm gap-4">
             <span>All rights reserved © {settings?.siteName || "Rayzor Industrial Packaging Pvt Ltd"} {new Date().getFullYear()}</span>
             <div className="flex gap-6 md:gap-8">
-              <Link href="/privacy" className="hover:text-white transition-colors">Privacy policy</Link>
-              <Link href="/terms" className="hover:text-white transition-colors">Terms of services</Link>
+              <Link href="/privacy-policy" className="hover:text-white transition-colors">Privacy policy</Link>
+              <Link href="/terms-conditions" className="hover:text-white transition-colors">Terms of services</Link>
             </div>
             <span>Website by MNT</span>
           </div>
