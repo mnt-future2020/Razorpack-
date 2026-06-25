@@ -2,7 +2,8 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Eye, EyeOff, Loader2 } from "lucide-react"
+import { motion, type Variants } from "motion/react"
+import { ArrowLeft, Loader2, Eye, EyeOff } from "lucide-react"
 import Link from "next/link"
 import axios from "axios"
 import { useToast } from "@/hooks/use-toast"
@@ -15,6 +16,7 @@ export default function LoginPage() {
     email: "",
     password: "",
   })
+  
   const router = useRouter()
   const { toast } = useToast()
 
@@ -29,27 +31,15 @@ export default function LoginPage() {
       })
 
       if (response.data.success) {
-        // Store token in localStorage
         localStorage.setItem("admin_token", response.data.token)
-        
-        toast({
-          title: "Success",
-          description: "Login successful! Redirecting...",
-        })
-
-        // Redirect to admin dashboard
-        setTimeout(() => {
-          router.push("/admin")
-        }, 500)
+        toast({ title: "Success", description: "Login successful! Redirecting..." })
+        setTimeout(() => router.push("/admin"), 500)
       }
     } catch (error: any) {
       console.error("Login error:", error)
-      
-      const errorMessage = error.response?.data?.error || "Login failed. Please try again."
-      
       toast({
         title: "Error",
-        description: errorMessage,
+        description: error.response?.data?.error || "Login failed. Please try again.",
         variant: "destructive",
       })
     } finally {
@@ -57,95 +47,132 @@ export default function LoginPage() {
     }
   }
 
+  const containerVariants: Variants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.2 } },
+  }
+
+  const itemVariants: Variants = {
+    hidden: { opacity: 0, y: 15 },
+    visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } },
+  }
+
   return (
     <>
       <Toaster />
-      <main className="min-h-screen flex flex-col"><section className="flex-1 flex items-center justify-center py-12 sm:py-16 bg-[#fefaf6]">
-        <div className="w-full max-w-md mx-auto px-4 sm:px-6">
-          <div className="bg-white rounded-lg shadow-lg p-6 sm:p-8">
-            <div className="flex justify-center mb-6">
-              <span className="text-2xl font-bold">
-                <span className="text-[#014a74]">blu</span>
-                <span className="text-[#f58420]">facade</span>
-              </span>
-            </div>
+      <div className="flex min-h-screen w-full flex-col bg-white font-sans text-neutral-950 antialiased selection:bg-[var(--brand-blue)]/30 selection:text-neutral-900 lg:flex-row">
+        {/* Left Image Panel */}
+        <div className="relative flex w-full flex-col justify-end overflow-hidden p-8 md:p-12 lg:w-1/2 min-h-[40vh] lg:min-h-screen">
+          <img
+            src="/images/login_bg.png"
+            alt="Abstract brand background"
+            className="absolute inset-0 h-full w-full object-cover"
+          />
 
-            <h1 className="text-2xl font-bold text-center text-[#014a74] mb-2">Welcome Back</h1>
-            <p className="text-gray-600 text-center text-sm mb-8">Sign in to access your account</p>
 
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-[#014a74] mb-2">
-                  Email Address
+          <div className="relative z-10 mt-12 lg:mt-0">
+            <h1 className="mb-4 max-w-xl text-4xl font-medium leading-[1.1] tracking-tight text-white sm:text-5xl lg:text-6xl">
+              Packaging Excellence
+              <br />
+              Since 2012.
+            </h1>
+            <p className="max-w-md text-base leading-relaxed text-white/90 sm:text-lg">
+              Rayzorpack empowers businesses to scale and protect their products with high-quality packaging solutions.
+            </p>
+          </div>
+        </div>
+
+        {/* Right Form Panel */}
+        <div className="flex w-full flex-col items-center justify-center p-6 sm:p-12 lg:w-1/2">
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="w-full max-w-md md:max-w-lg xl:max-w-xl"
+          >
+            {/* Titles */}
+            <motion.div variants={itemVariants} className="mb-6">
+              <h2 className="mb-2 text-3xl font-medium tracking-tight text-neutral-900">
+                Welcome Back
+              </h2>
+              <p className="text-[15px] text-neutral-500">
+                Log in to access your admin dashboard
+              </p>
+            </motion.div>
+
+            {/* Form */}
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+              <motion.div variants={itemVariants} className="flex flex-col gap-1.5">
+                <label htmlFor="email" className="text-sm font-medium text-neutral-900">
+                  Email
                 </label>
                 <input
-                  type="email"
                   id="email"
-                  name="email"
-                  required
+                  type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  placeholder="Enter your email"
+                  required
                   disabled={isLoading}
-                  className="w-full px-4 py-3 border border-gray-300 rounded focus:ring-2 focus:ring-[#f58420] focus:border-transparent outline-none transition-all disabled:opacity-50"
-                  placeholder="you@example.com"
+                  className="w-full rounded-lg border border-neutral-200 bg-white px-4 py-3 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-[var(--brand-blue)] focus:outline-none focus:ring-1 focus:ring-[var(--brand-blue)]"
                 />
-              </div>
+              </motion.div>
 
-              <div>
-                <label htmlFor="password" className="block text-sm font-medium text-[#014a74] mb-2">
+              <motion.div variants={itemVariants} className="flex flex-col gap-1.5">
+                <label htmlFor="password" className="text-sm font-medium text-neutral-900">
                   Password
                 </label>
                 <div className="relative">
                   <input
-                    type={showPassword ? "text" : "password"}
                     id="password"
-                    name="password"
-                    required
+                    type={showPassword ? "text" : "password"}
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    disabled={isLoading}
-                    className="w-full px-4 py-3 pr-12 border border-gray-300 rounded focus:ring-2 focus:ring-[#f58420] focus:border-transparent outline-none transition-all disabled:opacity-50"
                     placeholder="Enter your password"
+                    required
+                    disabled={isLoading}
+                    className="w-full rounded-lg border border-neutral-200 bg-white px-4 py-3 pr-12 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-[var(--brand-blue)] focus:outline-none focus:ring-1 focus:ring-[var(--brand-blue)]"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    disabled={isLoading}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-700"
                   >
-                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    {showPassword ? <EyeOff className="size-5" /> : <Eye className="size-5" />}
                   </button>
                 </div>
-              </div>
+              </motion.div>
 
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full bg-[#014a74] text-white font-medium py-3 rounded hover:bg-[#012d47] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                    Signing In...
-                  </>
-                ) : (
-                  "Sign In"
-                )}
-              </button>
+              {/* Checkbox */}
+              <motion.div variants={itemVariants} className="mt-1 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-5 items-center">
+                    <input
+                      id="remember"
+                      type="checkbox"
+                      className="h-4 w-4 rounded border-neutral-300 text-[var(--brand-blue)] focus:ring-[var(--brand-blue)]"
+                    />
+                  </div>
+                  <label htmlFor="remember" className="text-sm text-neutral-600">
+                    Remember me
+                  </label>
+                </div>
+              </motion.div>
+
+              {/* Login Button */}
+              <motion.div variants={itemVariants} className="mt-2">
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full rounded-lg flex items-center justify-center gap-2 bg-[var(--brand-blue)] py-3.5 text-sm font-medium text-white shadow-sm transition-all hover:bg-[#1a8abf] active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
+                >
+                  {isLoading ? <Loader2 className="size-5 animate-spin" /> : "Log In"}
+                </button>
+              </motion.div>
             </form>
-
-            <p className="text-center text-sm text-gray-500 mt-6">
-              <Link href="/" className="text-[#f58420] hover:underline">
-                Back to Home
-              </Link>
-            </p>
-          </div>
-
-          <p className="text-center text-sm text-gray-500 mt-6">
-            © {new Date().getFullYear()} Rayzor Industrial Packaging Pvt Ltd. All rights reserved.
-          </p>
+          </motion.div>
         </div>
-      </section></main>
+      </div>
     </>
   )
 }

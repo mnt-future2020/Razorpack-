@@ -3,6 +3,7 @@
 import React, { useState, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { QuoteModal } from "@/components/Blufacade/QuoteModal";
 import { ChevronDown, Check, ArrowRight, Phone } from "lucide-react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -61,6 +62,7 @@ function AccordionItem({ title, children, defaultOpen = false }: AccordionItemPr
 export function ProductDetailClient({ product }: { product: ProductData }) {
   const sectionRef = useRef<HTMLElement>(null);
   const [selectedImage, setSelectedImage] = useState(0);
+  const [quoteOpen, setQuoteOpen] = useState(false);
 
   // ── Background color transition: white → dark on scroll ──
   useGSAP(
@@ -233,12 +235,13 @@ export function ProductDetailClient({ product }: { product: ProductData }) {
 
             {/* CTA Buttons */}
             <div className="space-y-3 mb-8">
-              <Link
-                href="/contact"
-                className="pdt-btn-primary flex items-center justify-center gap-2 w-full bg-[#1b1c19] text-white py-4 rounded-lg font-bold text-sm uppercase tracking-wider transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] shadow-sm hover:shadow-md"
+              <button
+                type="button"
+                onClick={() => setQuoteOpen(true)}
+                className="pdt-btn-primary flex items-center justify-center gap-2 w-full bg-[#1b1c19] text-white py-4 rounded-lg font-bold text-sm uppercase tracking-wider transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] shadow-sm hover:shadow-md cursor-pointer"
               >
                 Request a Quote
-              </Link>
+              </button>
               <a
                 href="tel:+919087787879"
                 className="pdt-btn-secondary flex items-center justify-center gap-2 w-full bg-white text-[#1b1c19] py-4 rounded-lg font-bold text-sm uppercase tracking-wider border border-[#e0e0e0] transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
@@ -339,6 +342,7 @@ export function ProductDetailClient({ product }: { product: ProductData }) {
           </div>
         </div>
       </div>
+      <QuoteModal open={quoteOpen} onClose={() => setQuoteOpen(false)} productOrService={product.productName} />
     </section>
   );
 }

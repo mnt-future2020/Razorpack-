@@ -142,9 +142,7 @@ export default function AdminDashboard() {
     { title: "Total Leads", value: metrics.totalLeads, change: `${metrics.leadsGrowth >= 0 ? "+" : ""}${metrics.leadsGrowth}%`, icon: Users },
     { title: "Pending Leads", value: metrics.pendingLeads, change: `${metrics.newLeads} new`, icon: TrendingUp },
     { title: "Service Views", value: metrics.totalServiceViews, change: `${metrics.activeServices} active`, icon: Eye },
-    { title: "Total Feedback", value: metrics.totalFeedback, change: `${metrics.newFeedback} new`, icon: MessageSquare },
-    { title: "Testimonials", value: metrics.publishedTestimonials, change: `${metrics.totalTestimonials} total`, icon: Star },
-    { title: "Portfolio Projects", value: metrics.activePortfolio, change: `${metrics.totalPortfolio} total`, icon: Heart },
+    { title: "Products", value: metrics.totalServices, change: `${metrics.activeServices} active`, icon: Briefcase },
   ];
 
   const formatDate = (date: string) => {
@@ -179,14 +177,12 @@ export default function AdminDashboard() {
   };
 
   const quickActions = [
-    { title: "Services", href: "/admin/services", icon: Briefcase },
-    { title: "Portfolio", href: "/admin/portfolio", icon: Heart },
+    { title: "Products", href: "/admin/products", icon: Briefcase },
+    { title: "Services", href: "/admin/services", icon: Eye },
     { title: "Leads", href: "/admin/leads", icon: Users },
-    { title: "Testimonials", href: "/admin/testimonials", icon: Star },
     { title: "Banners", href: "/admin/banners", icon: Image },
-    { title: "SEO", href: "/admin/seo", icon: Globe },
-    { title: "Feedback", href: "/admin/feedback", icon: MessageSquare },
-    { title: "Profile", href: "/admin/profile", icon: Settings },
+    { title: "Gallery", href: "/admin/gallery", icon: Globe },
+    { title: "Settings", href: "/admin/settings", icon: Settings },
   ];
 
   return (
@@ -208,17 +204,19 @@ export default function AdminDashboard() {
         </Button>
       </div>
 
-      {/* Stats Grid - 6 columns on large screens */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+      {/* Stats Grid */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat) => (
-          <Card key={stat.title} className="border-0 shadow-lg">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between mb-2">
-                <stat.icon className="h-5 w-5 text-[#221E1F]" />
-                <span className="text-xs text-gray-500">{stat.change}</span>
+          <Card key={stat.title} className="border-0 shadow-md bg-white">
+            <CardContent className="p-5">
+              <div className="flex items-center justify-between mb-3">
+                <div className="w-10 h-10 rounded-lg bg-[#26A8E0]/10 flex items-center justify-center">
+                  <stat.icon className="h-5 w-5 text-[#26A8E0]" />
+                </div>
+                <span className="text-xs font-medium text-[#26A8E0] bg-[#26A8E0]/10 px-2 py-0.5 rounded-full">{stat.change}</span>
               </div>
-              <p className="text-2xl font-bold text-[#221E1F]">{stat.value}</p>
-              <p className="text-xs text-gray-500 mt-1">{stat.title}</p>
+              <p className="text-3xl font-bold text-[#221E1F]">{stat.value}</p>
+              <p className="text-sm text-gray-500 mt-1 font-medium">{stat.title}</p>
             </CardContent>
           </Card>
         ))}
