@@ -35,6 +35,11 @@ const settingsSchema = new mongoose.Schema(
       trim: true,
       default: null,
     },
+    companyProfile: {
+      type: String,
+      trim: true,
+      default: null,
+    },
     isActive: {
       type: Boolean,
       default: true,

@@ -68,7 +68,7 @@ export async function PUT(request: NextRequest) {
     await connectDB();
 
     const body = await request.json();
-    const { siteName, siteNameAccent, siteTagline, logo, favicon } = body;
+    const { siteName, siteNameAccent, siteTagline, logo, favicon, companyProfile } = body;
 
     // Get current settings to access old file paths
     const currentSettings = await Settings.findOne({ id: "default" });
@@ -94,6 +94,20 @@ export async function PUT(request: NextRequest) {
       faviconPath = await uploadBase64Image(favicon, "favicon");
     }
 
+    // Handle company profile PDF upload if it's base64 data
+    let companyProfilePath = companyProfile;
+    if (companyProfile && companyProfile.startsWith("data:")) {
+      if (currentSettings?.companyProfile) {
+        await deleteOldFile(currentSettings.companyProfile);
+      }
+      const base64Data = companyProfile.split(";base64,").pop();
+      if (base64Data) {
+        const buffer = Buffer.from(base64Data, "base64");
+        const result = await uploadToCloudinary(buffer, "settings/company-profile");
+        companyProfilePath = result.secure_url;
+      }
+    }
+
     // Find and update the settings
     const updatedSettings = await Settings.findOneAndUpdate(
       { id: "default" },
@@ -103,6 +117,7 @@ export async function PUT(request: NextRequest) {
         ...(siteTagline !== undefined && { siteTagline }),
         ...(logoPath !== undefined && { logo: logoPath }),
         ...(faviconPath !== undefined && { favicon: faviconPath }),
+        ...(companyProfilePath !== undefined && { companyProfile: companyProfilePath }),
         lastUpdated: new Date(),
       },
       { new: true, runValidators: true, upsert: true }

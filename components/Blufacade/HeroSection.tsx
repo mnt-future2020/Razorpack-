@@ -16,18 +16,18 @@ import {
   type CarouselApi,
 } from "@/components/ui/carousel";
 import Link from "next/link";
-import { Marquee } from "@/components/ui/marquee";
-import { useClientLogos } from "@/hooks/use-client-logos";
+// import { Marquee } from "@/components/ui/marquee";
+// import { useClientLogos } from "@/hooks/use-client-logos";
 
-const FALLBACK_LOGOS = [
-  { name: "Foxconn", logo: "/images/logos/foxconn.svg" },
-  { name: "Royal Enfield", logo: "/images/logos/royal-enfield.svg" },
-  { name: "Asian Paints", logo: "/images/logos/asian-paints.svg" },
-  { name: "Hyundai Mobis", logo: "/images/logos/hyundai-mobis.svg" },
-  { name: "Samsung", logo: "/images/logos/samsung.svg" },
-  { name: "Tata Motors", logo: "/images/logos/tata-motors.svg" },
-  { name: "Bosch", logo: "/images/logos/bosch.svg" },
-];
+// const FALLBACK_LOGOS = [
+//   { name: "Foxconn", logo: "/images/logos/foxconn.svg" },
+//   { name: "Royal Enfield", logo: "/images/logos/royal-enfield.svg" },
+//   { name: "Asian Paints", logo: "/images/logos/asian-paints.svg" },
+//   { name: "Hyundai Mobis", logo: "/images/logos/hyundai-mobis.svg" },
+//   { name: "Samsung", logo: "/images/logos/samsung.svg" },
+//   { name: "Tata Motors", logo: "/images/logos/tata-motors.svg" },
+//   { name: "Bosch", logo: "/images/logos/bosch.svg" },
+// ];
 
 interface Slide {
   id: string;
@@ -81,10 +81,10 @@ const staticSlides: Slide[] = [
 
 export function HeroSection() {
   const { slides: dynamicSlides } = useHeroSlides();
-  const { clientLogos: dynamicLogos } = useClientLogos();
-  const clientLogos = dynamicLogos.length > 0
-    ? dynamicLogos.map((l) => ({ name: l.name, logo: l.logo }))
-    : FALLBACK_LOGOS;
+  // const { clientLogos: dynamicLogos } = useClientLogos();
+  // const clientLogos = dynamicLogos.length > 0
+  //   ? dynamicLogos.map((l: any) => ({ name: l.name, logo: l.logo }))
+  //   : FALLBACK_LOGOS;
 
   // Map dynamic slides to Slide format, fallback to static
   const slides: Slide[] = dynamicSlides.length > 0
@@ -377,46 +377,27 @@ export function HeroSection() {
         )}
       </div>
 
-      {/* ── TRUSTED BY STRIP (Solid Light Background) ── */}
+      {/* ── TRUSTED BY STRIP (Commented out) ──
       <div className="w-full bg-[#fcfbf9] border-b border-black/5 py-2 sm:py-3 lg:py-5 relative z-30 shrink-0">
         <div className="mx-auto px-4 sm:px-6 md:px-12 lg:px-16 xl:px-20 flex flex-row items-center gap-3 sm:gap-6 md:gap-12">
-          {/* Left: Title — hidden on small devices */}
           <div className="hidden sm:flex shrink-0 flex-col self-center">
             <h3 className="text-[#002f4b] font-heading font-black text-[12px] md:text-[15px] leading-[1.1] tracking-wide uppercase">
-              Trusted By
-              <br />
-              Industry Leaders
+              Trusted By<br />Industry Leaders
             </h3>
             <div className="w-10 h-[3px] bg-[var(--brand-blue)] mt-3 rounded-full"></div>
           </div>
-
-          {/* Right: Marquee of logos */}
-          <div
-            className="flex-1 overflow-hidden min-w-0"
-            style={{
-              maskImage:
-                "linear-gradient(to right, transparent, black 5%, black 95%, transparent)",
-            }}
-          >
+          <div className="flex-1 overflow-hidden min-w-0" style={{ maskImage: "linear-gradient(to right, transparent, black 5%, black 95%, transparent)" }}>
             <Marquee pauseOnHover className="[--duration:40s] [--gap:1rem] sm:[--gap:1.5rem]">
               {clientLogos.map((item) => (
-                <div
-                  key={item.name}
-                  className="flex items-center justify-center bg-white px-3 sm:px-6 py-1 sm:py-2 rounded-md shadow-sm border border-black/5 h-[36px] sm:h-[46px] md:h-[60px] w-24 sm:w-32 md:w-36"
-                >
-                  <Image
-                    src={item.logo}
-                    alt={item.name}
-                    width={100}
-                    height={32}
-                    className="max-h-5 sm:max-h-6 md:max-h-8 w-auto object-contain"
-                  />
+                <div key={item.name} className="flex items-center justify-center bg-white px-3 sm:px-6 py-1 sm:py-2 rounded-md shadow-sm border border-black/5 h-[36px] sm:h-[46px] md:h-[60px] w-24 sm:w-32 md:w-36">
+                  <Image src={item.logo} alt={item.name} width={100} height={32} className="max-h-5 sm:max-h-6 md:max-h-8 w-auto object-contain" />
                 </div>
               ))}
             </Marquee>
           </div>
         </div>
       </div>
+      */}
     </section>
   );
 }

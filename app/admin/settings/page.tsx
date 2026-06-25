@@ -24,6 +24,8 @@ export default function SettingsPage() {
   const [siteTagline, setSiteTagline] = useState("Premium Packaging Solutions & LDPE Films");
   const [logo, setLogo] = useState<string | null>(null);
   const [favicon, setFavicon] = useState<string | null>(null);
+  const [companyProfile, setCompanyProfile] = useState<string | null>(null);
+  const [companyProfileName, setCompanyProfileName] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [fetchLoading, setFetchLoading] = useState(true);
 
@@ -40,6 +42,7 @@ export default function SettingsPage() {
           setSiteTagline(result.data.siteTagline || "Premium Packaging Solutions & LDPE Films");
           setLogo(result.data.logo || null);
           setFavicon(result.data.favicon || null);
+          setCompanyProfile(result.data.companyProfile || null);
         }
       } catch (error) {
         console.error("Error fetching settings:", error);
@@ -66,6 +69,7 @@ export default function SettingsPage() {
           siteTagline,
           logo,
           favicon,
+          companyProfile,
         }),
       });
 
@@ -344,6 +348,79 @@ export default function SettingsPage() {
                   </p>
                 </div>
               </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Company Profile PDF */}
+        <Card className="shadow-lg border-0">
+          <CardHeader className="bg-gradient-to-r from-[#221E1F]/10 to-[#26A8E0]/10 p-6">
+            <CardTitle className="flex items-center gap-2 text-[#221E1F]">
+              <Upload className="h-5 w-5 text-[#26A8E0]" />
+              Company Profile PDF
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-6 space-y-4">
+            <p className="text-sm text-gray-500">
+              Upload your company profile PDF. This will be available for download from the &quot;Download Profile&quot; button in the navbar.
+            </p>
+
+            {companyProfile && (
+              <div className="flex items-center gap-3 p-4 bg-green-50 border border-green-200 rounded-lg">
+                <svg className="w-8 h-8 text-red-500 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zM6 20V4h7v5h5v11H6z" />
+                  <path d="M8 12h3v1H9.5v1H11v1H8v-3zm4 0h1.5c.28 0 .5.22.5.5v2c0 .28-.22.5-.5.5H12v-3zm1 2.5V13h.5v1.5H13zm2-2.5h1.5c.28 0 .5.22.5.5v.5c0 .28-.22.5-.5.5h-1v1h-1v-3h.5z" />
+                </svg>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-green-800 truncate">
+                    {companyProfileName || "Company Profile.pdf"}
+                  </p>
+                  <a href={companyProfile} target="_blank" rel="noopener noreferrer" className="text-xs text-green-600 hover:underline">
+                    View current PDF
+                  </a>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => { setCompanyProfile(null); setCompanyProfileName(""); }}
+                  className="text-red-500 hover:text-red-600 text-xs font-medium"
+                >
+                  Remove
+                </button>
+              </div>
+            )}
+
+            <div>
+              <input
+                type="file"
+                id="profile-upload"
+                accept=".pdf"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    if (file.size > 10 * 1024 * 1024) {
+                      toast({ title: "Error", description: "PDF must be under 10MB", variant: "destructive" });
+                      return;
+                    }
+                    setCompanyProfileName(file.name);
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                      setCompanyProfile(reader.result as string);
+                    };
+                    reader.readAsDataURL(file);
+                  }
+                }}
+              />
+              <Label
+                htmlFor="profile-upload"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
+              >
+                <Upload className="h-4 w-4" />
+                {companyProfile ? "Replace PDF" : "Upload PDF"}
+              </Label>
+              <p className="text-xs text-gray-500 mt-2">
+                Max 10MB, PDF format only
+              </p>
             </div>
           </CardContent>
         </Card>

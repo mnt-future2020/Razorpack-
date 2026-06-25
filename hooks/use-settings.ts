@@ -8,6 +8,7 @@ interface SiteSettings {
   siteTagline: string
   logo: string | null
   favicon: string | null
+  companyProfile: string | null
 }
 
 export function useSettings() {
