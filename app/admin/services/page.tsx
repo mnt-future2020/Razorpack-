@@ -68,6 +68,9 @@ interface Service {
   features: string[];
   technicalSpecs?: Array<{ label: string; value: string }>;
   applications?: string[];
+  processSteps?: Array<{ title: string; description: string }>;
+  whyChooseUs?: string[];
+  highlights?: string[];
   slug: string;
   status: string;
   order: number;
@@ -113,6 +116,9 @@ export default function ServicesPage() {
     description: "",
     features: "",
     applications: [] as string[],
+    processSteps: [] as Array<{ title: string; description: string }>,
+    whyChooseUs: "",
+    highlights: "",
     image: "",
     gallery: [] as string[],
     status: "active",
@@ -181,6 +187,9 @@ export default function ServicesPage() {
       description: service.description,
       features: service.features.join(", "),
       applications: service.applications || [],
+      processSteps: service.processSteps || [],
+      whyChooseUs: (service.whyChooseUs || []).join("\n"),
+      highlights: (service.highlights || []).join(", "),
       image: service.image,
       gallery: service.gallery || [],
       status: service.status,
@@ -245,8 +254,27 @@ export default function ServicesPage() {
             .filter((f) => f)
         )
       );
-      submitFormData.append("technicalSpecs", JSON.stringify(formData.technicalSpecs));
-      submitFormData.append("applications", JSON.stringify(formData.applications));
+      submitFormData.append("technicalSpecs", JSON.stringify(formData.technicalSpecs || []));
+      submitFormData.append("applications", JSON.stringify(formData.applications || []));
+      submitFormData.append("processSteps", JSON.stringify(formData.processSteps || []));
+      submitFormData.append(
+        "whyChooseUs",
+        JSON.stringify(
+          formData.whyChooseUs
+            .split("\n")
+            .map((f) => f.trim())
+            .filter((f) => f)
+        )
+      );
+      submitFormData.append(
+        "highlights",
+        JSON.stringify(
+          formData.highlights
+            .split(",")
+            .map((f) => f.trim())
+            .filter((f) => f)
+        )
+      );
       submitFormData.append("seoTitle", formData.seoTitle.trim());
       submitFormData.append("seoDescription", formData.seoDescription.trim());
       submitFormData.append("seoKeywords", formData.seoKeywords.trim());
@@ -921,6 +949,110 @@ export default function ServicesPage() {
                     })
                   }
                   placeholder="e.g., Automotive, Electronics, Heavy Machinery, Aerospace"
+                  className="mt-2"
+                />
+              </div>
+            </div>
+
+            {/* Additional Static Sections to Dynamic */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-[#221E1F]">
+                  Our Process Steps
+                </h3>
+                <Button
+                  type="button"
+                  onClick={() => {
+                    setFormData({
+                      ...formData,
+                      processSteps: [
+                        ...(formData.processSteps || []),
+                        { title: "", description: "" },
+                      ],
+                    });
+                  }}
+                  variant="outline"
+                  size="sm"
+                >
+                  <Plus className="h-4 w-4 mr-1" />
+                  Add Step
+                </Button>
+              </div>
+
+              {(formData.processSteps?.length || 0) === 0 ? (
+                <div className="text-center p-6 border-2 border-dashed rounded-md bg-gray-50 text-gray-500">
+                  No process steps added yet. Click "Add Step" to create one.
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {formData.processSteps?.map((step, index) => (
+                    <div
+                      key={index}
+                      className="flex items-start gap-3 p-4 border rounded-md bg-white relative group"
+                    >
+                      <div className="flex-1 space-y-3">
+                        <Input
+                          placeholder="Step Title (e.g. Consultation)"
+                          value={step.title}
+                          onChange={(e) => {
+                            const newSteps = [...(formData.processSteps || [])];
+                            newSteps[index].title = e.target.value;
+                            setFormData({ ...formData, processSteps: newSteps });
+                          }}
+                        />
+                        <Textarea
+                          placeholder="Step Description"
+                          value={step.description}
+                          onChange={(e) => {
+                            const newSteps = [...(formData.processSteps || [])];
+                            newSteps[index].description = e.target.value;
+                            setFormData({ ...formData, processSteps: newSteps });
+                          }}
+                          rows={2}
+                        />
+                      </div>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="text-red-500 opacity-0 group-hover:opacity-100 transition-opacity mt-1"
+                        onClick={() => {
+                          setFormData({
+                            ...formData,
+                            processSteps: (formData.processSteps || []).filter(
+                              (_, i) => i !== index
+                            ),
+                          });
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div>
+                <Label>Why Choose Us (newline-separated)</Label>
+                <Textarea
+                  value={formData.whyChooseUs}
+                  onChange={(e) =>
+                    setFormData({ ...formData, whyChooseUs: e.target.value })
+                  }
+                  placeholder={`20+ years of industrial packaging expertise\nIn-house production hub in Madurai\nStrict quality standards & certifications`}
+                  rows={4}
+                  className="mt-2"
+                />
+              </div>
+
+              <div>
+                <Label>Quick Info Pills / Highlights (comma-separated)</Label>
+                <Input
+                  value={formData.highlights}
+                  onChange={(e) =>
+                    setFormData({ ...formData, highlights: e.target.value })
+                  }
+                  placeholder="In-House Production, Pan-India Delivery, Custom Solutions"
                   className="mt-2"
                 />
               </div>

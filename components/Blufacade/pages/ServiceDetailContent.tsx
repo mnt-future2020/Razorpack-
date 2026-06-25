@@ -162,7 +162,7 @@ export function ServiceDetailContent({ serviceData }: { serviceData: ServiceData
               <div className="grid grid-cols-4 gap-2.5">
                 {allImages.slice(0, 4).map((img, idx) => (
                   <button
-                    key={idx}
+                    key={img}
                     onClick={() => setSelectedImage(idx)}
                     className={`relative aspect-square bg-white rounded-md overflow-hidden border transition-all duration-300 ${
                       selectedImage === idx
@@ -186,7 +186,7 @@ export function ServiceDetailContent({ serviceData }: { serviceData: ServiceData
               <div className="grid grid-cols-4 gap-2.5">
                 {allImages.slice(4, 8).map((img, idx) => (
                   <button
-                    key={idx + 4}
+                    key={img}
                     onClick={() => setSelectedImage(idx + 4)}
                     className={`relative aspect-square bg-white rounded-md overflow-hidden border transition-all duration-300 ${
                       selectedImage === idx + 4
@@ -224,12 +224,22 @@ export function ServiceDetailContent({ serviceData }: { serviceData: ServiceData
 
             {/* Quick info pills */}
             <div className="flex flex-wrap gap-2 mb-6">
-              <span className="sdt-pill px-3 py-1.5 bg-[#f5f5f5] text-[var(--brand-dark)] text-[11px] font-semibold rounded-full uppercase tracking-wider">
-                In-House Production
-              </span>
-              <span className="sdt-pill px-3 py-1.5 bg-[#f5f5f5] text-[var(--brand-dark)] text-[11px] font-semibold rounded-full uppercase tracking-wider">
-                Pan-India Delivery
-              </span>
+              {serviceData.highlights && serviceData.highlights.length > 0 ? (
+                serviceData.highlights.map((highlight: string, idx: number) => (
+                  <span key={highlight} className="sdt-pill px-3 py-1.5 bg-[#f5f5f5] text-[var(--brand-dark)] text-[11px] font-semibold rounded-full uppercase tracking-wider">
+                    {highlight}
+                  </span>
+                ))
+              ) : (
+                <>
+                  <span className="sdt-pill px-3 py-1.5 bg-[#f5f5f5] text-[var(--brand-dark)] text-[11px] font-semibold rounded-full uppercase tracking-wider">
+                    In-House Production
+                  </span>
+                  <span className="sdt-pill px-3 py-1.5 bg-[#f5f5f5] text-[var(--brand-dark)] text-[11px] font-semibold rounded-full uppercase tracking-wider">
+                    Pan-India Delivery
+                  </span>
+                </>
+              )}
               <span className="sdt-pill-accent px-3 py-1.5 bg-[var(--brand-blue)]/10 text-[var(--brand-blue)] text-[11px] font-semibold rounded-full uppercase tracking-wider">
                 {serviceData.category || "Premium Service"}
               </span>
@@ -262,31 +272,24 @@ export function ServiceDetailContent({ serviceData }: { serviceData: ServiceData
 
             {/* Key Features */}
             <AccordionItem title="Key Features" defaultOpen>
-              <div className="space-y-3">
-                {features.map((feature, idx) => (
-                  <div key={idx} className="flex items-start gap-3">
-                    <div className="sdt-check-bg w-5 h-5 rounded-full bg-[var(--brand-blue)]/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <Check className="w-3 h-3 text-[var(--brand-blue)]" />
+              <ul className="space-y-3.5">
+                {features.map((feature) => (
+                  <li key={feature} className="flex items-start gap-3 group">
+                    <div className="sdt-check-bg w-5 h-5 rounded-full bg-[var(--brand-blue)]/10 flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-[var(--brand-blue)] transition-colors duration-300">
+                      <Check className="sdt-check-icon w-3 h-3 text-[var(--brand-blue)] group-hover:text-white transition-colors duration-300" />
                     </div>
                     <span className="sdt-text text-[#555] text-sm leading-relaxed">{feature}</span>
-                  </div>
+                  </li>
                 ))}
-              </div>
+              </ul>
             </AccordionItem>
 
             {/* Technical Specifications */}
             {serviceData.technicalSpecs && serviceData.technicalSpecs.length > 0 && (
               <AccordionItem title="Technical Specifications">
-                <div className="space-y-0">
-                  {serviceData.technicalSpecs.map((spec, idx) => (
-                    <div
-                      key={idx}
-                      className={`flex justify-between items-center py-3 ${
-                        idx !== serviceData.technicalSpecs!.length - 1
-                          ? "border-b border-[#f0f0f0]"
-                          : ""
-                      }`}
-                    >
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                  {serviceData.technicalSpecs.map((spec) => (
+                    <div key={spec._id || spec.label} className="flex flex-col border-l-2 border-[var(--brand-blue)] pl-4 py-1">
                       <span className="sdt-accordion-title text-[#333] text-sm font-medium">{spec.label}</span>
                       <span className="sdt-text text-[#888] text-sm">{spec.value}</span>
                     </div>
@@ -300,7 +303,7 @@ export function ServiceDetailContent({ serviceData }: { serviceData: ServiceData
               <div className="flex flex-wrap gap-2">
                 {applications.map((app, idx) => (
                   <span
-                    key={idx}
+                    key={app}
                     className="sdt-pill px-4 py-2 bg-[#f5f5f5] text-[#555] text-xs font-medium rounded-full"
                   >
                     {app}
@@ -312,13 +315,21 @@ export function ServiceDetailContent({ serviceData }: { serviceData: ServiceData
             {/* Our Process */}
             <AccordionItem title="Our Process">
               <div className="space-y-4">
-                {[
-                  { step: "01", title: "Consultation", desc: "We analyze your requirements and recommend the optimal packaging solution." },
-                  { step: "02", title: "Material Selection", desc: "Our experts choose the right polymer grade and specifications for your application." },
-                  { step: "03", title: "Execution", desc: "In-house manufacturing with strict quality control at every stage." },
-                  { step: "04", title: "Delivery", desc: "On-time dispatch with 99% on-schedule delivery across India and internationally." },
-                ].map((item, idx) => (
-                  <div key={idx} className="flex items-start gap-4">
+                {(serviceData.processSteps && serviceData.processSteps.length > 0
+                  ? serviceData.processSteps.map((s: any, i: number) => ({
+                      _id: s._id,
+                      step: String(i + 1).padStart(2, "0"),
+                      title: s.title,
+                      desc: s.description,
+                    }))
+                  : [
+                      { step: "01", title: "Consultation", desc: "We analyze your requirements and recommend the optimal packaging solution." },
+                      { step: "02", title: "Material Selection", desc: "Our experts choose the right polymer grade and specifications for your application." },
+                      { step: "03", title: "Execution", desc: "In-house manufacturing with strict quality control at every stage." },
+                      { step: "04", title: "Delivery", desc: "On-time dispatch with 99% on-schedule delivery across India and internationally." },
+                    ]
+                ).map((item: any, idx: number) => (
+                  <div key={item._id || item.step} className="flex items-start gap-4">
                     <span className="sdt-step-num text-[var(--brand-blue)] font-heading font-bold text-lg flex-shrink-0 w-8">
                       {item.step}
                     </span>
@@ -334,15 +345,18 @@ export function ServiceDetailContent({ serviceData }: { serviceData: ServiceData
             {/* Why Choose Us */}
             <AccordionItem title="Why Choose Us">
               <div className="space-y-3">
-                {[
-                  "20+ years of industrial packaging expertise",
-                  "In-house production hub in Madurai, Tamil Nadu",
-                  "Strict quality standards & certifications",
-                  "Custom solutions tailored to your supply chain",
-                  "Pan-India delivery with 99% on-time rate",
-                  "Dedicated project coordination team",
-                ].map((point, idx) => (
-                  <div key={idx} className="flex items-start gap-3">
+                {(serviceData.whyChooseUs && serviceData.whyChooseUs.length > 0
+                  ? serviceData.whyChooseUs
+                  : [
+                      "20+ years of industrial packaging expertise",
+                      "In-house production hub in Madurai, Tamil Nadu",
+                      "Strict quality standards & certifications",
+                      "Custom solutions tailored to your supply chain",
+                      "Pan-India delivery with 99% on-time rate",
+                      "Dedicated project coordination team",
+                    ]
+                ).map((point: string, idx: number) => (
+                  <div key={point} className="flex items-start gap-3">
                     <div className="sdt-check-green-bg w-5 h-5 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 mt-0.5">
                       <Check className="sdt-check-green-icon w-3 h-3 text-green-600" />
                     </div>

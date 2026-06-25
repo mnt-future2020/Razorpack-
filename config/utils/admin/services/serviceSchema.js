@@ -61,6 +61,27 @@ const serviceSchema = new mongoose.Schema(
         trim: true,
       },
     ],
+    // Process steps
+    processSteps: [
+      {
+        title: { type: String, trim: true },
+        description: { type: String, trim: true },
+      },
+    ],
+    // Why Choose Us points
+    whyChooseUs: [
+      {
+        type: String,
+        trim: true,
+      },
+    ],
+    // Quick info highlights (pills)
+    highlights: [
+      {
+        type: String,
+        trim: true,
+      },
+    ],
     slug: {
       type: String,
       required: true,
