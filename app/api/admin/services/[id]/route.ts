@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/config/models/connectDB";
 import Service from "@/config/utils/admin/services/serviceSchema";
-import { uploadToCloudinary } from "@/config/utils/cloudinary";
+import { uploadToCloudinary, deleteByUrl } from "@/config/utils/cloudinary";
 import jwt from "jsonwebtoken";
 
 interface DecodedToken {
@@ -138,6 +138,7 @@ export async function PUT(
     }
 
     // Handle image upload
+    const oldImageUrl = service.image;
     let imageUrl = existingImage || service.image;
     if (imageFile && imageFile.size > 0) {
       const imageBytes = await imageFile.arrayBuffer();
@@ -147,6 +148,19 @@ export async function PUT(
         `services/${newSlug}/main`
       );
       imageUrl = imageResult.secure_url;
+      // Delete old image from Cloudinary if it was replaced
+      if (oldImageUrl && oldImageUrl !== imageUrl) {
+        await deleteByUrl(oldImageUrl);
+      }
+    }
+
+    // Delete removed gallery images from Cloudinary
+    const oldGalleryUrls: string[] = service.gallery || [];
+    const removedGalleryUrls = oldGalleryUrls.filter(
+      (url: string) => url && !existingGallery.includes(url)
+    );
+    for (const url of removedGalleryUrls) {
+      await deleteByUrl(url);
     }
 
     // Handle gallery images
@@ -159,7 +173,7 @@ export async function PUT(
           const buffer = Buffer.from(bytes);
           const result = await uploadToCloudinary(
             buffer,
-            `services/${newSlug}/gallery-${Date.now()}-${i + 1}`
+            `services/${newSlug}/gallery`
           );
           galleryUrls.push(result.secure_url);
         }
@@ -220,6 +234,16 @@ export async function DELETE(
         { success: false, message: "Service not found" },
         { status: 404 }
       );
+    }
+
+    // Delete images from Cloudinary before removing the record
+    if (service.image) {
+      await deleteByUrl(service.image);
+    }
+    if (service.gallery && service.gallery.length > 0) {
+      for (const url of service.gallery) {
+        if (url) await deleteByUrl(url);
+      }
     }
 
     // Hard delete - permanently remove from database

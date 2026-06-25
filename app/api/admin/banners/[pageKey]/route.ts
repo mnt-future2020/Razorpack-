@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import connectDB from "@/config/models/connectDB";
 import Banner from "@/config/utils/admin/banner/bannerSchema";
-import { uploadToCloudinary } from "@/config/utils/cloudinary";
+import { uploadToCloudinary, deleteByUrl } from "@/config/utils/cloudinary";
 import jwt from "jsonwebtoken";
 
 interface DecodedToken {
@@ -82,6 +82,9 @@ export async function PUT(
     const status = (formData.get("status") as string) || undefined;
     const imageFile = formData.get("image") as File | null;
 
+    // Fetch old banner to compare images
+    const oldBanner = await Banner.findOne({ pageKey: pageKey.toLowerCase() }).lean();
+
     const update: any = {};
     if (status) update.status = status;
 
@@ -93,6 +96,12 @@ export async function PUT(
         `banners/${pageKey}/main`
       );
       update.image = result.secure_url;
+
+      // Delete old image from Cloudinary if it changed
+      const oldImageUrl = (oldBanner as any)?.image;
+      if (oldImageUrl && oldImageUrl !== update.image) {
+        await deleteByUrl(oldImageUrl);
+      }
     }
 
     const saved = await Banner.findOneAndUpdate(
@@ -120,6 +129,19 @@ export async function DELETE(
   try {
     await connectDB();
     const { pageKey } = await params;
+
+    // Fetch banner to delete its images from Cloudinary
+    const banner = await Banner.findOne({ pageKey: pageKey.toLowerCase() }).lean() as any;
+    if (banner) {
+      if (banner.image) await deleteByUrl(banner.image);
+      if (banner.mobileImage) await deleteByUrl(banner.mobileImage);
+      if (Array.isArray(banner.images)) {
+        for (const url of banner.images) {
+          if (url) await deleteByUrl(url);
+        }
+      }
+    }
+
     await Banner.findOneAndUpdate(
       { pageKey: pageKey.toLowerCase() },
       { $set: { isDeleted: true, status: "inactive" } }

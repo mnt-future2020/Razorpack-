@@ -8,7 +8,14 @@ export async function GET() {
     await connectDB();
     
     // Check if SEO data exists, if not create default data
-    let seoData = await SEO.find({}).sort({ lastUpdated: -1 });
+    let seoData = await SEO.find({}).lean().then((data: any[]) => {
+        const order = ["home", "about", "products", "services", "gallery", "contact"];
+        return data.sort((a, b) => {
+          const ai = order.indexOf(a.id);
+          const bi = order.indexOf(b.id);
+          return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
+        });
+      });
     
     if (seoData.length === 0) {
       // Create default SEO data for Rayzor Industrial Packaging Pvt Ltd
@@ -16,45 +23,54 @@ export async function GET() {
         {
           id: "home",
           pageName: "Home Page",
-          title: "Rayzor Industrial Packaging Pvt Ltd - Premium Facade Construction & Cladding Solutions",
-          description: "Rayzor Industrial Packaging Pvt Ltd offers premium facade construction services including ACP cladding, structural glazing, aluminium doors & windows, and modern architectural solutions in Chennai, India.",
-          keywords: "facade construction, ACP cladding, structural glazing, aluminium windows, facade contractor Chennai, building facade, modern architecture, HPL cladding, spider glazing",
+          title: "Rayzor Industrial Packaging Pvt Ltd | Premium Packaging Solutions & LDPE Films",
+          description: "Rayzor Industrial Packaging Pvt Ltd is the leading manufacturer of VCI film rolls, LDPE bags, pallet covers, and industrial packaging solutions in Madurai, Tamil Nadu.",
+          keywords: "VCI film rolls, LDPE bags, industrial packaging, pallet covers, container liners, shrink films, corrosion protection, Madurai packaging",
           lastUpdated: new Date(),
           isActive: true,
         },
         {
           id: "about",
           pageName: "About Us",
-          title: "About Rayzor Industrial Packaging Pvt Ltd - Leading Facade Construction Company in Chennai",
-          description: "Learn about Rayzor Industrial Packaging Pvt Ltd, a trusted facade construction company with 15+ years of experience. We specialize in innovative architectural solutions and premium cladding services.",
-          keywords: "about blufacade, facade company Chennai, experienced facade contractor, architectural solutions, premium cladding services, building exterior specialists",
+          title: "About Us | Rayzor Industrial Packaging Pvt Ltd",
+          description: "For over two decades, Rayzor Industrial Packaging Pvt Ltd has been the driving force behind tailor-made packaging solutions from our production hub in Madurai, Tamil Nadu.",
+          keywords: "about rayzorpack, packaging company Madurai, industrial packaging manufacturer, VCI protection, LDPE packaging, Made in India packaging",
           lastUpdated: new Date(),
           isActive: true,
         },
         {
           id: "services",
           pageName: "Services Page",
-          title: "Facade Services - ACP, Glazing, Aluminium & HPL Solutions",
-          description: "Explore our comprehensive facade services including ACP cladding, structural glazing, aluminium doors & windows, HPL panels, spider glazing, and glass partition systems.",
-          keywords: "facade services, ACP cladding services, structural glazing, aluminium fabrication, HPL panels, spider glazing, glass partition, DGU unitised, canopy work",
+          title: "Our Services | Rayzor Industrial Packaging Pvt Ltd",
+          description: "Explore our industrial packaging services — contract packaging, export palletization, vacuum & barrier packing, and VCI corrosion protection solutions.",
+          keywords: "contract packaging, export palletization, vacuum packing, barrier packing, VCI corrosion protection, industrial packaging services",
           lastUpdated: new Date(),
           isActive: true,
         },
         {
-          id: "portfolio",
-          pageName: "Portfolio",
-          title: "Rayzor Industrial Packaging Pvt Ltd Portfolio - Our Completed Facade Projects",
-          description: "View our portfolio of completed facade projects showcasing modern architecture, innovative designs, and quality craftsmanship across residential and commercial buildings.",
-          keywords: "facade portfolio, completed projects, facade gallery, architectural projects, building facades, construction portfolio, modern facades, commercial facades",
+          id: "products",
+          pageName: "Products Page",
+          title: "Products | Rayzor Industrial Packaging Pvt Ltd",
+          description: "Precision-engineered VCI & LDPE films, pouches, bags, shrink wraps, pallet covers, and container liners — 16+ specialized packaging solutions.",
+          keywords: "VCI film rolls, VCI bags, LDPE film rolls, LDPE bags, pallet covers, container liners, shrink films, antistatic films, PP film, HM pouches",
+          lastUpdated: new Date(),
+          isActive: true,
+        },
+        {
+          id: "gallery",
+          pageName: "Gallery",
+          title: "Gallery | Rayzor Industrial Packaging Pvt Ltd",
+          description: "View our portfolio of industrial packaging projects showcasing VCI protection, export palletization, and custom packaging solutions.",
+          keywords: "packaging gallery, industrial packaging portfolio, VCI packaging projects, export packaging, manufacturing facility",
           lastUpdated: new Date(),
           isActive: true,
         },
         {
           id: "contact",
           pageName: "Contact Us",
-          title: "Contact Rayzor Industrial Packaging Pvt Ltd - Get Expert Facade Solutions Today",
-          description: "Contact Rayzor Industrial Packaging Pvt Ltd for premium facade construction services in Chennai, Madurai, and Dindigul. Call 9994162996 or email blufacadein@gmail.com for consultation.",
-          keywords: "contact blufacade, facade inquiry, Chennai facade contractor, facade consultation, building exterior services, ACP cladding quote, glazing services Chennai",
+          title: "Contact Us | Rayzor Industrial Packaging Pvt Ltd",
+          description: "Get in touch with our packaging experts in Madurai, Tamil Nadu. Call +91 90877 87879 or email sales@rayzorpack.com for custom packaging solutions.",
+          keywords: "contact rayzorpack, packaging enquiry, Madurai packaging, industrial packaging quote, VCI packaging consultation",
           lastUpdated: new Date(),
           isActive: true,
         },
@@ -70,10 +86,17 @@ export async function GET() {
       }));
 
       await SEO.bulkWrite(bulkOps);
-      seoData = await SEO.find({}).sort({ lastUpdated: -1 });
+      seoData = await SEO.find({}).lean().then((data: any[]) => {
+        const order = ["home", "about", "products", "services", "gallery", "contact"];
+        return data.sort((a, b) => {
+          const ai = order.indexOf(a.id);
+          const bi = order.indexOf(b.id);
+          return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
+        });
+      });
       console.log("✅ SEO data initialized for Rayzor Industrial Packaging Pvt Ltd");
     }
-    
+
     return NextResponse.json({
       success: true,
       data: seoData,

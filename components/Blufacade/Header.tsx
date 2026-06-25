@@ -308,7 +308,7 @@ export function Header() {
   const isHidden = navState === "hidden" && !menuOpen;
   const isTop = navState === "top" && !menuOpen;
 
-  const hasDarkHero = pathname === "/" || pathname === "/about";
+  const hasDarkHero = pathname === "/" || pathname === "/gallery";
   const useLightText = isTop && hasDarkHero;
 
   return (

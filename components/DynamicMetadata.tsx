@@ -34,7 +34,7 @@ export function DynamicMetadata() {
     // Update document title with siteName and siteTagline
     if (settings?.siteName || settings?.siteTagline) {
       const siteName = settings.siteName || "Rayzor Industrial Packaging Pvt Ltd"
-      const tagline = settings.siteTagline || "Premium Facade & Cladding Solutions"
+      const tagline = settings.siteTagline || "Premium Packaging Solutions & LDPE Films"
       document.title = `${siteName} | ${tagline}`
     }
   }, [settings])

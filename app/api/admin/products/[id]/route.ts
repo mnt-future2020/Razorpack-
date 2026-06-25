@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/config/models/connectDB";
 import Product from "@/config/utils/admin/products/productSchema";
-import { uploadToCloudinary } from "@/config/utils/cloudinary";
+import { uploadToCloudinary, deleteByUrl } from "@/config/utils/cloudinary";
 import jwt from "jsonwebtoken";
 
 interface DecodedToken {
@@ -138,6 +138,7 @@ export async function PUT(
     }
 
     // Handle image upload
+    const oldImageUrl = product.image;
     let imageUrl = existingImage || product.image;
     if (imageFile && imageFile.size > 0) {
       const imageBytes = await imageFile.arrayBuffer();
@@ -147,6 +148,19 @@ export async function PUT(
         `products/${newSlug}/main`
       );
       imageUrl = imageResult.secure_url;
+      // Delete old image from Cloudinary if it was replaced
+      if (oldImageUrl && oldImageUrl !== imageUrl) {
+        await deleteByUrl(oldImageUrl);
+      }
+    }
+
+    // Delete removed gallery images from Cloudinary
+    const oldGalleryUrls: string[] = product.gallery || [];
+    const removedGalleryUrls = oldGalleryUrls.filter(
+      (url: string) => url && !existingGallery.includes(url)
+    );
+    for (const url of removedGalleryUrls) {
+      await deleteByUrl(url);
     }
 
     // Handle gallery images
@@ -159,7 +173,7 @@ export async function PUT(
           const buffer = Buffer.from(bytes);
           const result = await uploadToCloudinary(
             buffer,
-            `products/${newSlug}/gallery-${Date.now()}-${i + 1}`
+            `products/${newSlug}/gallery`
           );
           galleryUrls.push(result.secure_url);
         }
@@ -220,6 +234,16 @@ export async function DELETE(
         { success: false, message: "Product not found" },
         { status: 404 }
       );
+    }
+
+    // Delete images from Cloudinary before removing the record
+    if (product.image) {
+      await deleteByUrl(product.image);
+    }
+    if (product.gallery && product.gallery.length > 0) {
+      for (const url of product.gallery) {
+        if (url) await deleteByUrl(url);
+      }
     }
 
     // Hard delete - permanently remove from database

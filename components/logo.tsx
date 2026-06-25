@@ -29,8 +29,20 @@ export function Logo({ className = "" }: { className?: string }) {
       )}
       <div className="flex flex-col">
         <span className="font-bold text-base sm:text-lg leading-tight">
-          <span className="text-[var(--brand-dark)]">Rayzor</span>
-          <span className="text-[var(--brand-blue)]">pack</span>
+          {(() => {
+            const name = (settings?.siteName || "Rayzorpack").toUpperCase();
+            const accent = (settings?.siteNameAccent || "PACK").toUpperCase();
+            const idx = name.lastIndexOf(accent);
+            if (idx > 0) {
+              return (
+                <>
+                  <span className="text-[var(--brand-dark)]">{name.slice(0, idx)}</span>
+                  <span className="text-[var(--brand-blue)]">{name.slice(idx)}</span>
+                </>
+              );
+            }
+            return <span className="text-[var(--brand-dark)]">{name}</span>;
+          })()}
         </span>
       </div>
     </div>

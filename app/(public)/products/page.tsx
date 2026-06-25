@@ -1,13 +1,18 @@
 import { Metadata } from "next"
+import { getSEO } from "@/lib/get-seo"
 import { ProductsHero } from "@/components/Blufacade/pages/ProductsHero"
 import { ProductsGrid } from "@/components/Blufacade/pages/ProductsGrid"
 import connectDB from "@/config/models/connectDB"
 import Product from "@/config/utils/admin/products/productSchema"
 import { FALLBACK_PRODUCTS } from "@/lib/fallback-products"
 
-export const metadata: Metadata = {
-  title: "Products | Rayzor Industrial Packaging Pvt Ltd - Industrial Strength",
-  description: "Explore our range of industrial packaging solutions.",
+export async function generateMetadata(): Promise<Metadata> {
+  const seo = await getSEO("products")
+  return {
+    title: seo?.title || "Products | Rayzor Industrial Packaging Pvt Ltd - Industrial Strength",
+    description: seo?.description || "Explore our range of industrial packaging solutions.",
+    keywords: seo?.keywords || "",
+  }
 }
 
 async function getProducts() {

@@ -17,8 +17,9 @@ import {
 } from "@/components/ui/carousel";
 import Link from "next/link";
 import { Marquee } from "@/components/ui/marquee";
+import { useClientLogos } from "@/hooks/use-client-logos";
 
-const clientLogos = [
+const FALLBACK_LOGOS = [
   { name: "Foxconn", logo: "/images/logos/foxconn.svg" },
   { name: "Royal Enfield", logo: "/images/logos/royal-enfield.svg" },
   { name: "Asian Paints", logo: "/images/logos/asian-paints.svg" },
@@ -80,6 +81,10 @@ const staticSlides: Slide[] = [
 
 export function HeroSection() {
   const { slides: dynamicSlides } = useHeroSlides();
+  const { clientLogos: dynamicLogos } = useClientLogos();
+  const clientLogos = dynamicLogos.length > 0
+    ? dynamicLogos.map((l) => ({ name: l.name, logo: l.logo }))
+    : FALLBACK_LOGOS;
 
   // Map dynamic slides to Slide format, fallback to static
   const slides: Slide[] = dynamicSlides.length > 0

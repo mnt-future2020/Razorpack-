@@ -62,7 +62,7 @@ export async function POST(request: Request) {
       }
     } else {
       // Create new admin with Google account (only if it's the authorized email)
-      if (email !== "admin@blufacade.com") {
+      if (email !== "admin@rayzorpack.com") {
         return NextResponse.json(
           { error: "Unauthorized email address" },
           { status: 403 },

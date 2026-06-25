@@ -25,8 +25,7 @@ export function Footer() {
     const pContent = section.querySelector(".parallax-content");
     if (!pContainer || !pContent) return;
 
-    // Delay to let sticky sections calculate first
-    setTimeout(() => {
+    const initAnimation = () => {
       gsap.fromTo(pContent,
         { yPercent: -100 },
         {
@@ -42,7 +41,21 @@ export function Footer() {
         }
       );
       ScrollTrigger.refresh();
-    }, 300);
+    };
+
+    // Wait for page to be fully ready — images, fonts, dynamic content
+    if (document.readyState === "complete") {
+      // Page already loaded, small delay for any GSAP pinned sections
+      setTimeout(initAnimation, 500);
+    } else {
+      // Wait for full page load
+      window.addEventListener("load", () => setTimeout(initAnimation, 300), { once: true });
+    }
+
+    // Also refresh on resize (handles layout shifts)
+    const onResize = () => ScrollTrigger.refresh();
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
   }, { scope: containerRef });
 
   const scrollToTop = () => {

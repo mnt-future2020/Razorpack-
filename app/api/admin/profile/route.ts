@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import connectDB from "@/config/models/connectDB";
 import Admin from "@/config/utils/admin/login/loginSchema";
 import jwt from "jsonwebtoken";
-import { uploadToCloudinary } from "@/config/utils/cloudinary";
+import { uploadToCloudinary, deleteByUrl } from "@/config/utils/cloudinary";
 
 interface DecodedToken {
   adminId: string;
@@ -93,6 +93,7 @@ export async function PUT(request: Request) {
     }
 
     // Handle avatar upload if provided
+    const oldAvatarUrl = admin.avatar;
     let avatarUrl = admin.avatar; // Keep existing avatar URL by default
     if (avatarFile) {
       try {
@@ -101,6 +102,10 @@ export async function PUT(request: Request) {
         const folderPath = `admin/${admin._id}/avatar`;
         const result = await uploadToCloudinary(buffer, folderPath);
         avatarUrl = result.secure_url;
+        // Delete old avatar from Cloudinary if it was replaced
+        if (oldAvatarUrl && oldAvatarUrl !== avatarUrl) {
+          await deleteByUrl(oldAvatarUrl);
+        }
       } catch (uploadError) {
         console.error("Avatar upload failed:", uploadError);
         return NextResponse.json(

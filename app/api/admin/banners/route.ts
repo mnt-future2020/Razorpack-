@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import connectDB from "@/config/models/connectDB";
 import Banner from "@/config/utils/admin/banner/bannerSchema";
-import { uploadToCloudinary } from "@/config/utils/cloudinary";
+import { uploadToCloudinary, deleteByUrl } from "@/config/utils/cloudinary";
 import jwt from "jsonwebtoken";
 
 interface DecodedToken {
@@ -92,6 +92,7 @@ export async function POST(request: NextRequest) {
     const headingLine1 = ((formData.get("headingLine1") as string) || "").trim();
     const headingLine2 = ((formData.get("headingLine2") as string) || "").trim();
     const description = ((formData.get("description") as string) || "").trim();
+    const heroSource = ((formData.get("heroSource") as string) || "").trim();
 
     if (!pageKey) {
       return NextResponse.json(
@@ -167,11 +168,18 @@ export async function POST(request: NextRequest) {
       finalImages = mergedImages.filter(img => img !== "");
     }
 
-    if (!finalImageUrl && finalImages.length === 0 && slides.length === 0) {
-      return NextResponse.json(
-        { success: false, message: "Banner image or slides data is required" },
-        { status: 400 }
-      );
+    // Upload gallery images (for gallery page or any page with multiple images)
+    const galleryImageFiles = formData.getAll("galleryImages") as File[];
+    if (galleryImageFiles.length > 0) {
+      for (let i = 0; i < galleryImageFiles.length; i++) {
+        const gf = galleryImageFiles[i];
+        if (gf && gf.size > 0) {
+          const bytes = await gf.arrayBuffer();
+          const buffer = Buffer.from(bytes);
+          const result = await uploadToCloudinary(buffer, `banners/${pageKey}`);
+          finalImages.push(result.secure_url);
+        }
+      }
     }
 
     // Parse slides data if provided (for home hero carousel)
@@ -179,6 +187,18 @@ export async function POST(request: NextRequest) {
     let slides: any[] = [];
     if (slidesJson) {
       try { slides = JSON.parse(slidesJson); } catch { slides = []; }
+    }
+
+    if (!finalImageUrl && finalImages.length === 0 && slides.length === 0 && !heroSource) {
+      return NextResponse.json(
+        { success: false, message: "Banner image or slides data is required" },
+        { status: 400 }
+      );
+    }
+
+    // For gallery page with no uploaded image, use a placeholder
+    if (!finalImageUrl && finalImages.length === 0 && heroSource) {
+      finalImageUrl = "/images/placeholder.svg";
     }
 
     const payload: any = {
@@ -194,15 +214,38 @@ export async function POST(request: NextRequest) {
     if (headingLine2) payload.headingLine2 = headingLine2;
     if (description) payload.description = description;
 
-    if (finalImages.length > 0) {
-      payload.images = finalImages;
-    }
+    // Gallery hero source preference — always save (even empty) so unselections persist
+    payload.heroSource = heroSource || "[]";
+
+    // Always set images (even empty) so deletions are saved
+    payload.images = finalImages;
 
     if (slides.length > 0) {
       payload.slides = slides;
     }
 
     if (finalMobileImageUrl) payload.mobileImage = finalMobileImageUrl;
+
+    // Delete removed images from Cloudinary before saving
+    const oldBanner = await Banner.findOne({ pageKey }).lean();
+    if (oldBanner) {
+      const oldImages = (oldBanner as any).images || [];
+      const newImages = payload.images || [];
+      const removedImages = oldImages.filter((img: string) => img && !newImages.includes(img));
+      for (const url of removedImages) {
+        await deleteByUrl(url);
+      }
+      // Also delete old main image if replaced
+      const oldMainImage = (oldBanner as any).image || "";
+      if (oldMainImage && payload.image && oldMainImage !== payload.image && oldMainImage !== "/images/placeholder.svg") {
+        await deleteByUrl(oldMainImage);
+      }
+      // Also delete old mobile image if replaced
+      const oldMobileImage = (oldBanner as any).mobileImage || "";
+      if (oldMobileImage && payload.mobileImage && oldMobileImage !== payload.mobileImage) {
+        await deleteByUrl(oldMobileImage);
+      }
+    }
 
     // Upsert by pageKey (one banner per page)
     const saved = await Banner.findOneAndUpdate(

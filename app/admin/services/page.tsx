@@ -473,7 +473,7 @@ export default function ServicesPage() {
               isActive={currentPage === i}
               className={`cursor-pointer ${
                 currentPage === i
-                  ? "bg-[#8CC63F] text-white border-0 hover:bg-[#7AB52F]"
+                  ? "bg-[#26A8E0] text-white border-0 hover:bg-[#1a8abf]"
                   : ""
               }`}
             >
@@ -519,7 +519,7 @@ export default function ServicesPage() {
               isActive={currentPage === i}
               className={`cursor-pointer ${
                 currentPage === i
-                  ? "bg-[#8CC63F] text-white border-0 hover:bg-[#7AB52F]"
+                  ? "bg-[#26A8E0] text-white border-0 hover:bg-[#1a8abf]"
                   : ""
               }`}
             >
@@ -631,7 +631,7 @@ export default function ServicesPage() {
           <div className="bg-gray-50 rounded-full h-16 w-16 flex items-center justify-center mx-auto mb-4">
             <Briefcase className="h-8 w-8 text-gray-400" />
           </div>
-          <h3 className="text-lg font-semibold text-[#1E3A5F] mb-1">
+          <h3 className="text-lg font-semibold text-[#221E1F] mb-1">
             No services found
           </h3>
           <p className="text-gray-500 mb-6">

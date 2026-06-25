@@ -1,29 +1,108 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef, useCallback, useEffect } from "react"
 import { motion } from "framer-motion"
 import { Phone, Mail, MapPin, Clock, Send, Loader2, Facebook, Instagram, Linkedin, Twitter, Youtube, MessageCircle } from "lucide-react"
 import { useContact } from "@/hooks/use-contact"
 import { useServices } from "@/hooks/use-services"
+import { useProducts } from "@/hooks/use-products"
 
 export function ContactContent() {
-  const { contactInfo, isLoading: isContactLoading } = useContact()
-  const { services } = useServices()
+  const { contactInfo } = useContact()
+  const { services } = useServices(1, 100)
+  const [productPage, setProductPage] = useState(1)
+  const [allProducts, setAllProducts] = useState<any[]>([])
+  const [hasMoreProducts, setHasMoreProducts] = useState(true)
+  const { products, pagination: productPagination } = useProducts(productPage, 10)
+  const dropdownRef = useRef<HTMLDivElement>(null)
+  const loaderRef = useRef<HTMLDivElement>(null)
+  const [dropdownOpen, setDropdownOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // Accumulate products as pages load
+  useEffect(() => {
+    if (products && products.length > 0) {
+      setAllProducts(prev => {
+        const existingIds = new Set(prev.map((p: any) => p._id || p.slug))
+        const newItems = products.filter((p: any) => !existingIds.has(p._id || p.slug))
+        return [...prev, ...newItems]
+      })
+      setHasMoreProducts(productPagination?.hasNextPage || false)
+    }
+  }, [products, productPagination])
+
+  // Infinite scroll observer
+  useEffect(() => {
+    if (!loaderRef.current || !dropdownOpen) return
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMoreProducts) {
+          setProductPage(prev => prev + 1)
+        }
+      },
+      { root: dropdownRef.current, threshold: 0.1 }
+    )
+    observer.observe(loaderRef.current)
+    return () => observer.disconnect()
+  }, [dropdownOpen, hasMoreProducts])
+
+  // Close dropdown on click outside
+  useEffect(() => {
+    if (!dropdownOpen) return
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement
+      if (!target.closest("[data-subject-dropdown]")) {
+        setDropdownOpen(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [dropdownOpen])
+
   const [submitStatus, setSubmitStatus] = useState<{ type: 'success' | 'error' | null, message: string }>({ type: null, message: "" })
   
   const [formData, setFormData] = useState({
-    fullName: "",
-    companyName: "",
+    firstName: "",
+    lastName: "",
     email: "",
     phone: "",
-    division: "",
-    source: "",
+    subject: "",
     message: "",
   })
+  const [errors, setErrors] = useState<Record<string, string>>({})
+
+  const validate = () => {
+    const newErrors: Record<string, string> = {}
+
+    if (!formData.firstName.trim()) newErrors.firstName = "First name is required"
+    if (!formData.lastName.trim()) newErrors.lastName = "Last name is required"
+
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required"
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = "Enter a valid email address"
+    }
+
+    if (!formData.phone.trim()) {
+      newErrors.phone = "Phone number is required"
+    } else if (!/^[+]?[\d\s()-]{7,15}$/.test(formData.phone.trim())) {
+      newErrors.phone = "Enter a valid phone number"
+    }
+
+    if (!formData.subject) newErrors.subject = "Please select a service or product"
+    if (!formData.message.trim()) {
+      newErrors.message = "Message is required"
+    } else if (formData.message.trim().length < 10) {
+      newErrors.message = "Message must be at least 10 characters"
+    }
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!validate()) return
     setIsSubmitting(true)
     setSubmitStatus({ type: null, message: "" })
 
@@ -31,14 +110,22 @@ export function ContactContent() {
       const response = await fetch("/api/leads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          phone: formData.phone,
+          subject: formData.subject || "General Enquiry",
+          message: formData.message,
+          source: "website",
+        }),
       })
 
       const data = await response.json()
 
       if (data.success) {
-        setSubmitStatus({ type: 'success', message: "Thank you! Your message has been sent successfully." })
-        setFormData({ fullName: "", companyName: "", email: "", phone: "", division: "", source: "", message: "" })
+        setSubmitStatus({ type: 'success', message: "Thank you! Your enquiry has been submitted. We'll contact you within 24 hours." })
+        setFormData({ firstName: "", lastName: "", email: "", phone: "", subject: "", message: "" })
       } else {
         setSubmitStatus({ type: 'error', message: data.error || "Something went wrong. Please try again." })
       }
@@ -82,113 +169,145 @@ export function ContactContent() {
                 </div>
               )}
 
-              <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                
-                {/* Full Name */}
-                <div className="sm:col-span-2">
+              <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4" noValidate>
+
+                {/* First Name */}
+                <div className="sm:col-span-1">
                   <input
                     type="text"
-                    required
-                    value={formData.fullName}
-                    onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                    placeholder="Full Name"
-                    className="w-full bg-white border-0 p-5 text-[15px] outline-none focus:ring-2 focus:ring-[#1a1a1a] text-[#36312d]"
+                    value={formData.firstName}
+                    onChange={(e) => { setFormData({ ...formData, firstName: e.target.value }); if (errors.firstName) setErrors(prev => ({ ...prev, firstName: "" })) }}
+                    placeholder="First Name *"
+                    className={`w-full bg-white border-2 p-5 text-[15px] outline-none focus:ring-0 text-[#36312d] transition-colors ${errors.firstName ? "border-red-400" : "border-transparent focus:border-[#1a1a1a]"}`}
                   />
+                  {errors.firstName && <p className="text-red-400 text-xs mt-1 pl-1">{errors.firstName}</p>}
                 </div>
 
-                {/* Company Name */}
-                <div className="sm:col-span-2">
+                {/* Last Name */}
+                <div className="sm:col-span-1">
                   <input
                     type="text"
-                    value={formData.companyName}
-                    onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
-                    placeholder="Company Name"
-                    className="w-full bg-white border-0 p-5 text-[15px] outline-none focus:ring-2 focus:ring-[#1a1a1a] text-[#36312d]"
+                    value={formData.lastName}
+                    onChange={(e) => { setFormData({ ...formData, lastName: e.target.value }); if (errors.lastName) setErrors(prev => ({ ...prev, lastName: "" })) }}
+                    placeholder="Last Name *"
+                    className={`w-full bg-white border-2 p-5 text-[15px] outline-none focus:ring-0 text-[#36312d] transition-colors ${errors.lastName ? "border-red-400" : "border-transparent focus:border-[#1a1a1a]"}`}
                   />
+                  {errors.lastName && <p className="text-red-400 text-xs mt-1 pl-1">{errors.lastName}</p>}
                 </div>
 
                 {/* Email Address */}
-                <div className="sm:col-span-2">
+                <div className="sm:col-span-1">
                   <input
                     type="email"
-                    required
                     value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    placeholder="Email Address"
-                    className="w-full bg-white border-0 p-5 text-[15px] outline-none focus:ring-2 focus:ring-[#1a1a1a] text-[#36312d]"
+                    onChange={(e) => { setFormData({ ...formData, email: e.target.value }); if (errors.email) setErrors(prev => ({ ...prev, email: "" })) }}
+                    placeholder="Email Address *"
+                    className={`w-full bg-white border-2 p-5 text-[15px] outline-none focus:ring-0 text-[#36312d] transition-colors ${errors.email ? "border-red-400" : "border-transparent focus:border-[#1a1a1a]"}`}
                   />
+                  {errors.email && <p className="text-red-400 text-xs mt-1 pl-1">{errors.email}</p>}
                 </div>
 
-                {/* Contact Number */}
+                {/* Phone Number */}
                 <div className="sm:col-span-1">
                   <input
                     type="tel"
-                    required
                     value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    placeholder="Contact Number"
-                    className="w-full bg-white border-0 p-5 text-[15px] outline-none focus:ring-2 focus:ring-[#1a1a1a] text-[#36312d]"
+                    onChange={(e) => { setFormData({ ...formData, phone: e.target.value }); if (errors.phone) setErrors(prev => ({ ...prev, phone: "" })) }}
+                    placeholder="Phone Number *"
+                    className={`w-full bg-white border-2 p-5 text-[15px] outline-none focus:ring-0 text-[#36312d] transition-colors ${errors.phone ? "border-red-400" : "border-transparent focus:border-[#1a1a1a]"}`}
                   />
+                  {errors.phone && <p className="text-red-400 text-xs mt-1 pl-1">{errors.phone}</p>}
                 </div>
 
-                {/* Division Interested In */}
-                <div className="sm:col-span-1 relative">
-                  <select
-                    value={formData.division}
-                    onChange={(e) => setFormData({ ...formData, division: e.target.value })}
-                    className="w-full bg-white border-0 p-5 text-[15px] outline-none focus:ring-2 focus:ring-[#1a1a1a] appearance-none cursor-pointer"
-                    style={{ color: formData.division ? "#36312d" : "#9ca3af" }}
+                {/* Service / Product Interested In — Custom scrollable dropdown */}
+                <div className="sm:col-span-2 relative" data-subject-dropdown>
+                  <button
+                    type="button"
+                    onClick={() => { setDropdownOpen(!dropdownOpen); if (errors.subject) setErrors(prev => ({ ...prev, subject: "" })) }}
+                    className={`w-full bg-white border-2 p-5 text-[15px] outline-none focus:ring-0 cursor-pointer text-left flex items-center justify-between transition-colors ${errors.subject ? "border-red-400" : "border-transparent focus:border-[#1a1a1a]"}`}
                   >
-                    <option value="" disabled hidden>Division Interested In</option>
-                    <option value="VCI Protection" className="text-[#36312d]">VCI Protection</option>
-                    <option value="Export Palletization" className="text-[#36312d]">Export Palletization</option>
-                    <option value="Contract Packaging" className="text-[#36312d]">Contract Packaging</option>
-                    <option value="Specialty Films" className="text-[#36312d]">Specialty Films</option>
-                  </select>
-                  {/* Dropdown Arrow */}
-                  <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none">
-                    <svg className="w-5 h-5 text-gray-800" fill="currentColor" viewBox="0 0 20 20">
+                    <span style={{ color: formData.subject ? "#36312d" : "#9ca3af" }}>
+                      {formData.subject || "Service / Product Interested In *"}
+                    </span>
+                    <svg className={`w-5 h-5 text-gray-800 transition-transform duration-200 ${dropdownOpen ? "rotate-180" : ""}`} fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
                     </svg>
-                  </div>
-                </div>
+                  </button>
 
-                {/* Radio Group */}
-                <div className="sm:col-span-2 mt-4 mb-3">
-                  <label className="block text-[15px] font-medium text-white mb-5">
-                    Where did you hear about Rayzor Industrial Packaging Pvt Ltd? *
-                  </label>
-                  <div className="flex flex-wrap gap-x-10 gap-y-4">
-                    {["LinkedIn", "Word of mouth", "Online search", "Other"].map((source) => (
-                      <label key={source} className="flex items-center gap-3 cursor-pointer group">
-                        <div className={`w-5 h-5 rounded-full border-2 border-white flex items-center justify-center transition-colors ${formData.source === source ? 'bg-white' : 'bg-transparent group-hover:bg-white/20'}`}>
-                          {formData.source === source && <div className="w-2 h-2 rounded-full bg-[var(--brand-blue)] ring-2 ring-white" />}
-                        </div>
-                        <input
-                          type="radio"
-                          name="source"
-                          value={source}
-                          checked={formData.source === source}
-                          onChange={(e) => setFormData({ ...formData, source: e.target.value })}
-                          className="sr-only"
-                          required
-                        />
-                        <span className="text-[15px] text-white/90">{source}</span>
-                      </label>
-                    ))}
-                  </div>
+                  {dropdownOpen && (
+                    <div
+                      ref={dropdownRef}
+                      className="absolute top-full left-0 right-0 z-50 bg-white shadow-xl border border-gray-200 max-h-[280px] overflow-y-auto"
+                      style={{ scrollbarWidth: "thin" }}
+                    >
+                      {/* Services */}
+                      {services && services.length > 0 && (
+                        <>
+                          <div className="px-5 py-2 text-[11px] font-bold uppercase tracking-wider text-[var(--brand-blue)] bg-gray-50 sticky top-0">Services</div>
+                          {services.map((s: any) => (
+                            <button
+                              key={s._id || s.slug}
+                              type="button"
+                              onClick={() => { setFormData({ ...formData, subject: s.serviceName }); setDropdownOpen(false) }}
+                              className={`w-full text-left px-5 py-3 text-[14px] hover:bg-[var(--brand-blue)]/5 transition-colors ${formData.subject === s.serviceName ? "bg-[var(--brand-blue)]/10 text-[var(--brand-blue)] font-medium" : "text-[#36312d]"}`}
+                            >
+                              {s.serviceName}
+                            </button>
+                          ))}
+                        </>
+                      )}
+
+                      {/* Products — infinite scroll */}
+                      {allProducts.length > 0 && (
+                        <>
+                          <div className="px-5 py-2 text-[11px] font-bold uppercase tracking-wider text-[var(--brand-blue)] bg-gray-50 sticky top-0">Products</div>
+                          {allProducts.map((p: any) => (
+                            <button
+                              key={p._id || p.slug}
+                              type="button"
+                              onClick={() => { setFormData({ ...formData, subject: p.productName }); setDropdownOpen(false) }}
+                              className={`w-full text-left px-5 py-3 text-[14px] hover:bg-[var(--brand-blue)]/5 transition-colors ${formData.subject === p.productName ? "bg-[var(--brand-blue)]/10 text-[var(--brand-blue)] font-medium" : "text-[#36312d]"}`}
+                            >
+                              {p.productName}
+                            </button>
+                          ))}
+                          {/* Infinite scroll loader */}
+                          {hasMoreProducts && (
+                            <div ref={loaderRef} className="px-5 py-3 text-center">
+                              <Loader2 className="w-4 h-4 animate-spin text-[var(--brand-blue)] mx-auto" />
+                            </div>
+                          )}
+                        </>
+                      )}
+
+                      {/* Other */}
+                      <div className="px-5 py-2 text-[11px] font-bold uppercase tracking-wider text-gray-400 bg-gray-50 sticky top-0">Other</div>
+                      {["Custom Solution", "General Enquiry"].map((item) => (
+                        <button
+                          key={item}
+                          type="button"
+                          onClick={() => { setFormData({ ...formData, subject: item }); setDropdownOpen(false) }}
+                          className={`w-full text-left px-5 py-3 text-[14px] hover:bg-[var(--brand-blue)]/5 transition-colors ${formData.subject === item ? "bg-[var(--brand-blue)]/10 text-[var(--brand-blue)] font-medium" : "text-[#36312d]"}`}
+                        >
+                          {item}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  {errors.subject && <p className="text-red-400 text-xs mt-1 pl-1">{errors.subject}</p>}
                 </div>
 
                 {/* Message */}
                 <div className="sm:col-span-2">
                   <textarea
-                    required
                     rows={7}
                     value={formData.message}
-                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    placeholder="Message..."
-                    className="w-full bg-white border-0 p-5 text-[15px] outline-none focus:ring-2 focus:ring-[#1a1a1a] resize-none text-[#36312d]"
+                    onChange={(e) => { setFormData({ ...formData, message: e.target.value }); if (errors.message) setErrors(prev => ({ ...prev, message: "" })) }}
+                    placeholder="Tell us about your packaging requirements... *"
+                    className={`w-full bg-white border-2 p-5 text-[15px] outline-none focus:ring-0 resize-none text-[#36312d] transition-colors ${errors.message ? "border-red-400" : "border-transparent focus:border-[#1a1a1a]"}`}
                   />
+                  {errors.message && <p className="text-red-400 text-xs mt-1 pl-1">{errors.message}</p>}
                 </div>
 
                 {/* Submit Button */}

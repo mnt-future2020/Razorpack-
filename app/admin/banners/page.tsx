@@ -24,8 +24,6 @@ export default function BannersPage() {
     { key: "about", label: "About Us" },
     { key: "products", label: "Products" },
     { key: "services", label: "Services" },
-    { key: "portfolio", label: "Portfolio" },
-    { key: "careers", label: "Careers" },
     { key: "contact", label: "Contact" },
   ];
 
@@ -227,6 +225,7 @@ export default function BannersPage() {
         if (heroHeadingLine1) form.append("headingLine1", heroHeadingLine1);
         if (heroHeadingLine2) form.append("headingLine2", heroHeadingLine2);
         if (heroDescription) form.append("description", heroDescription);
+
       }
 
       const res = await axios.post(`/api/admin/banners`, form, {
@@ -389,6 +388,7 @@ export default function BannersPage() {
                       />
                     </div>
                   </div>
+
                 </>
               )}
 

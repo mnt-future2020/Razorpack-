@@ -6,13 +6,15 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+const PROJECT_FOLDER = "rayzorpack";
+
 export const uploadToCloudinary = async (buffer: Buffer, folder: string) => {
   try {
     const result = await new Promise((resolve, reject) => {
       cloudinary.uploader
         .upload_stream(
           {
-            folder: folder,
+            folder: `${PROJECT_FOLDER}/${folder}`,
             resource_type: 'image',
             use_filename: true,
             unique_filename: true,
@@ -41,6 +43,30 @@ export const deleteFromCloudinary = async (publicId: string) => {
   } catch (error) {
     console.error('Error deleting from Cloudinary:', error);
     throw error;
+  }
+};
+
+// Extract public_id from a Cloudinary URL for deletion
+export const getPublicIdFromUrl = (url: string): string | null => {
+  try {
+    // URL format: https://res.cloudinary.com/<cloud>/image/upload/v123/folder/subfolder/filename.ext
+    const match = url.match(/\/upload\/(?:v\d+\/)?(.+)\.\w+$/);
+    return match ? match[1] : null;
+  } catch {
+    return null;
+  }
+};
+
+// Delete a Cloudinary image by its URL
+export const deleteByUrl = async (url: string) => {
+  const publicId = getPublicIdFromUrl(url);
+  if (publicId) {
+    try {
+      await cloudinary.uploader.destroy(publicId);
+      console.log(`✅ Deleted from Cloudinary: ${publicId}`);
+    } catch (error) {
+      console.error(`❌ Failed to delete from Cloudinary: ${publicId}`, error);
+    }
   }
 };
 

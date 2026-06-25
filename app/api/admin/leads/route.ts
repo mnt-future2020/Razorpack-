@@ -145,12 +145,12 @@ async function sendLeadEmails(lead: any) {
   // Admin Notification
   const adminHtml = `
     <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; background-color: #f8fafc;">
-      <div style="background: linear-gradient(135deg, #014a74 0%, #012d47 100%); padding: 30px; text-align: center;">
+      <div style="background: linear-gradient(135deg, #221E1F 0%, #26A8E0 100%); padding: 30px; text-align: center;">
         <h1 style="color: white; margin: 0; font-size: 28px;">New Lead Submission</h1>
         <p style="color: #e2e8f0; margin: 10px 0 0 0; font-size: 16px;">Rayzor Industrial Packaging Pvt Ltd Admin Panel</p>
       </div>
       <div style="padding: 30px; background-color: white; margin: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-         <h2 style="color: #014a74; border-bottom: 2px solid #f58420; padding-bottom: 10px;">Enquiry Details</h2>
+         <h2 style="color: #221E1F; border-bottom: 2px solid #f58420; padding-bottom: 10px;">Enquiry Details</h2>
          <p><strong>Name:</strong> ${lead.firstName} ${lead.lastName}</p>
          <p><strong>Email:</strong> ${lead.email}</p>
          <p><strong>Phone:</strong> ${lead.phone || "N/A"}</p>
@@ -166,9 +166,9 @@ async function sendLeadEmails(lead: any) {
   // Customer Confirmation
   const customerHtml = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f8fafc;">
-      <div style="background: linear-gradient(135deg, #014a74 0%, #012d47 100%); padding: 30px; text-align: center;">
+      <div style="background: linear-gradient(135deg, #221E1F 0%, #26A8E0 100%); padding: 30px; text-align: center;">
         <h1 style="color: white; margin: 0; font-size: 28px;">Thank You for Contacting Us!</h1>
-        <p style="color: #e2e8f0; margin: 10px 0 0 0; font-size: 16px;">Rayzor Industrial Packaging Pvt Ltd - Inspiring Skylines</p>
+        <p style="color: #e2e8f0; margin: 10px 0 0 0; font-size: 16px;">Rayzor Industrial Packaging Pvt Ltd - Premium Packaging Solutions</p>
       </div>
       <div style="padding: 30px; background-color: white; margin: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
         <p>Hi ${lead.firstName},</p>
@@ -227,7 +227,7 @@ export async function PUT(request: NextRequest) {
     ) {
       // Generate a unique review token
       const reviewToken = `review_${_id}_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
-      const appUrl = process.env.APP_URL || "https://blufacade.com";
+      const appUrl = process.env.APP_URL || "https://www.rayzorpack.com";
       const reviewLink = `${appUrl}/review?token=${reviewToken}`;
 
       updateData.reviewToken = reviewToken;

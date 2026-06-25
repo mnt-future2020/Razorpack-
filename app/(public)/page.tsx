@@ -4,23 +4,23 @@ import { ProductsCarousel } from "@/components/Blufacade/ProductsCarousel";
 import { ServicesSection } from "@/components/Blufacade/ServicesSection";
 import { UniqueSection } from "@/components/Blufacade/UniqueSection";
 import { MissionSection } from "@/components/Blufacade/MissionSection";
+import { getSEO } from "@/lib/get-seo";
 
-export const metadata: Metadata = {
-  title:
-    "Rayzor Industrial Packaging Pvt Ltd | Premium Packaging Solutions & LDPE Films",
-  description:
-    "Rayzor Industrial Packaging Pvt Ltd is the leading manufacturer of premium packaging materials, LDPE Film Rolls, and Poly Bags in Madurai, Tamil Nadu. Transform your packaging with our industrial solutions.",
-  keywords:
-    "packaging solutions, LDPE film rolls, VCI poly bags, stretch films, custom packaging, Madurai, Tamil Nadu, industrial packaging",
-  openGraph: {
-    title: "Rayzor Industrial Packaging Pvt Ltd | Premium Packaging Solutions",
-    description:
-      "Leading manufacturer of premium packaging materials, LDPE Film Rolls, and Poly Bags.",
-    url: "https://www.rayzorpack.com",
-    siteName: "Rayzor Industrial Packaging Pvt Ltd",
-    type: "website",
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const seo = await getSEO("home");
+  return {
+    title: seo?.title || "Rayzor Industrial Packaging Pvt Ltd | Premium Packaging Solutions & LDPE Films",
+    description: seo?.description || "Rayzor Industrial Packaging Pvt Ltd is the leading manufacturer of premium packaging materials, LDPE Film Rolls, and Poly Bags in Madurai, Tamil Nadu.",
+    keywords: seo?.keywords || "packaging solutions, LDPE film rolls, VCI poly bags, stretch films, custom packaging, Madurai, Tamil Nadu",
+    openGraph: {
+      title: seo?.title || "Rayzor Industrial Packaging Pvt Ltd | Premium Packaging Solutions",
+      description: seo?.description || "Leading manufacturer of premium packaging materials, LDPE Film Rolls, and Poly Bags.",
+      url: "https://www.rayzorpack.com",
+      siteName: "Rayzor Industrial Packaging Pvt Ltd",
+      type: "website",
+    },
+  };
+}
 
 export default function Home() {
   return (

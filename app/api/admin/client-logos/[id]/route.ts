@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/config/models/connectDB';
 import ClientLogo from '@/config/utils/admin/clientLogo/clientLogoSchema';
-import { uploadToCloudinary } from '@/config/utils/cloudinary';
+import { uploadToCloudinary, deleteByUrl } from '@/config/utils/cloudinary';
 import jwt from 'jsonwebtoken';
 
 interface DecodedToken {
@@ -130,6 +130,7 @@ export async function PUT(
       );
     }
 
+    const oldLogoUrl = existingClientLogo.logo;
     let logoUrl = existingLogo || existingClientLogo.logo;
 
     // Upload new logo if provided
@@ -141,6 +142,10 @@ export async function PUT(
         `client-logos/${name.toLowerCase().replace(/\s+/g, '-')}`
       );
       logoUrl = logoResult.secure_url;
+      // Delete old logo from Cloudinary if it was replaced
+      if (oldLogoUrl && oldLogoUrl !== logoUrl) {
+        await deleteByUrl(oldLogoUrl);
+      }
     }
 
     const updatedLogo = await ClientLogo.findByIdAndUpdate(
@@ -184,7 +189,7 @@ export async function DELETE(
     await connectDB();
     const { id } = await params;
 
-    const clientLogo = await ClientLogo.findByIdAndDelete(id);
+    const clientLogo = await ClientLogo.findById(id);
 
     if (!clientLogo) {
       return NextResponse.json(
@@ -195,6 +200,13 @@ export async function DELETE(
         { status: 404 }
       );
     }
+
+    // Delete logo from Cloudinary before removing the record
+    if (clientLogo.logo) {
+      await deleteByUrl(clientLogo.logo);
+    }
+
+    await ClientLogo.findByIdAndDelete(id);
 
     return NextResponse.json({
       success: true,

@@ -114,7 +114,7 @@ export default function AdminDashboard() {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-[#8CC63F]" />
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-[#26A8E0]" />
           <p className="text-gray-600">Loading dashboard...</p>
         </div>
       </div>
@@ -194,14 +194,14 @@ export default function AdminDashboard() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-[#1E3A5F]">Dashboard</h1>
+          <h1 className="text-3xl font-bold text-[#221E1F]">Dashboard</h1>
           <p className="text-gray-600 mt-1">Welcome back! Here&apos;s your overview.</p>
         </div>
         <Button
           onClick={handleRefresh}
           disabled={refreshing}
           variant="outline"
-          className="border-[#1E3A5F]/20 text-[#1E3A5F] hover:bg-[#1E3A5F]/10 hover:text-[#1E3A5F] hover:border-[#1E3A5F]/30"
+          className="border-[#221E1F]/20 text-[#221E1F] hover:bg-[#221E1F]/10 hover:text-[#221E1F] hover:border-[#221E1F]/30"
         >
           <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? "animate-spin" : ""}`} />
           {refreshing ? "Refreshing..." : "Refresh"}
@@ -214,10 +214,10 @@ export default function AdminDashboard() {
           <Card key={stat.title} className="border-0 shadow-lg">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <stat.icon className="h-5 w-5 text-[#1E3A5F]" />
+                <stat.icon className="h-5 w-5 text-[#221E1F]" />
                 <span className="text-xs text-gray-500">{stat.change}</span>
               </div>
-              <p className="text-2xl font-bold text-[#1E3A5F]">{stat.value}</p>
+              <p className="text-2xl font-bold text-[#221E1F]">{stat.value}</p>
               <p className="text-xs text-gray-500 mt-1">{stat.title}</p>
             </CardContent>
           </Card>
@@ -228,14 +228,14 @@ export default function AdminDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Recent Leads - Takes 3 columns */}
         <Card className="border-0 shadow-lg lg:col-span-3">
-          <CardHeader className="bg-linear-to-r from-[#1E3A5F]/10 to-[#8CC63F]/10 p-4 border-b">
+          <CardHeader className="bg-linear-to-r from-[#221E1F]/10 to-[#26A8E0]/10 p-4 border-b">
             <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2 text-[#1E3A5F]">
-                <Users className="h-5 w-5 text-[#8CC63F]" />
+              <CardTitle className="flex items-center gap-2 text-[#221E1F]">
+                <Users className="h-5 w-5 text-[#26A8E0]" />
                 Recent Leads
               </CardTitle>
               <Link href="/admin/leads">
-                <Button variant="outline" size="sm" className="text-[#1E3A5F] hover:bg-[#1E3A5F]/10 hover:text-[#1E3A5F] border-[#1E3A5F]/20 hover:border-[#1E3A5F]/30">
+                <Button variant="outline" size="sm" className="text-[#221E1F] hover:bg-[#221E1F]/10 hover:text-[#221E1F] border-[#221E1F]/20 hover:border-[#221E1F]/30">
                   View All
                   <ChevronRight className="h-4 w-4 ml-1" />
                 </Button>
@@ -247,13 +247,13 @@ export default function AdminDashboard() {
               <div className="divide-y">
                 {recentLeads.map((lead) => (
                   <div key={lead._id} className="flex items-center gap-4 p-4 hover:bg-gray-50 transition-colors">
-                    <div className="w-10 h-10 bg-[#1E3A5F] rounded-full flex items-center justify-center shrink-0">
+                    <div className="w-10 h-10 bg-[#221E1F] rounded-full flex items-center justify-center shrink-0">
                       <span className="text-white font-medium text-sm">
                         {lead.fullName.split(" ").slice(0, 2).map((n) => n[0]).join("").toUpperCase()}
                       </span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-[#1E3A5F] truncate">{lead.fullName}</p>
+                      <p className="font-semibold text-[#221E1F] truncate">{lead.fullName}</p>
                       <p className="text-sm text-gray-500 truncate">{lead.subject}</p>
                     </div>
                     <div className="text-right shrink-0">
@@ -276,9 +276,9 @@ export default function AdminDashboard() {
 
         {/* Quick Actions - Takes 1 column */}
         <Card className="border-0 shadow-lg h-fit">
-          <CardHeader className="bg-linear-to-r from-[#1E3A5F]/10 to-[#8CC63F]/10 p-4 border-b">
-            <CardTitle className="flex items-center gap-2 text-[#1E3A5F]">
-              <Settings className="h-5 w-5 text-[#8CC63F]" />
+          <CardHeader className="bg-linear-to-r from-[#221E1F]/10 to-[#26A8E0]/10 p-4 border-b">
+            <CardTitle className="flex items-center gap-2 text-[#221E1F]">
+              <Settings className="h-5 w-5 text-[#26A8E0]" />
               Quick Actions
             </CardTitle>
           </CardHeader>
@@ -288,10 +288,10 @@ export default function AdminDashboard() {
                 <Link key={action.title} href={action.href}>
                   <Button
                     variant="outline"
-                    className="w-full h-auto py-3 flex flex-col items-center gap-1 hover:bg-[#8CC63F]/10 hover:border-[#8CC63F]"
+                    className="w-full h-auto py-3 flex flex-col items-center gap-1 hover:bg-[#26A8E0]/10 hover:border-[#26A8E0]"
                   >
-                    <action.icon className="h-5 w-5 text-[#1E3A5F]" />
-                    <span className="text-xs font-medium text-[#1E3A5F]">{action.title}</span>
+                    <action.icon className="h-5 w-5 text-[#221E1F]" />
+                    <span className="text-xs font-medium text-[#221E1F]">{action.title}</span>
                   </Button>
                 </Link>
               ))}
@@ -301,11 +301,11 @@ export default function AdminDashboard() {
             <div className="mt-4 pt-4 border-t">
               <div className="flex items-center justify-between text-sm mb-2">
                 <span className="text-gray-600">Lead Completion</span>
-                <span className="font-semibold text-[#8CC63F]">{metrics.completionRate}%</span>
+                <span className="font-semibold text-[#26A8E0]">{metrics.completionRate}%</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
                 <div
-                  className="bg-[#8CC63F] h-2 rounded-full transition-all duration-500"
+                  className="bg-[#26A8E0] h-2 rounded-full transition-all duration-500"
                   style={{ width: `${metrics.completionRate}%` }}
                 />
               </div>
@@ -314,11 +314,11 @@ export default function AdminDashboard() {
             {/* Additional Stats */}
             <div className="mt-4 pt-4 border-t grid grid-cols-2 gap-3">
               <div className="text-center p-2 bg-gray-50 rounded-lg">
-                <p className="text-lg font-bold text-[#1E3A5F]">{metrics.thisMonthLeads}</p>
+                <p className="text-lg font-bold text-[#221E1F]">{metrics.thisMonthLeads}</p>
                 <p className="text-[10px] text-gray-500">This Month</p>
               </div>
               <div className="text-center p-2 bg-gray-50 rounded-lg">
-                <p className="text-lg font-bold text-[#1E3A5F]">{metrics.completedLeads}</p>
+                <p className="text-lg font-bold text-[#221E1F]">{metrics.completedLeads}</p>
                 <p className="text-[10px] text-gray-500">Completed</p>
               </div>
             </div>

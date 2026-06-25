@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/config/models/connectDB';
 import ClientLogo from '@/config/utils/admin/clientLogo/clientLogoSchema';
-import { uploadToCloudinary } from '@/config/utils/cloudinary';
+import { uploadToCloudinary, deleteByUrl } from '@/config/utils/cloudinary';
 import jwt from 'jsonwebtoken';
 
 interface DecodedToken {
@@ -175,9 +175,9 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    const clientLogo = await ClientLogo.findByIdAndDelete(id);
+    const record = await ClientLogo.findById(id);
 
-    if (!clientLogo) {
+    if (!record) {
       return NextResponse.json(
         {
           success: false,
@@ -186,6 +186,13 @@ export async function DELETE(request: NextRequest) {
         { status: 404 }
       );
     }
+
+    // Delete logo from Cloudinary
+    if (record.logo) {
+      await deleteByUrl(record.logo);
+    }
+
+    await ClientLogo.findByIdAndDelete(id);
 
     return NextResponse.json({
       success: true,

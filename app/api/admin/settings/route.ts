@@ -1,24 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/config/models/connectDB";
 import Settings from "@/config/utils/admin/settings/settingsSchema";
-import { uploadToCloudinary, deleteFromCloudinary } from "@/config/utils/cloudinary";
-
-// Helper function to delete old file from Cloudinary
-async function deleteOldFile(cloudinaryUrl: string | null): Promise<void> {
-  if (!cloudinaryUrl) return;
-  
-  try {
-    // Extract public_id from Cloudinary URL
-    const urlParts = cloudinaryUrl.split('/');
-    const publicId = `settings/${urlParts[urlParts.length - 1].split('.')[0]}`;
-    
-    await deleteFromCloudinary(publicId);
-    console.log(`✅ Deleted file from Cloudinary: ${publicId}`);
-  } catch (error) {
-    console.error(`❌ Error deleting file from Cloudinary:`, error);
-    // Don't throw error - file deletion failure shouldn't stop the update
-  }
-}
+import { uploadToCloudinary, deleteByUrl } from "@/config/utils/cloudinary";
 
 // GET - Fetch site settings
 export async function GET() {
@@ -97,7 +80,7 @@ export async function PUT(request: NextRequest) {
     if (logo && logo.startsWith("data:image/")) {
       // Delete old logo from Cloudinary if it exists
       if (currentSettings?.logo) {
-        await deleteOldFile(currentSettings.logo);
+        await deleteByUrl(currentSettings.logo);
       }
       logoPath = await uploadBase64Image(logo, "logo");
     }
@@ -106,7 +89,7 @@ export async function PUT(request: NextRequest) {
     if (favicon && favicon.startsWith("data:image/")) {
       // Delete old favicon from Cloudinary if it exists
       if (currentSettings?.favicon) {
-        await deleteOldFile(currentSettings.favicon);
+        await deleteByUrl(currentSettings.favicon);
       }
       faviconPath = await uploadBase64Image(favicon, "favicon");
     }
@@ -156,10 +139,10 @@ export async function POST() {
 
     // Delete old logo and favicon from Cloudinary if they exist
     if (currentSettings?.logo) {
-      await deleteOldFile(currentSettings.logo);
+      await deleteByUrl(currentSettings.logo);
     }
     if (currentSettings?.favicon) {
-      await deleteOldFile(currentSettings.favicon);
+      await deleteByUrl(currentSettings.favicon);
     }
 
     const defaultSettings = {

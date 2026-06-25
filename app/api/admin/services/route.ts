@@ -180,7 +180,7 @@ export async function POST(request: NextRequest) {
           const buffer = Buffer.from(bytes);
           const result = await uploadToCloudinary(
             buffer,
-            `services/${slug}/gallery-${i + 1}`
+            `services/${slug}/gallery`
           );
           galleryUrls.push(result.secure_url);
         }

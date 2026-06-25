@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import { useLeads, Lead } from "@/hooks/use-leads"
 import { useServices } from "@/hooks/use-services"
+import { useProducts } from "@/hooks/use-products"
 import {
   Dialog,
   DialogContent,
@@ -91,7 +92,8 @@ export default function LeadManager() {
     status: statusFilter,
     priority: priorityFilter
   })
-  const { services } = useServices()
+  const { services } = useServices(1, 100)
+  const { products } = useProducts(1, 100)
 
   const [formData, setFormData] = useState<Partial<Lead>>({
     firstName: "",
@@ -343,7 +345,7 @@ export default function LeadManager() {
               setFormData({ firstName: "", lastName: "", email: "", phone: "", subject: "", message: "", status: "new", priority: "medium", source: "website", estimatedCost: "", notes: "" })
               setIsAddModalOpen(true)
             }}
-            className="bg-[#26A8E0] hover:bg-[#e67a1c] text-white"
+            className="bg-[#26A8E0] hover:bg-[#1a8abf] text-white"
           >
             <UserPlus className="h-4 w-4 mr-2" />
             Add New Lead
@@ -359,7 +361,7 @@ export default function LeadManager() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-500">{stat.title}</p>
-                  <h3 className="text-3xl font-bold mt-1 text-[#1E3A5F]">{stat.value}</h3>
+                  <h3 className="text-3xl font-bold mt-1 text-[#221E1F]">{stat.value}</h3>
                 </div>
                 <div className={`${stat.color}`}>
                   <stat.icon className="h-6 w-6" />
@@ -418,9 +420,9 @@ export default function LeadManager() {
 
       {/* Table */}
       <Card className="border-0 shadow-lg">
-        <CardHeader className="bg-linear-to-r from-[#1E3A5F]/10 to-[#8CC63F]/10 p-4 border-b">
-          <CardTitle className="flex items-center gap-2 text-[#1E3A5F]">
-            <Users className="h-5 w-5 text-[#8CC63F]" />
+        <CardHeader className="bg-linear-to-r from-[#221E1F]/10 to-[#26A8E0]/10 p-4 border-b">
+          <CardTitle className="flex items-center gap-2 text-[#221E1F]">
+            <Users className="h-5 w-5 text-[#26A8E0]" />
             Enquiries List
           </CardTitle>
         </CardHeader>
@@ -429,13 +431,13 @@ export default function LeadManager() {
             <Table>
               <TableHeader>
                 <TableRow className="bg-gray-50">
-                  <TableHead className="font-semibold text-[#1E3A5F]">Name & Contact</TableHead>
-                  <TableHead className="font-semibold text-[#1E3A5F]">Subject</TableHead>
-                  <TableHead className="font-semibold text-[#1E3A5F]">Status</TableHead>
-                  <TableHead className="font-semibold text-[#1E3A5F]">Priority</TableHead>
-                  <TableHead className="font-semibold text-[#1E3A5F]">Est. Cost</TableHead>
-                  <TableHead className="font-semibold text-[#1E3A5F]">Date</TableHead>
-                  <TableHead className="text-right font-semibold text-[#1E3A5F]">Actions</TableHead>
+                  <TableHead className="font-semibold text-[#221E1F]">Name & Contact</TableHead>
+                  <TableHead className="font-semibold text-[#221E1F]">Subject</TableHead>
+                  <TableHead className="font-semibold text-[#221E1F]">Status</TableHead>
+                  <TableHead className="font-semibold text-[#221E1F]">Priority</TableHead>
+                  <TableHead className="font-semibold text-[#221E1F]">Est. Cost</TableHead>
+                  <TableHead className="font-semibold text-[#221E1F]">Date</TableHead>
+                  <TableHead className="text-right font-semibold text-[#221E1F]">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -457,7 +459,7 @@ export default function LeadManager() {
                     <TableRow key={lead._id} className="hover:bg-gray-50">
                       <TableCell className="py-4">
                         <div className="flex flex-col">
-                          <span className="font-semibold text-[#1E3A5F]">{lead.firstName} {lead.lastName}</span>
+                          <span className="font-semibold text-[#221E1F]">{lead.firstName} {lead.lastName}</span>
                           <span className="text-xs text-gray-500">{lead.email}</span>
                           {lead.phone && <span className="text-xs text-gray-400">{lead.phone}</span>}
                         </div>
@@ -490,7 +492,7 @@ export default function LeadManager() {
                       </TableCell>
                       <TableCell className="text-right py-4">
                         <div className="flex justify-end gap-1">
-                          <Button variant="ghost" size="icon" onClick={() => handleViewLead(lead)} className="h-8 w-8 text-[#1E3A5F] hover:text-blue-700 hover:bg-blue-50">
+                          <Button variant="ghost" size="icon" onClick={() => handleViewLead(lead)} className="h-8 w-8 text-[#221E1F] hover:text-blue-700 hover:bg-blue-50">
                             <Eye className="h-4 w-4" />
                           </Button>
                           <Button variant="ghost" size="icon" onClick={() => handleEditLead(lead)} className="h-8 w-8 text-amber-600 hover:text-amber-700 hover:bg-amber-50">
@@ -527,8 +529,8 @@ export default function LeadManager() {
       <Dialog open={isAddModalOpen} onOpenChange={(open) => { if (!open) { setIsAddModalOpen(false); setIsFormSubmitted(false) } }}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-[#1E3A5F] flex items-center gap-2">
-              <UserPlus className="h-6 w-6 text-[#8CC63F]" />
+            <DialogTitle className="text-2xl font-bold text-[#221E1F] flex items-center gap-2">
+              <UserPlus className="h-6 w-6 text-[#26A8E0]" />
               Add Manual Lead
             </DialogTitle>
           </DialogHeader>
@@ -581,11 +583,25 @@ export default function LeadManager() {
                   </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
-                  {services.map((service) => (
-                    <SelectItem key={service._id} value={service.serviceName}>{service.serviceName}</SelectItem>
-                  ))}
+                  {services && services.length > 0 && (
+                    <>
+                      <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[#26A8E0]">Services</div>
+                      {services.map((service: any) => (
+                        <SelectItem key={service._id || service.slug} value={service.serviceName}>{service.serviceName}</SelectItem>
+                      ))}
+                    </>
+                  )}
+                  {products && products.length > 0 && (
+                    <>
+                      <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[#26A8E0] mt-1">Products</div>
+                      {products.map((product: any) => (
+                        <SelectItem key={product._id || product.slug} value={product.productName}>{product.productName}</SelectItem>
+                      ))}
+                    </>
+                  )}
+                  <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-gray-400 mt-1">Other</div>
+                  <SelectItem value="Custom Solution">Custom Solution</SelectItem>
                   <SelectItem value="General Enquiry">General Enquiry</SelectItem>
-                  <SelectItem value="Other">Other</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -645,7 +661,7 @@ export default function LeadManager() {
             <div className="space-y-2">
               <Label>Estimated Cost</Label>
               <Input 
-                placeholder="$500 or To be determined"
+                placeholder="₹50,000 or To be determined"
                 value={formData.estimatedCost} 
                 onChange={(e) => setFormData({ ...formData, estimatedCost: e.target.value })} 
               />
@@ -662,7 +678,7 @@ export default function LeadManager() {
           </div>
           <div className="flex gap-3 justify-end pt-4 border-t">
             <Button variant="outline" onClick={() => { setIsAddModalOpen(false); setIsFormSubmitted(false) }}>Cancel</Button>
-            <Button onClick={handleAddLead} disabled={isSaving} className="bg-[#26A8E0] hover:bg-[#e67a1c] text-white min-w-[120px]">
+            <Button onClick={handleAddLead} disabled={isSaving} className="bg-[#26A8E0] hover:bg-[#1a8abf] text-white min-w-[120px]">
               {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : "Add Lead"}
             </Button>
           </div>
@@ -674,8 +690,8 @@ export default function LeadManager() {
       <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-[#1E3A5F] flex items-center gap-2">
-              <Edit className="h-6 w-6 text-[#8CC63F]" />
+            <DialogTitle className="text-2xl font-bold text-[#221E1F] flex items-center gap-2">
+              <Edit className="h-6 w-6 text-[#26A8E0]" />
               Update Lead Status & Details
             </DialogTitle>
             <p className="text-gray-600 text-sm mt-2">
@@ -687,7 +703,7 @@ export default function LeadManager() {
               {/* Read-only Customer Information */}
               <div className="bg-gray-50 p-6 rounded-lg border">
                 <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                  <User className="h-5 w-5 text-[#1E3A5F]" />
+                  <User className="h-5 w-5 text-[#221E1F]" />
                   Customer Information (Read-only)
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -721,9 +737,9 @@ export default function LeadManager() {
               </div>
 
               {/* Editable Administrative Fields */}
-              <div className="bg-[#8CC63F]/10 p-6 rounded-lg border border-[#8CC63F]/30">
+              <div className="bg-[#26A8E0]/10 p-6 rounded-lg border border-[#26A8E0]/30">
                 <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                  <Settings className="h-5 w-5 text-[#8CC63F]" />
+                  <Settings className="h-5 w-5 text-[#26A8E0]" />
                   Administrative Details (Editable)
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -779,7 +795,7 @@ export default function LeadManager() {
                     <Input
                       value={selectedLead.estimatedCost || ""}
                       onChange={(e) => setSelectedLead({ ...selectedLead, estimatedCost: e.target.value })}
-                      placeholder="$500 or To be determined"
+                      placeholder="₹50,000 or To be determined"
                     />
                   </div>
                   <div className="space-y-2">
@@ -817,7 +833,7 @@ export default function LeadManager() {
             <Button variant="outline" onClick={() => setIsEditModalOpen(false)} disabled={isSaving}>
               Cancel
             </Button>
-            <Button onClick={handleUpdateLead} disabled={isSaving} className="bg-[#8CC63F] hover:bg-[#7AB82F] text-white min-w-[140px]">
+            <Button onClick={handleUpdateLead} disabled={isSaving} className="bg-[#26A8E0] hover:bg-[#7AB82F] text-white min-w-[140px]">
               {isSaving ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />

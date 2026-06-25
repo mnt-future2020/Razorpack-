@@ -21,6 +21,7 @@ import {
   Briefcase,
   Heart,
   MessageSquare,
+  ImageIcon,
   Globe,
 } from "lucide-react"
 import { Suspense } from "react"
@@ -152,25 +153,13 @@ export default function AdminLayout({
         { name: "Contact Manager", href: "/admin/contact", icon: <Phone className="h-4 w-4" /> },
         { name: "Products", href: "/admin/products", icon: <Briefcase className="h-4 w-4" /> },
         { name: "Services", href: "/admin/services", icon: <Briefcase className="h-4 w-4" /> },
-        { name: "Portfolio", href: "/admin/portfolio", icon: <Briefcase className="h-4 w-4" /> },
+        { name: "Gallery", href: "/admin/gallery", icon: <ImageIcon className="h-4 w-4" /> },
         { name: "Client Logos", href: "/admin/client-logos", icon: <Users className="h-4 w-4" /> },
       ],
     },
     {
       name: "Lead Manager",
       href: "/admin/leads",
-      icon: <MessageSquare className="h-5 w-5" />,
-      color: "text-[#26A8E0]",
-    },
-    {
-      name: "Feedback",
-      href: "/admin/feedback",
-      icon: <Heart className="h-5 w-5" />,
-      color: "text-[#221E1F]",
-    },
-    {
-      name: "Testimonials",
-      href: "/admin/testimonials",
       icon: <MessageSquare className="h-5 w-5" />,
       color: "text-[#26A8E0]",
     },

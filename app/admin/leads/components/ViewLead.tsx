@@ -290,7 +290,7 @@ export default function ViewLead({ lead, isOpen, onClose }: ViewLeadProps) {
             <div className="flex flex-wrap gap-3">
               <Button
                 onClick={() => window.open(`mailto:${lead.email}`)}
-                className="bg-[#1E3A5F] hover:bg-[#2c5282] text-white"
+                className="bg-[#221E1F] hover:bg-[#2c5282] text-white"
               >
                 <Mail className="h-4 w-4 mr-2" />
                 Send Email
@@ -320,7 +320,7 @@ export default function ViewLead({ lead, isOpen, onClose }: ViewLeadProps) {
                     const reviewMessage = `Hi ${lead.firstName}, thank you for choosing Rayzor Industrial Packaging Pvt Ltd! We hope you had a great experience with our ${lead.subject} service.\n\nPlease take a moment to share your feedback: ${lead.reviewLink}\n\nYour feedback helps us serve you better! 🙏`;
                     window.open(`https://wa.me/${lead.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(reviewMessage)}`);
                   }}
-                  className="bg-[#26A8E0] hover:bg-[#e67a1c] text-white"
+                  className="bg-[#26A8E0] hover:bg-[#1a8abf] text-white"
                 >
                   <Star className="h-4 w-4 mr-2" />
                   Share Review Link

@@ -39,6 +39,12 @@ const bannerSchema = new mongoose.Schema(
       ],
       default: [],
     },
+    // Gallery hero image source preference
+    heroSource: {
+      type: String,
+      enum: ["upload", "works", "both"],
+      default: "upload",
+    },
     // Page hero text fields (for services, products, about, etc.)
     label: {
       type: String,

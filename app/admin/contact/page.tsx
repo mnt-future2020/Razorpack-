@@ -56,12 +56,6 @@ export default function ContactPage() {
     latitude: "",
     longitude: "",
 
-    // Contact Page Content
-    pageTitle: "",
-    pageDescription: "",
-    officeTitle: "",
-    officeDescription: "",
-    
     // Service Areas
     serviceAreas: "",
   });
@@ -553,77 +547,15 @@ export default function ContactPage() {
           </CardContent>
         </Card>
 
-        {/* Contact Page Content */}
+        {/* Service Areas */}
         <Card className="shadow-lg border-0 rounded-none">
           <CardHeader className="bg-gradient-to-r from-[#26A8E0]/10 to-[#221E1F]/10 p-6">
             <CardTitle className="flex items-center gap-2 text-[#221E1F]">
-              <Mail className="h-5 w-5 text-[#26A8E0]" />
-              Contact Page Content
+              <MapPin className="h-5 w-5 text-[#26A8E0]" />
+              Service Areas
             </CardTitle>
           </CardHeader>
           <CardContent className="p-8 space-y-6">
-            <div>
-              <Label htmlFor="pageTitle" className="text-base font-semibold">
-                Contact Page Title
-              </Label>
-              <Input
-                id="pageTitle"
-                value={contactInfo.pageTitle}
-                onChange={(e) => handleInputChange("pageTitle", e.target.value)}
-                placeholder="Get in Touch with Rayzor Industrial Packaging Pvt Ltd"
-                className="mt-2"
-              />
-            </div>
-            <div>
-              <Label
-                htmlFor="pageDescription"
-                className="text-base font-semibold"
-              >
-                Contact Page Description
-              </Label>
-              <Textarea
-                id="pageDescription"
-                value={contactInfo.pageDescription}
-                onChange={(e) =>
-                  handleInputChange("pageDescription", e.target.value)
-                }
-                placeholder="Ready to transform your building's exterior? Contact our expert team today and let us bring your architectural vision to life with premium facade solutions."
-                rows={3}
-                className="mt-2 w-full"
-              />
-            </div>
-            <div>
-              <Label htmlFor="officeTitle" className="text-base font-semibold">
-                Office Section Title
-              </Label>
-              <Input
-                id="officeTitle"
-                value={contactInfo.officeTitle}
-                onChange={(e) =>
-                  handleInputChange("officeTitle", e.target.value)
-                }
-                placeholder="Visit Our Office"
-                className="mt-2"
-              />
-            </div>
-            <div>
-              <Label
-                htmlFor="officeDescription"
-                className="text-base font-semibold"
-              >
-                Office Section Description
-              </Label>
-              <Textarea
-                id="officeDescription"
-                value={contactInfo.officeDescription}
-                onChange={(e) =>
-                  handleInputChange("officeDescription", e.target.value)
-                }
-                placeholder="Conveniently located in Chennai, our office is your gateway to premium facade construction services tailored to your architectural needs."
-                rows={3}
-                className="mt-2 w-full"
-              />
-            </div>
             <div>
               <Label
                 htmlFor="serviceAreas"
@@ -637,12 +569,12 @@ export default function ContactPage() {
                 onChange={(e) =>
                   handleInputChange("serviceAreas", e.target.value)
                 }
-                placeholder="Chennai, Madurai, Dindigul, Coimbatore, Trichy, Salem, Tamil Nadu, South India"
+                placeholder="Madurai, Chennai, Bangalore, Coimbatore, Tamil Nadu, South India"
                 rows={3}
                 className="mt-2 w-full"
               />
               <p className="text-sm text-gray-500 mt-1">
-                Enter service areas separated by commas. These will be displayed on the contact page.
+                Enter service areas separated by commas.
               </p>
             </div>
           </CardContent>

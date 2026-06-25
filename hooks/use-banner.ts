@@ -12,6 +12,7 @@ interface Banner {
   headingLine2?: string;
   description?: string;
   mobileImage?: string;
+  heroSource?: string;
   status: string;
 }
 
