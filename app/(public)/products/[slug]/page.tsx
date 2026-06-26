@@ -34,15 +34,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (!productData) {
     return {
-      title: "Product Not Found - Rayzor Industrial Packaging Pvt Ltd",
+      title: "Product Not Found",
       description: "The requested product could not be found.",
     };
   }
 
   return {
-    title:
-      productData.seoTitle ||
-      `${productData.productName} | Rayzor Industrial Packaging Pvt Ltd`,
+    title: productData.seoTitle || productData.productName,
     description:
       productData.seoDescription ||
       productData.shortDescription ||

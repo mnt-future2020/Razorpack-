@@ -88,15 +88,13 @@ export async function generateMetadata({ params }: PageProps) {
 
   if (!serviceData) {
     return {
-      title: "Service Not Found - Rayzor Industrial Packaging Pvt Ltd",
+      title: "Service Not Found",
       description: "The requested service could not be found.",
     };
   }
 
   return {
-    title:
-      serviceData.seoTitle ||
-      `${serviceData.serviceName} | Rayzor Industrial Packaging Pvt Ltd`,
+    title: serviceData.seoTitle || serviceData.serviceName,
     description: serviceData.seoDescription || serviceData.description,
     keywords:
       serviceData.seoKeywords ||
