@@ -2,7 +2,7 @@
 
 import React, { useRef } from "react";
 import Link from "next/link";
-
+import { MapPin, Phone, Mail } from "lucide-react";
 import { useSettings } from "@/hooks/use-settings";
 import { useContact } from "@/hooks/use-contact";
 import { siteConfig } from "@/config/site";
@@ -98,7 +98,7 @@ export function Footer() {
             <div className="md:col-span-3 lg:col-span-4 flex flex-col gap-5 lg:gap-6">
               
               <div className="flex gap-4">
-                <span className="font-bold text-[#1b1c19] w-4 mt-0.5">L</span>
+                <MapPin size={18} className="text-[#1b1c19] mt-0.5 shrink-0" />
                 <p className="text-[#1b1c19] font-medium text-sm md:text-base leading-snug">
                   {contactInfo?.address || "No: 298 A1, M.M Nagar, Thiruppalai"}
                   {contactInfo?.city ? <><br/>{contactInfo.city} - {contactInfo.postcode || ""}</> : <><br/>Madurai - 625014</>}
@@ -107,14 +107,14 @@ export function Footer() {
               </div>
 
               <div className="flex gap-4 items-center">
-                <span className="font-bold text-[#1b1c19] w-4">P</span>
+                <Phone size={18} className="text-[#1b1c19] shrink-0" />
                 <a href={`tel:${contactInfo?.primaryPhone || "+919087787879"}`} className="text-[#1b1c19] font-medium text-sm md:text-base hover:text-[var(--brand-blue)] transition-colors">
                   {contactInfo?.primaryPhone || "+91 90877 87879"}
                 </a>
               </div>
 
               <div className="flex gap-4 items-center">
-                <span className="font-bold text-[#1b1c19] w-4">E</span>
+                <Mail size={18} className="text-[#1b1c19] shrink-0" />
                 <a href={`mailto:${contactInfo?.email || "sales@rayzorpack.com"}`} className="text-[#1b1c19] font-medium text-sm md:text-base hover:text-[var(--brand-blue)] transition-colors">
                   {contactInfo?.email || "sales@rayzorpack.com"}
                 </a>
