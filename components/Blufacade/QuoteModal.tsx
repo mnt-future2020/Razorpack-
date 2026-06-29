@@ -12,6 +12,7 @@ interface QuoteModalProps {
 export function QuoteModal({ open, onClose, productOrService }: QuoteModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState("");
   const [formData, setFormData] = useState({
     fullName: "",
     companyName: "",
@@ -24,9 +25,27 @@ export function QuoteModal({ open, onClose, productOrService }: QuoteModalProps)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
     setIsSubmitting(true);
 
     try {
+      // Validate required fields
+      if (!formData.fullName.trim()) {
+        setError("Please enter your full name");
+        setIsSubmitting(false);
+        return;
+      }
+      if (!formData.email.trim()) {
+        setError("Please enter your email");
+        setIsSubmitting(false);
+        return;
+      }
+      if (!formData.message.trim()) {
+        setError("Please enter your message");
+        setIsSubmitting(false);
+        return;
+      }
+
       // Split fullName into firstName + lastName for API
       const nameParts = formData.fullName.trim().split(/\s+/);
       const firstName = nameParts[0] || "";
@@ -55,9 +74,11 @@ export function QuoteModal({ open, onClose, productOrService }: QuoteModalProps)
           setFormData({ fullName: "", companyName: "", email: "", phone: "", division: productOrService || "", source: "", message: "" });
           onClose();
         }, 2500);
+      } else {
+        setError(data.error || "Failed to submit. Please try again.");
       }
     } catch {
-      // silently fail
+      setError("Something went wrong. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -168,6 +189,12 @@ export function QuoteModal({ open, onClose, productOrService }: QuoteModalProps)
                 className="w-full border border-gray-200 rounded-lg px-3.5 py-2.5 text-sm focus:border-[var(--brand-blue)] focus:ring-1 focus:ring-[var(--brand-blue)]/20 outline-none transition-colors resize-none"
               />
             </div>
+
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-4 py-3">
+                {error}
+              </div>
+            )}
 
             <button
               type="submit"

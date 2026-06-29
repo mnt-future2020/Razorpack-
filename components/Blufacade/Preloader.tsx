@@ -2,8 +2,10 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import { gsap } from "gsap";
+import { useSettings } from "@/hooks/use-settings";
 
 export function Preloader() {
+  const { settings } = useSettings();
   const [progress, setProgress] = useState(0);
   const preloaderRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLHeadingElement>(null);
@@ -89,8 +91,18 @@ export function Preloader() {
            className="text-[12vw] lg:text-[13vw] font-black tracking-[-0.06em] leading-none w-full text-center" 
            style={{ transform: "scaleY(1.2)" }}
          >
-           <span className="text-white">RAYZOR</span>
-           <span className="text-[var(--brand-blue)]">PACK</span>
+           {(() => {
+             const name = (settings?.siteName || "RAYZORPACK").toUpperCase();
+             const accent = (settings?.siteNameAccent || "PACK").toUpperCase();
+             const idx = name.lastIndexOf(accent);
+             if (idx >= 0) {
+               return <>
+                 <span className="text-white">{name.slice(0, idx)}</span>
+                 <span className="text-[var(--brand-blue)]">{accent}</span>
+               </>;
+             }
+             return <span className="text-white">{name}</span>;
+           })()}
          </h1>
       </div>
 
