@@ -299,89 +299,34 @@ export function Header() {
     <>
       <header
         ref={headerRef}
-        className="fixed top-0 left-0 right-0 z-50 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+        className="fixed top-0 left-0 right-0 z-50 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] bg-white shadow-sm"
         style={{ transform: isHidden ? "translateY(-100%)" : "translateY(0%)" }}
       >
         <div className="flex items-stretch h-14 sm:h-16 lg:h-[72px]">
           {/* ─── LEFT: Logo + Company Name ─── */}
-          <div
-            className="shrink-0 flex items-center pl-4 pr-4 lg:pl-6 lg:pr-6 xl:pl-8 xl:pr-10 transition-all duration-500"
-            style={{ backgroundColor: isTop ? "transparent" : "#ffffff" }}
-          >
+          <div className="shrink-0 flex items-center pl-4 pr-4 lg:pl-6 lg:pr-6 xl:pl-8 xl:pr-10 transition-all duration-500">
             <Link
               href="/"
               className="flex items-center gap-2 sm:gap-2.5 lg:gap-3.5 group"
             >
-              <div
-                className="w-9 h-9 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded flex items-center justify-center shrink-0 transition-all duration-500"
-                style={{
-                  border: useLightText
-                    ? "1.5px solid rgba(255,255,255,0.35)"
-                    : "1.5px solid #e0e0e0",
-                  backgroundColor: useLightText
-                    ? "rgba(0,0,0,0.2)"
-                    : "transparent",
-                }}
-              >
+              <div className="relative h-8 w-48 sm:h-10 sm:w-56 lg:h-12 lg:w-72 shrink-0 transition-all duration-500">
                 <Image
-                  src={
-                    settings?.logo ||
-                    "/images/rayzor/logo/Rayzor Final Logo File-03.png"
-                  }
+                  src={settings?.logo || "/images/rayzor/logo/Rayzor_Logo.png"}
                   alt={
                     settings?.siteName
                       ? `${settings.siteName} Logo`
                       : "Rayzor Industrial Packaging Pvt Ltd Logo"
                   }
-                  width={36}
-                  height={36}
-                  className="h-6 w-6 sm:h-7 sm:w-7 lg:h-9 lg:w-9 object-contain"
+                  fill
+                  className="object-contain object-left"
                   priority
                 />
               </div>
-              <span className="text-base sm:text-lg md:text-xl lg:text-xl xl:text-2xl font-heading font-extrabold tracking-tight leading-none transition-colors duration-500 uppercase">
-                {(() => {
-                  const name = settings?.siteName || "RAYZORPACK";
-                  const accent = settings?.siteNameAccent || "PACK";
-                  const upperName = name.toUpperCase();
-                  const upperAccent = accent.toUpperCase();
-                  const idx = upperName.lastIndexOf(upperAccent);
-                  if (idx > 0) {
-                    return (
-                      <>
-                        <span
-                          style={{
-                            color: useLightText
-                              ? "var(--brand-white)"
-                              : "var(--brand-dark)",
-                          }}
-                        >
-                          {upperName.slice(0, idx)}
-                        </span>
-                        <span className="text-[var(--brand-blue)]">
-                          {upperName.slice(idx)}
-                        </span>
-                      </>
-                    );
-                  }
-                  return (
-                    <span
-                      style={{
-                        color: useLightText
-                          ? "var(--brand-white)"
-                          : "var(--brand-dark)",
-                      }}
-                    >
-                      {upperName}
-                    </span>
-                  );
-                })()}
-              </span>
             </Link>
           </div>
 
-          {/* ─── RIGHT: Nav + buttons — always white bg ─── */}
-          <div className="hidden lg:flex flex-1 items-stretch bg-white">
+          {/* ─── RIGHT: Nav + buttons ─── */}
+          <div className="hidden lg:flex flex-1 items-stretch">
             <nav className="flex items-center gap-4 xl:gap-7 h-full flex-1 justify-end pr-4 xl:pr-6">
               {navItems.map((item) => {
                 if (item.hasDropdown) {
@@ -466,10 +411,7 @@ export function Header() {
           </div>
 
           {/* ─── MOBILE: right side with hamburger ─── */}
-          <div
-            className="lg:hidden flex flex-1 items-center justify-end px-3 sm:px-4 transition-colors duration-500"
-            style={{ backgroundColor: useLightText ? "transparent" : isTop ? "transparent" : "#ffffff" }}
-          >
+          <div className="lg:hidden flex flex-1 items-center justify-end px-3 sm:px-4 transition-colors duration-500">
             <button
               onClick={() => setMenuOpen(!menuOpen)}
               className="p-1.5 sm:p-2 transition-colors duration-500"

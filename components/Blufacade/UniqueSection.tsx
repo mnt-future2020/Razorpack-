@@ -423,7 +423,10 @@ export function UniqueSection() {
           <div ref={textRef} className="relative flex items-center">
             <h2
               className="t-stagger-line t-stagger-line--1 font-heading font-black uppercase whitespace-nowrap tracking-tighter mix-blend-multiply drop-shadow-[0_4px_10px_rgba(255,255,255,0.3)] flex"
-              style={{ fontSize: "clamp(3rem, 8vw, 8rem)", lineHeight: "0.85" }}
+              style={{
+                fontSize: "clamp(3rem, 7vw, 7.5rem)",
+                lineHeight: "0.85",
+              }}
             >
               {"WHAT MAKES US ".split("").map((char, i) => (
                 <span
