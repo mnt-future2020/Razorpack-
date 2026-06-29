@@ -238,6 +238,13 @@ export default function BannersPage() {
     const newImages = [...homeImages];
     newImages[index] = "";
     setHomeImages(newImages);
+
+    // Also clear the slide's imageUrl
+    const updatedSlides = [...slides];
+    if (updatedSlides[index]) {
+      updatedSlides[index] = { ...updatedSlides[index], imageUrl: "" };
+      setSlides(updatedSlides);
+    }
   };
 
   const updateSlideField = (
@@ -283,11 +290,8 @@ export default function BannersPage() {
           }
         });
 
-        // Send slides data
-        const validSlides = slides.filter((s) => s.title || s.imageUrl);
-        if (validSlides.length > 0) {
-          form.append("slides", JSON.stringify(validSlides));
-        }
+        // Always send slides data (even empty) so cleared slides persist
+        form.append("slides", JSON.stringify(slides));
       } else {
         // For other pages, single image
         if (imageUrl && !file) {

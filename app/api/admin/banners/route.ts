@@ -220,9 +220,8 @@ export async function POST(request: NextRequest) {
     // Always set images (even empty) so deletions are saved
     payload.images = finalImages;
 
-    if (slides.length > 0) {
-      payload.slides = slides;
-    }
+    // Always set slides (even empty) so cleared data persists
+    payload.slides = slides;
 
     if (finalMobileImageUrl) payload.mobileImage = finalMobileImageUrl;
 

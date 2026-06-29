@@ -60,11 +60,11 @@ async function getHomeData() {
       Contact.findOne({}).lean(),
     ]);
 
-    // Process hero slides
+    // Process hero slides — images[] from carousel upload takes priority over slide.imageUrl
     const raw = banner?.slides || [];
     const images = banner?.images || [];
     const heroSlides = raw.map((s: any, i: number) => ({
-      imageUrl: s.imageUrl || images[i] || "",
+      imageUrl: images[i] || s.imageUrl || "",
       title: s.title || "",
       highlight: (s.highlight || "").replace(/\\n/g, "\n"),
       tagline: (s.tagline || "").replace(/\\n/g, "\n"),
