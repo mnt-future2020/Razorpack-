@@ -209,10 +209,10 @@ export async function POST(request: NextRequest) {
     };
 
     // Add hero text fields if provided
-    if (label) payload.label = label;
-    if (headingLine1) payload.headingLine1 = headingLine1;
-    if (headingLine2) payload.headingLine2 = headingLine2;
-    if (description) payload.description = description;
+    if (label !== undefined) payload.label = label || "";
+    if (headingLine1 !== undefined) payload.headingLine1 = headingLine1 || "";
+    if (headingLine2 !== undefined) payload.headingLine2 = headingLine2 || "";
+    if (description !== undefined) payload.description = description || "";
 
     // Gallery hero source preference — always save (even empty) so unselections persist
     payload.heroSource = heroSource || "[]";

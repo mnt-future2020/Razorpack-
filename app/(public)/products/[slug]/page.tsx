@@ -39,15 +39,28 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
 
+  const title = productData.seoTitle || productData.productName;
+  const description = productData.seoDescription || productData.shortDescription || productData.description?.replace(/<[^>]+>/g, "").substring(0, 160);
+  const ogImg = productData.ogImage || productData.image || "";
+
   return {
-    title: productData.seoTitle || productData.productName,
-    description:
-      productData.seoDescription ||
-      productData.shortDescription ||
-      productData.description?.replace(/<[^>]+>/g, "").substring(0, 160),
-    keywords:
-      productData.seoKeywords ||
-      `${productData.productName}, ${productData.category || "industrial packaging"}, VCI protection, LDPE packaging`,
+    title,
+    description,
+    keywords: productData.seoKeywords || `${productData.productName}, ${productData.category || "industrial packaging"}`,
+    alternates: { canonical: `/products/${resolvedParams.slug}` },
+    openGraph: {
+      title,
+      description,
+      url: `/products/${resolvedParams.slug}`,
+      type: "article",
+      ...(ogImg && { images: [{ url: ogImg, width: 1200, height: 630, alt: productData.productName }] }),
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      ...(ogImg && { images: [ogImg] }),
+    },
   };
 }
 

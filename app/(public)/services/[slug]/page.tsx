@@ -93,12 +93,28 @@ export async function generateMetadata({ params }: PageProps) {
     };
   }
 
+  const title = serviceData.seoTitle || serviceData.serviceName;
+  const description = serviceData.seoDescription || serviceData.description?.replace(/<[^>]+>/g, "").substring(0, 160) || "";
+  const ogImg = serviceData.ogImage || serviceData.image || "";
+
   return {
-    title: serviceData.seoTitle || serviceData.serviceName,
-    description: serviceData.seoDescription || serviceData.description,
-    keywords:
-      serviceData.seoKeywords ||
-      `${serviceData.serviceName}, industrial packaging, VCI protection, LDPE packaging`,
+    title,
+    description,
+    keywords: serviceData.seoKeywords || `${serviceData.serviceName}, industrial packaging`,
+    alternates: { canonical: `/services/${resolvedParams.slug}` },
+    openGraph: {
+      title,
+      description,
+      url: `/services/${resolvedParams.slug}`,
+      type: "article",
+      ...(ogImg && { images: [{ url: ogImg, width: 1200, height: 630, alt: serviceData.serviceName }] }),
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      ...(ogImg && { images: [ogImg] }),
+    },
   };
 }
 
