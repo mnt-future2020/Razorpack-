@@ -62,7 +62,7 @@ export function QuoteModal({ open, onClose, productOrService }: QuoteModalProps)
           companyName: formData.companyName,
           subject: formData.division || productOrService || "Quote Request",
           message: formData.message,
-          source: "Quote Modal",
+          source: "website",
         }),
       });
 

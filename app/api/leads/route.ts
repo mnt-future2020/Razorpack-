@@ -55,8 +55,13 @@ export async function POST(request: NextRequest) {
     
     // Handle validation errors from mongoose
     if (error instanceof Error && error.name === 'ValidationError') {
+      const validationError = error as any;
+      const fieldErrors = Object.keys(validationError.errors || {}).map(
+        (field) => `${field}: ${validationError.errors[field].message}`
+      );
+      console.error("Validation errors:", fieldErrors);
       return NextResponse.json(
-        { success: false, error: "Please check all required fields are filled correctly" },
+        { success: false, error: fieldErrors.length > 0 ? fieldErrors.join(", ") : "Please check all required fields are filled correctly" },
         { status: 400 }
       );
     }

@@ -162,7 +162,7 @@ export default function AdminLayout({
         { name: "Products", href: "/admin/products", icon: <Package className="h-4 w-4" /> },
         { name: "Services", href: "/admin/services", icon: <Briefcase className="h-4 w-4" /> },
         { name: "Gallery", href: "/admin/gallery", icon: <ImageIcon className="h-4 w-4" /> },
-        { name: "Client Logos", href: "/admin/client-logos", icon: <Users className="h-4 w-4" /> },
+        // { name: "Client Logos", href: "/admin/client-logos", icon: <Users className="h-4 w-4" /> },
       ],
     },
     {
