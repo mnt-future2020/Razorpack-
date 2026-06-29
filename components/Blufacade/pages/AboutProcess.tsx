@@ -15,7 +15,7 @@ const STEPS = [
     label: "Requirements & Engineering",
     description:
       "We analyze your specific requirements, chemical sensitivities, transit hazards, and metal composition to engineer bespoke packaging specifications.",
-    image: "/images/rayzor_collaboration.png",
+    image: "/images/about-process/rayzor_collaboration.jpg",
   },
   {
     id: "material-extrusion",
@@ -23,7 +23,7 @@ const STEPS = [
     label: "Material Extrusion",
     description:
       "High-performance resins are blended with custom VCI (Volatile Corrosion Inhibitor) masterbatches and co-extruded into multi-layer heavy-duty films.",
-    image: "/images/rayzor_vci_film_rolls.png",
+    image: "/images/about-process/rayzor_vci_film_rolls.jpg",
   },
   {
     id: "advanced-manufacturing",
@@ -31,7 +31,7 @@ const STEPS = [
     label: "Advanced Manufacturing",
     description:
       "Our automated conversion lines manufacture custom poly bags, 3D barrier liners, pallet covers, and printed film sheets to exact dimensional tolerances.",
-    image: "/images/rayzor_manufacturing_hub.png",
+    image: "/images/about-process/rayzor_manufacturing_hub.jpg",
   },
   {
     id: "quality-dispatch",
@@ -39,7 +39,7 @@ const STEPS = [
     label: "Quality Lab & Dispatch",
     description:
       "Every batch undergoes rigorous quality testing for tear strength, thickness, and VCI concentration before certified dispatch across India and globally.",
-    image: "/images/rayzor_quality_inspection.png",
+    image: "/images/about-process/rayzor_quality_inspection.jpg",
   },
 ];
 
@@ -86,12 +86,12 @@ export function AboutProcess() {
             yPercent: 120, // Slide down completely
             ease: "none",
           },
-          0
+          0,
         );
 
         // All the cards BEHIND the top card shuffle up into the new positions
         for (let j = i + 1; j < STEPS.length; j++) {
-          const targetSlot = j - i - 1; 
+          const targetSlot = j - i - 1;
           stepTl.to(
             `.process-card-${j}`,
             {
@@ -99,7 +99,7 @@ export function AboutProcess() {
               scale: 1 - targetSlot * 0.05,
               ease: "none",
             },
-            0
+            0,
           );
         }
 
@@ -118,8 +118,8 @@ export function AboutProcess() {
             trigger: section,
             start: "top 80%",
             toggleActions: "play none none none",
-          }
-        }
+          },
+        },
       );
 
       gsap.fromTo(
@@ -134,8 +134,8 @@ export function AboutProcess() {
             trigger: section,
             start: "top 80%",
             toggleActions: "play none none none",
-          }
-        }
+          },
+        },
       );
 
       gsap.fromTo(
@@ -151,15 +151,15 @@ export function AboutProcess() {
             trigger: section,
             start: "top 80%",
             toggleActions: "play none none none",
-          }
-        }
+          },
+        },
       );
 
       // Refresh ScrollTrigger to handle any layout shifts from the sections loading above
       const timer = setTimeout(() => ScrollTrigger.refresh(), 500);
       return () => clearTimeout(timer);
     },
-    { scope: sectionRef }
+    { scope: sectionRef },
   );
 
   return (
@@ -174,11 +174,15 @@ export function AboutProcess() {
             <span className="process-title-line-1 block">PACKAGING</span>
           </div>
           <div className="overflow-hidden py-1">
-            <span className="process-title-line-2 block text-[var(--brand-blue)]">PROCESS</span>
+            <span className="process-title-line-2 block text-[var(--brand-blue)]">
+              PROCESS
+            </span>
           </div>
         </h2>
         <p className="process-desc text-[#4b5563] text-xs sm:text-sm md:text-base font-light max-w-[420px] leading-relaxed tracking-wide">
-          Every Rayzor Industrial Packaging product goes through a precise, quality-focused manufacturing process to ensure industrial strength, durability, and corrosion protection from start to finish.
+          Every Rayzor Industrial Packaging product goes through a precise,
+          quality-focused manufacturing process to ensure industrial strength,
+          durability, and corrosion protection from start to finish.
         </p>
       </div>
 

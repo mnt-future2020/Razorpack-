@@ -8,7 +8,7 @@ export function AboutBusinessAreas() {
       {/* BACKGROUND IMAGE W/ OVERLAY */}
       <div className="absolute inset-0 w-full h-full z-0">
         <Image
-          src="/images/dark_industrial_texture.png"
+          src="/images/about-business-areas/dark_industrial_texture.jpg"
           alt="Dark Industrial Background"
           fill
           className="object-cover object-center opacity-20 mix-blend-overlay"
@@ -47,9 +47,10 @@ export function AboutBusinessAreas() {
               </h3>
               <p className="text-white/70 text-sm md:text-base leading-relaxed max-w-[500px] font-light">
                 Whether on the phone or on-site, our dedicated team collaborates
-                with you, providing fast and optimal solutions for your packaging
-                needs. We specialize in VCI Film Rolls, LDPE Film Rolls, Pallet
-                Covers, Container Liners, and more — all crafted in-house.
+                with you, providing fast and optimal solutions for your
+                packaging needs. We specialize in VCI Film Rolls, LDPE Film
+                Rolls, Pallet Covers, Container Liners, and more — all crafted
+                in-house.
               </p>
             </div>
           </div>
@@ -71,9 +72,9 @@ export function AboutBusinessAreas() {
               </h3>
               <p className="text-white/70 text-sm md:text-base leading-relaxed max-w-[500px] font-light">
                 Meticulously crafted from high-quality materials, our bags offer
-                protection against moisture, gases, and leaks. Our strict quality
-                standards, certifications, and reliable suppliers ensure every
-                product meets the highest global benchmarks.
+                protection against moisture, gases, and leaks. Our strict
+                quality standards, certifications, and reliable suppliers ensure
+                every product meets the highest global benchmarks.
               </p>
             </div>
           </div>
@@ -94,10 +95,11 @@ export function AboutBusinessAreas() {
                 Made in India
               </h3>
               <p className="text-white/70 text-sm md:text-base leading-relaxed max-w-[500px] font-light">
-                Our production hub in Madurai, Tamil Nadu stands as a testament to
-                our commitment to precision and quality. In-house production with
-                flexibility and reliability, contributing to the &quot;Made in India&quot;
-                legacy with distinctive custom-printed packaging options.
+                Our production hub in Madurai, Tamil Nadu stands as a testament
+                to our commitment to precision and quality. In-house production
+                with flexibility and reliability, contributing to the &quot;Made
+                in India&quot; legacy with distinctive custom-printed packaging
+                options.
               </p>
             </div>
           </div>

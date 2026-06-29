@@ -48,27 +48,31 @@ export const testSMTPConnection = async (smtpConfig) => {
 export const sendTestEmail = async (smtpConfig, testEmailData) => {
   try {
     const transporter = createSMTPTransporter(smtpConfig);
-    
+
     const mailOptions = {
       from: `"${smtpConfig.fromName}" <${smtpConfig.fromEmail}>`,
       to: testEmailData.email,
-      subject: 'SMTP Test Email - Rayzor Industrial Packaging Pvt Ltd',
+      subject: `SMTP Test Email - ${smtpConfig.fromName}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #8CC63F;">SMTP Test Email</h2>
-          <p><strong>From:</strong> ${smtpConfig.fromName}</p>
-          <p><strong>Message:</strong></p>
-          <div style="background-color: #F0F9E8; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #8CC63F;">
-            ${testEmailData.message}
+          <div style="background: linear-gradient(135deg, #221E1F 0%, #26A8E0 100%); padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
+            <h2 style="color: white; margin: 0;">SMTP Test Email</h2>
           </div>
-          <p style="color: #6b7280; font-size: 14px;">
-            This is a test email sent from Rayzor Industrial Packaging Pvt Ltd admin panel to verify SMTP configuration.
-          </p>
-          <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">
-          <p style="color: #9ca3af; font-size: 12px;">
-            Sent at: ${new Date().toLocaleString()}<br>
-            From: Rayzor Industrial Packaging Pvt Ltd Admin Panel
-          </p>
+          <div style="padding: 20px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 8px 8px;">
+            <p><strong>From:</strong> ${smtpConfig.fromName}</p>
+            <p><strong>Message:</strong></p>
+            <div style="background-color: #f0f9ff; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #26A8E0;">
+              ${testEmailData.message}
+            </div>
+            <p style="color: #6b7280; font-size: 14px;">
+              This is a test email sent from the admin panel to verify SMTP configuration.
+            </p>
+            <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">
+            <p style="color: #9ca3af; font-size: 12px;">
+              Sent at: ${new Date().toLocaleString()}<br>
+              From: ${smtpConfig.fromName} Admin Panel
+            </p>
+          </div>
         </div>
       `
     };

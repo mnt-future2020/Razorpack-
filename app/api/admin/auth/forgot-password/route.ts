@@ -3,6 +3,7 @@ import crypto from "crypto";
 import connectDB from "../../../../../config/models/connectDB";
 import Admin from "../../../../../config/utils/admin/login/loginSchema";
 import EmailSMTP from "../../../../../config/utils/admin/smtp/emailSMTPSchema";
+import Settings from "../../../../../config/utils/admin/settings/settingsSchema";
 import nodemailer from "nodemailer";
 
 export async function POST(request: Request) {
@@ -82,21 +83,32 @@ export async function POST(request: Request) {
     });
     console.log('Reset Link:', resetLink);
 
+    const settings = await Settings.findOne({ id: "default" }).lean() as any;
+    const siteName = settings?.siteName || "Admin Panel";
+
     try {
-      // Send email
       const info = await transporter.sendMail({
         from: smtpSettings.fromEmail,
         to: email,
-        subject: "Password Reset Request",
+        subject: `Password Reset Request - ${siteName}`,
         html: `
-          <h1>Password Reset Request</h1>
-          <p>You requested a password reset. Click the link below to reset your password:</p>
-          <p><a href="${resetLink}" style="padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px;">Reset Password</a></p>
-          <p>Or copy and paste this link in your browser:</p>
-          <p>${resetLink}</p>
-          <p>This link will expire in 1 hour.</p>
-          <p>If you didn't request this, please ignore this email.</p>
-          <p><small>This is an automated message, please do not reply to this email.</small></p>
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f8fafc;">
+            <div style="background: linear-gradient(135deg, #221E1F 0%, #26A8E0 100%); padding: 30px; text-align: center;">
+              <h1 style="color: white; margin: 0; font-size: 24px;">Password Reset Request</h1>
+              <p style="color: #e2e8f0; margin: 10px 0 0 0; font-size: 14px;">${siteName}</p>
+            </div>
+            <div style="padding: 30px; background-color: white; margin: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+              <p style="color: #4b5563; line-height: 1.6;">You requested a password reset. Click the button below to reset your password:</p>
+              <div style="text-align: center; margin: 30px 0;">
+                <a href="${resetLink}" style="padding: 12px 30px; background-color: #26A8E0; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">Reset Password</a>
+              </div>
+              <p style="color: #6b7280; font-size: 13px;">Or copy and paste this link in your browser:</p>
+              <p style="color: #26A8E0; font-size: 13px; word-break: break-all;">${resetLink}</p>
+              <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+                <p style="color: #9ca3af; font-size: 12px; margin: 0;">This link will expire in 1 hour.<br>If you didn't request this, please ignore this email.</p>
+              </div>
+            </div>
+          </div>
         `,
       });
       

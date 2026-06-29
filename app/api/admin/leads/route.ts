@@ -128,9 +128,8 @@ export async function POST(request: NextRequest) {
 }
 
 async function sendLeadEmails(lead: any) {
-  // Import internally to avoid circular dependencies if any
-  const EmailSMTP = (await import("@/config/utils/admin/smtp/emailSMTPSchema"))
-    .default;
+  const EmailSMTP = (await import("@/config/utils/admin/smtp/emailSMTPSchema")).default;
+  const Settings = (await import("@/config/utils/admin/settings/settingsSchema")).default;
   const { createSMTPTransporter } = await import("@/config/models/connectSMTP");
 
   const smtpConfig = await EmailSMTP.findOne({ id: "default", isActive: true });
@@ -139,44 +138,45 @@ async function sendLeadEmails(lead: any) {
     return;
   }
 
+  const settings = await Settings.findOne({ id: "default" }).lean() as any;
+  const siteName = settings?.siteName || "Our Team";
+
   const transporter = createSMTPTransporter(smtpConfig);
   const adminEmail = process.env.SMTP_FROM_EMAIL || smtpConfig.fromEmail;
 
-  // Admin Notification
   const adminHtml = `
     <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; background-color: #f8fafc;">
       <div style="background: linear-gradient(135deg, #221E1F 0%, #26A8E0 100%); padding: 30px; text-align: center;">
         <h1 style="color: white; margin: 0; font-size: 28px;">New Lead Submission</h1>
-        <p style="color: #e2e8f0; margin: 10px 0 0 0; font-size: 16px;">Rayzor Industrial Packaging Pvt Ltd Admin Panel</p>
+        <p style="color: #e2e8f0; margin: 10px 0 0 0; font-size: 16px;">${siteName} Admin Panel</p>
       </div>
       <div style="padding: 30px; background-color: white; margin: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-         <h2 style="color: #221E1F; border-bottom: 2px solid #f58420; padding-bottom: 10px;">Enquiry Details</h2>
+         <h2 style="color: #221E1F; border-bottom: 2px solid #26A8E0; padding-bottom: 10px;">Enquiry Details</h2>
          <p><strong>Name:</strong> ${lead.firstName} ${lead.lastName}</p>
          <p><strong>Email:</strong> ${lead.email}</p>
          <p><strong>Phone:</strong> ${lead.phone || "N/A"}</p>
          <p><strong>Subject:</strong> ${lead.subject}</p>
          <p><strong>Source:</strong> ${lead.source || "Website"}</p>
-         <div style="background-color: #f1f5f9; padding: 20px; border-radius: 8px; margin-top: 20px;">
+         <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin-top: 20px; border-left: 4px solid #26A8E0;">
            <p style="margin: 0; line-height: 1.6;">${lead.message}</p>
          </div>
       </div>
     </div>
   `;
 
-  // Customer Confirmation
   const customerHtml = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f8fafc;">
       <div style="background: linear-gradient(135deg, #221E1F 0%, #26A8E0 100%); padding: 30px; text-align: center;">
         <h1 style="color: white; margin: 0; font-size: 28px;">Thank You for Contacting Us!</h1>
-        <p style="color: #e2e8f0; margin: 10px 0 0 0; font-size: 16px;">Rayzor Industrial Packaging Pvt Ltd - Premium Packaging Solutions</p>
+        <p style="color: #e2e8f0; margin: 10px 0 0 0; font-size: 16px;">${siteName}</p>
       </div>
       <div style="padding: 30px; background-color: white; margin: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
         <p>Hi ${lead.firstName},</p>
-        <p>Thank you for reaching out to Rayzor Industrial Packaging Pvt Ltd. We have received your enquiry regarding "<strong>${lead.subject}</strong>" and our team will get back to you shortly.</p>
-        <div style="background-color: #fefaf6; padding: 15px; border-radius: 8px; border-left: 4px solid #f58420; margin: 20px 0;">
+        <p>Thank you for reaching out to ${siteName}. We have received your enquiry regarding "<strong>${lead.subject}</strong>" and our team will get back to you shortly.</p>
+        <div style="background-color: #f0f9ff; padding: 15px; border-radius: 8px; border-left: 4px solid #26A8E0; margin: 20px 0;">
           <p style="margin: 0; font-style: italic;">"${lead.message}"</p>
         </div>
-        <p>Best regards,<br>The Rayzor Industrial Packaging Pvt Ltd Team</p>
+        <p>Best regards,<br>The ${siteName} Team</p>
       </div>
     </div>
   `;
@@ -191,7 +191,7 @@ async function sendLeadEmails(lead: any) {
     transporter.sendMail({
       from: `"${smtpConfig.fromName}" <${smtpConfig.fromEmail}>`,
       to: lead.email,
-      subject: "Thank you for contacting Rayzor Industrial Packaging Pvt Ltd",
+      subject: `Thank you for contacting ${siteName}`,
       html: customerHtml,
     }),
   ]);

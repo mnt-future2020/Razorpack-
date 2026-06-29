@@ -20,7 +20,7 @@ const whyChooseUsData = [
     title: "Precision Quality & Structural Strength",
     description:
       "Every batch of our LDPE films and poly bags undergoes rigorous tensile strength, tear resistance, and gauge consistency testing in our state-of-the-art laboratory in Madurai.",
-    image: "/images/rayzor/why-choose-us/quality.png",
+    image: "/images/rayzor/why-choose-us/quality.jpg",
     spec: "100% QA CHECKED",
   },
   {
@@ -28,7 +28,7 @@ const whyChooseUsData = [
     title: "Proprietary VCI Rust Prevention",
     description:
       "Our advanced Vapor Corrosion Inhibitor (VCI) poly bags and sheets chemically shield metal components, preventing oxidation and rust during international shipping.",
-    image: "/images/rayzor/why-choose-us/vci.png",
+    image: "/images/rayzor/why-choose-us/vci.jpg",
     spec: "VCI RUST SHIELD",
   },
   {
@@ -36,7 +36,7 @@ const whyChooseUsData = [
     title: "Sustainable Material Engineering",
     description:
       "Formulated with premium, high-strength recyclable polymers, our packaging films minimize carbon footprint while maintaining exceptional puncture resistance.",
-    image: "/images/rayzor/why-choose-us/sustainability.png",
+    image: "/images/rayzor/why-choose-us/sustainability.jpg",
     spec: "100% RECYCLABLE",
   },
   {
@@ -44,7 +44,7 @@ const whyChooseUsData = [
     title: "Reliable High-Volume Supply Network",
     description:
       "With high-capacity extrusion machinery and a robust distribution network, we guarantee on-time shipping schedules for corporate industrial clients worldwide.",
-    image: "/images/rayzor/why-choose-us/logistics.png",
+    image: "/images/rayzor/why-choose-us/logistics.jpg",
     spec: "99% ON-TIME",
   },
 ];
@@ -112,7 +112,11 @@ function AccordionItem({
           </span>
           <h3
             className="accordion-title text-lg sm:text-xl md:text-[2rem] font-heading font-bold tracking-tight leading-tight transition-colors duration-300"
-            style={{ color: isActive ? "var(--acc-active, #1b1c19)" : "var(--acc-inactive, rgba(27,28,25,0.8))" }}
+            style={{
+              color: isActive
+                ? "var(--acc-active, #1b1c19)"
+                : "var(--acc-inactive, rgba(27,28,25,0.8))",
+            }}
           >
             {item.title}
           </h3>
@@ -122,16 +126,24 @@ function AccordionItem({
         <div
           className="w-10 h-10 md:w-11 md:h-11 rounded-md flex items-center justify-center border transition-all duration-300"
           style={{
-            backgroundColor: isActive ? "#006196" : "var(--acc-btn-bg, #1b1c19)",
+            backgroundColor: isActive
+              ? "#006196"
+              : "var(--acc-btn-bg, #1b1c19)",
             borderColor: isActive ? "#006196" : "var(--acc-btn-bg, #1b1c19)",
             transform: isActive ? "rotate(180deg)" : "rotate(0deg)",
           }}
         >
           <div className="t-icon-swap" data-state={isActive ? "b" : "a"}>
-            <span className="t-icon flex items-center justify-center" data-icon="a">
+            <span
+              className="t-icon flex items-center justify-center"
+              data-icon="a"
+            >
               <ArrowDownRight className="w-4 h-4 text-white" />
             </span>
-            <span className="t-icon flex items-center justify-center" data-icon="b">
+            <span
+              className="t-icon flex items-center justify-center"
+              data-icon="b"
+            >
               <X className="w-4 h-4 text-white" />
             </span>
           </div>
@@ -140,10 +152,18 @@ function AccordionItem({
 
       {/* Collapsible Content — GSAP height + transitions.dev panel blur */}
       <div ref={contentRef} className="overflow-hidden">
-        <div ref={innerRef} className="t-panel-slide pb-8 pt-2 flex flex-col gap-5" data-open={isActive ? "true" : "false"} style={{ "--panel-translate-y": "20px" } as React.CSSProperties}>
+        <div
+          ref={innerRef}
+          className="t-panel-slide pb-8 pt-2 flex flex-col gap-5"
+          data-open={isActive ? "true" : "false"}
+          style={{ "--panel-translate-y": "20px" } as React.CSSProperties}
+        >
           {/* Description + CTA */}
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5">
-            <p className="accordion-desc text-sm sm:text-base md:text-lg leading-relaxed max-w-3xl" style={{ color: "var(--acc-desc, #3f4850)" }}>
+            <p
+              className="accordion-desc text-sm sm:text-base md:text-lg leading-relaxed max-w-3xl"
+              style={{ color: "var(--acc-desc, #3f4850)" }}
+            >
               {item.description}
             </p>
             <Link
@@ -318,14 +338,26 @@ export function MissionSection() {
       tl.to(oldInner, { opacity: 0, duration: 0.15, ease: "power2.in" }, 0);
 
       // Close old + open new SIMULTANEOUSLY so total height stays constant
-      tl.to(oldContent, { height: 0, duration: dur, ease: "power2.inOut", overflow: "hidden" }, 0.1);
+      tl.to(
+        oldContent,
+        { height: 0, duration: dur, ease: "power2.inOut", overflow: "hidden" },
+        0.1,
+      );
 
       tl.set(newContent, { overflow: "hidden" }, 0.1);
       tl.set(newInner, { opacity: 0, y: 8 }, 0.1);
-      tl.to(newContent, { height: "auto", duration: dur, ease: "power2.inOut" }, 0.1);
+      tl.to(
+        newContent,
+        { height: "auto", duration: dur, ease: "power2.inOut" },
+        0.1,
+      );
 
       // Fade in new inner after height is mostly done
-      tl.to(newInner, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, 0.3);
+      tl.to(
+        newInner,
+        { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" },
+        0.3,
+      );
       tl.set(newContent, { overflow: "visible" });
 
       prevIndex.current = activeIndex;
@@ -345,11 +377,13 @@ export function MissionSection() {
         <RevealOnScroll effect="fadeIn">
           <div className="mb-16 text-center">
             <span className="text-sm font-bold text-[var(--brand-blue)] uppercase tracking-widest flex items-center justify-center gap-2 mb-4">
-              <span className="w-8 h-0.5 bg-[var(--brand-blue)]" /> Why Choose Us{" "}
-              <span className="w-8 h-0.5 bg-[var(--brand-blue)]" />
+              <span className="w-8 h-0.5 bg-[var(--brand-blue)]" /> Why Choose
+              Us <span className="w-8 h-0.5 bg-[var(--brand-blue)]" />
             </span>
             <h2 className="mission-title text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-heading font-extrabold text-[var(--brand-dark)] tracking-tight max-w-3xl mx-auto">
-              Engineering & <span className="text-[var(--brand-blue)]">Quality</span> Standards
+              Engineering &{" "}
+              <span className="text-[var(--brand-blue)]">Quality</span>{" "}
+              Standards
             </h2>
             <div className="mission-subtitle mt-4 flex items-center justify-center gap-2 text-lg md:text-xl text-steel">
               Built on{" "}
