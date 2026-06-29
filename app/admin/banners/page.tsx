@@ -270,14 +270,11 @@ export default function BannersPage() {
       form.append("status", status);
 
       if (pageKey === "home") {
-        // For home page, send existing images
+        // For home page, send existing images (always send, even if empty, to clear removed images)
         const existingImagesOnly = homeImages.filter(
           (img) => img && !img.startsWith("blob:")
         );
-
-        if (existingImagesOnly.length > 0) {
-          form.append("existingImages", JSON.stringify(existingImagesOnly));
-        }
+        form.append("existingImages", JSON.stringify(existingImagesOnly));
 
         // Send new files
         homeFiles.forEach((file, index) => {
