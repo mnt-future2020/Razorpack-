@@ -182,9 +182,9 @@ export function Footer() {
              </h1>
 
           {/* Very Bottom Copyright Links */}
-          <div className="relative z-10 w-full flex flex-col md:flex-row justify-between items-center text-[#a1a1aa] text-xs md:text-sm gap-4 pr-20 md:pr-24">
-            <span>All rights reserved © {settings?.siteName || "Rayzor Industrial Packaging Pvt Ltd"} {new Date().getFullYear()}</span>
-            <a href="https://mntfuture.com/" target="_blank" rel="noopener noreferrer" className="text-white hover:text-[var(--brand-blue)] transition-colors">Developed by MNT</a>
+          <div className="relative z-10 w-full flex flex-col md:flex-row justify-between items-center text-[#a1a1aa] text-xs md:text-sm gap-4 pb-16 md:pb-0 md:pr-24">
+            <span className="text-center">All rights reserved © {settings?.siteName || "Rayzor Industrial Packaging Pvt Ltd"} {new Date().getFullYear()}</span>
+            <a href="https://mntfuture.com/" target="_blank" rel="noopener noreferrer" className="text-white hover:text-[var(--brand-blue)] transition-colors text-center">Developed by MNT</a>
           </div>
 
         </div>
