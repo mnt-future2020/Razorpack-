@@ -456,7 +456,7 @@ export function CaseStudiesSection() {
               and logistics into one precision-engineered system for growth.
             </p>
             <div className="mt-6">
-              <button className="group/cta flex items-end">
+              <button className="group/cta flex items-end cursor-pointer">
                 <span className="inline-flex items-center gap-[10px] border border-black/20 bg-black px-3 py-2 text-base font-medium text-white transition-colors hover:bg-black/85">
                   Get an Enquiry
                 </span>

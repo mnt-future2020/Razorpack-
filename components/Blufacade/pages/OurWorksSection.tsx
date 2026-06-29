@@ -16,38 +16,6 @@ interface WorkData {
 }
 
 /* ───────── Fallback Works Data ───────── */
-const FALLBACK_WORKS = [
-  {
-    title: "LDPE Film Rolls",
-    description:
-      "With our specialisation in LDPE film manufacturing, our industrial packaging solutions are tailored to deliver high-performance protective films that aims for measurable results.",
-    image: "/images/gallery/work_ldpe_films.png",
-  },
-  {
-    title: "VCI Packaging Solutions",
-    description:
-      "Our advanced VCI (Volatile Corrosion Inhibitor) packaging protects metal components from corrosion during storage and transit, ensuring your products arrive in pristine condition.",
-    image: "/images/gallery/work_vci_packaging.png",
-  },
-  {
-    title: "Custom Printed Poly Bags",
-    description:
-      "From branded packaging to product-specific bags, our flexographic printing capabilities deliver vibrant, durable custom printed poly bags for every industry need.",
-    image: "/images/gallery/work_custom_printed.png",
-  },
-  {
-    title: "Stretch Films & Wrapping",
-    description:
-      "Our high-performance stretch films provide secure pallet wrapping and load containment, optimising your logistics chain with cost-effective protective solutions.",
-    image: "/images/gallery/work_stretch_films.png",
-  },
-  {
-    title: "Shrink Films",
-    description:
-      "Industrial-grade shrink films that offer tamper-evident, crystal-clear product bundling and protection for diverse applications across manufacturing and retail sectors.",
-    image: "/images/gallery/work_shrink_films.png",
-  },
-];
 
 /* ───────── Single Work Card ───────── */
 function WorkCard({
@@ -113,7 +81,7 @@ function WorkCard({
 /* ───────── Main Section ───────── */
 export function OurWorksSection({ initialWorks }: { initialWorks: WorkData[] }) {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const worksData = initialWorks.length > 0 ? initialWorks : FALLBACK_WORKS;
+  const worksData = initialWorks;
 
   useGSAP(
     () => {

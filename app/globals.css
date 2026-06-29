@@ -237,6 +237,12 @@
   body {
     @apply bg-background text-foreground font-sans;
   }
+  button, [role="button"], [onclick], summary {
+    cursor: pointer;
+  }
+  a {
+    cursor: pointer;
+  }
   h1, h2, h3, h4, h5, h6 {
     @apply font-heading tracking-tight;
   }

@@ -68,7 +68,7 @@ export function QuoteModal({ open, onClose, productOrService }: QuoteModalProps)
   return (
     <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4">
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm cursor-pointer" onClick={onClose} />
 
       {/* Modal */}
       <div className="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden animate-[modalIn_0.3s_ease-out]">
@@ -80,7 +80,7 @@ export function QuoteModal({ open, onClose, productOrService }: QuoteModalProps)
               <p className="text-white/60 text-xs mt-0.5">For: {productOrService}</p>
             )}
           </div>
-          <button onClick={onClose} className="text-white/60 hover:text-white transition-colors">
+          <button onClick={onClose} className="text-white/60 hover:text-white transition-colors cursor-pointer">
             <X className="w-5 h-5" />
           </button>
         </div>

@@ -78,7 +78,7 @@ settingsSchema.index({ isActive: 1 });
 const Settings =
   mongoose.models.Settings || mongoose.model("Settings", settingsSchema);
 
-// Default settings data for Blufacade
+// Default settings data
 const defaultSettingsData = {
   id: "default",
   siteName: "Rayzor Industrial Packaging Pvt Ltd",

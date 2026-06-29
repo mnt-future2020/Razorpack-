@@ -389,7 +389,7 @@ export default function EmailSMTP() {
                   fromEmail: e.target.value,
                 })
               }
-              placeholder="noreply@blufacade.com"
+              placeholder="noreply@rayzorpack.com"
               className="mt-2"
             />
             <p className="text-xs text-gray-500 mt-1">

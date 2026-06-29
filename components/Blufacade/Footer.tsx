@@ -2,7 +2,7 @@
 
 import React, { useRef } from "react";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+
 import { useSettings } from "@/hooks/use-settings";
 import { useContact } from "@/hooks/use-contact";
 import { siteConfig } from "@/config/site";
@@ -125,32 +125,13 @@ export function Footer() {
           </div>
 
           {/* Bottom Row of White Section */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center border-t border-[#e4e4e7] pt-8 lg:pt-10">
-            
-            <div className="md:col-span-3 lg:col-span-4">
-              <span className="text-[#1b1c19] font-bold text-sm md:text-base">Subscribe to our newsletter</span>
-            </div>
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6 border-t border-[#e4e4e7] pt-8 lg:pt-10">
 
-            <div className="md:col-span-4 lg:col-span-4">
-              <div className="flex items-center border-b border-[#a1a1aa] pb-2 group">
-                <input 
-                  type="email" 
-                  placeholder="Enter your email" 
-                  className="bg-transparent outline-none w-full text-[#1b1c19] text-sm md:text-base placeholder:text-[#a1a1aa]"
-                />
-                <button className="text-[#1b1c19] group-hover:translate-x-2 transition-transform">
-                  <ArrowRight size={18} />
-                </button>
-              </div>
-            </div>
+            <button onClick={scrollToTop} className="text-[#a1a1aa] font-medium text-sm md:text-base hover:text-[#1b1c19] transition-colors cursor-pointer">
+              Back to top
+            </button>
 
-            <div className="md:col-span-2 lg:col-span-2 text-center md:text-center">
-              <button onClick={scrollToTop} className="text-[#a1a1aa] font-medium text-sm md:text-base hover:text-[#1b1c19] transition-colors">
-                Back to top
-              </button>
-            </div>
-
-            <div className="md:col-span-3 lg:col-span-2 text-center md:text-right flex items-center justify-center md:justify-end gap-4">
+            <div className="flex items-center gap-4">
               {(contactInfo?.instagram || siteConfig.social.instagram) && (
                 <a href={contactInfo?.instagram || siteConfig.social.instagram} target="_blank" rel="noopener noreferrer" className="text-[#1b1c19] hover:text-[var(--brand-blue)] transition-colors font-medium text-sm md:text-base">Instagram</a>
               )}
@@ -170,7 +151,7 @@ export function Footer() {
 
       {/* ─── BLACK PARALLAX REVEAL SECTION ─── */}
       <div className="parallax-container relative w-full overflow-hidden z-0 bg-[#0a1118]">
-        <div className="parallax-content relative w-full flex flex-col justify-end p-6 md:p-8 lg:p-12 pb-4 md:pb-6 pt-16 md:pt-24 lg:pt-32">
+        <div className="parallax-content relative w-full flex flex-col justify-end p-6 md:p-8 lg:p-12 pb-12 md:pb-16 pt-16 md:pt-24 lg:pt-32">
           
           {/* Stationary Background Image */}
           <div 
@@ -201,13 +182,9 @@ export function Footer() {
              </h1>
 
           {/* Very Bottom Copyright Links */}
-          <div className="w-full flex flex-col md:flex-row justify-between items-center text-[#a1a1aa] text-xs md:text-sm gap-4">
+          <div className="relative z-10 w-full flex flex-col md:flex-row justify-between items-center text-[#a1a1aa] text-xs md:text-sm gap-4 pr-20 md:pr-24">
             <span>All rights reserved © {settings?.siteName || "Rayzor Industrial Packaging Pvt Ltd"} {new Date().getFullYear()}</span>
-            <div className="flex gap-6 md:gap-8">
-              <Link href="/privacy-policy" className="hover:text-white transition-colors">Privacy policy</Link>
-              <Link href="/terms-conditions" className="hover:text-white transition-colors">Terms of services</Link>
-            </div>
-            <span>Developed by MNT</span>
+            <a href="https://mntfuture.com/" target="_blank" rel="noopener noreferrer" className="text-white hover:text-[var(--brand-blue)] transition-colors">Developed by MNT</a>
           </div>
 
         </div>

@@ -246,7 +246,7 @@ export default function ContactPage() {
                 type="email"
                 value={contactInfo.email}
                 onChange={(e) => handleInputChange("email", e.target.value)}
-                placeholder="blufacadein@gmail.com"
+                placeholder="sales@rayzorpack.com"
                 className="mt-2"
               />
             </div>
@@ -372,7 +372,7 @@ export default function ContactPage() {
                   onChange={(e) =>
                     handleInputChange("facebook", e.target.value)
                   }
-                  placeholder="https://facebook.com/blufacade"
+                  placeholder="https://facebook.com/rayzorpack"
                   className="mt-2"
                 />
               </div>
@@ -388,7 +388,7 @@ export default function ContactPage() {
                   id="twitter"
                   value={contactInfo.twitter}
                   onChange={(e) => handleInputChange("twitter", e.target.value)}
-                  placeholder="https://twitter.com/blufacade"
+                  placeholder="https://twitter.com/rayzorpack"
                   className="mt-2"
                 />
               </div>
@@ -406,7 +406,7 @@ export default function ContactPage() {
                   onChange={(e) =>
                     handleInputChange("linkedin", e.target.value)
                   }
-                  placeholder="https://linkedin.com/company/blufacade"
+                  placeholder="https://linkedin.com/company/rayzorpack"
                   className="mt-2"
                 />
               </div>
@@ -424,7 +424,7 @@ export default function ContactPage() {
                   onChange={(e) =>
                     handleInputChange("instagram", e.target.value)
                   }
-                  placeholder="https://instagram.com/blufacade_"
+                  placeholder="https://instagram.com/rayzorpack"
                   className="mt-2"
                 />
               </div>
@@ -440,7 +440,7 @@ export default function ContactPage() {
                   id="youtube"
                   value={contactInfo.youtube}
                   onChange={(e) => handleInputChange("youtube", e.target.value)}
-                  placeholder="https://youtube.com/@blufacade"
+                  placeholder="https://youtube.com/@rayzorpack"
                   className="mt-2"
                 />
               </div>
@@ -476,7 +476,7 @@ export default function ContactPage() {
                   onChange={(e) =>
                     handleInputChange("telegram", e.target.value)
                   }
-                  placeholder="https://t.me/blufacade"
+                  placeholder="https://t.me/rayzorpack"
                   className="mt-2"
                 />
               </div>

@@ -312,7 +312,7 @@ export default function LeadManager() {
     const url = window.URL.createObjectURL(blob)
     const a = document.createElement("a")
     a.href = url
-    a.download = `blufacade-leads-${new Date().toISOString().split('T')[0]}.csv`
+    a.download = `rayzorpack-leads-${new Date().toISOString().split('T')[0]}.csv`
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)

@@ -12,51 +12,6 @@ interface BannerData {
   [key: string]: any;
 }
 
-/* ───────── Image data ───────── */
-const column1Images = [
-  {
-    src: "/images/gallery/col1_img1.png",
-    alt: "Modern packaging factory floor with LDPE film roll machines",
-  },
-  {
-    src: "/images/gallery/col1_img2.png",
-    alt: "Stretch film rolls and LDPE poly bags in warehouse",
-  },
-  {
-    src: "/images/gallery/col1_img3.png",
-    alt: "VCI packaging protecting metal automotive parts",
-  },
-];
-
-const column2Images = [
-  {
-    src: "/images/gallery/col2_img1.png",
-    alt: "Packaging engineers examining custom printed poly bags",
-  },
-  {
-    src: "/images/gallery/col2_img2.png",
-    alt: "Modern packaging warehouse with organized film rolls",
-  },
-  {
-    src: "/images/gallery/col2_img3.png",
-    alt: "Industrial packaging production line with automated machinery",
-  },
-];
-
-const column3Images = [
-  {
-    src: "/images/gallery/col3_img1.png",
-    alt: "Industrial trade exhibition booth showcasing packaging solutions",
-  },
-  {
-    src: "/images/gallery/col3_img2.png",
-    alt: "Custom printed packaging bags on flexographic printing press",
-  },
-  {
-    src: "/images/gallery/col3_img3.png",
-    alt: "Logistics loading dock with pallets wrapped in stretch film",
-  },
-];
 
 /* ───────── Sub-component: one column of sliding images ───────── */
 interface SlidingColumnProps {
@@ -133,15 +88,17 @@ export function GalleryHero({ initialBanner }: { initialBanner: BannerData | nul
       if (!allImages.includes(img)) allImages.push(img);
     });
 
-    if (allImages.length >= 3) {
-      const perCol = Math.ceil(allImages.length / 3);
-      return {
-        col1: allImages.slice(0, perCol).map((src, i) => ({ src, alt: `Gallery image ${i + 1}` })),
-        col2: allImages.slice(perCol, perCol * 2).map((src, i) => ({ src, alt: `Gallery image ${perCol + i + 1}` })),
-        col3: allImages.slice(perCol * 2).map((src, i) => ({ src, alt: `Gallery image ${perCol * 2 + i + 1}` })),
-      };
+    if (allImages.length === 0) {
+      return { col1: [], col2: [], col3: [] };
     }
-    return { col1: column1Images, col2: column2Images, col3: column3Images };
+
+    // Distribute images across 3 columns (works with any count)
+    const perCol = Math.ceil(allImages.length / 3);
+    return {
+      col1: allImages.slice(0, perCol).map((src, i) => ({ src, alt: `Gallery image ${i + 1}` })),
+      col2: allImages.slice(perCol, perCol * 2).map((src, i) => ({ src, alt: `Gallery image ${perCol + i + 1}` })),
+      col3: allImages.slice(perCol * 2).map((src, i) => ({ src, alt: `Gallery image ${perCol * 2 + i + 1}` })),
+    };
   }, [banner]);
 
   useGSAP(
