@@ -123,27 +123,27 @@ const contactSchema = new mongoose.Schema(
     // Contact Page Content
     pageTitle: {
       type: String,
-      required: true,
       trim: true,
       maxlength: 200,
+      default: "Get In Touch",
     },
     pageDescription: {
       type: String,
-      required: true,
       trim: true,
       maxlength: 500,
+      default: "",
     },
     officeTitle: {
       type: String,
-      required: true,
       trim: true,
       maxlength: 200,
+      default: "Our Office",
     },
     officeDescription: {
       type: String,
-      required: true,
       trim: true,
       maxlength: 500,
+      default: "",
     },
     
     // Service Areas

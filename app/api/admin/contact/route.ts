@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     // Validate required fields
-    const requiredFields = ['primaryPhone', 'whatsappNumber', 'email', 'address', 'city', 'state', 'postcode', 'country', 'pageTitle', 'pageDescription', 'officeTitle', 'officeDescription'];
+    const requiredFields = ['primaryPhone', 'whatsappNumber', 'email', 'address', 'city', 'state', 'postcode', 'country'];
     for (const field of requiredFields) {
       if (!body[field] || body[field].trim() === '') {
         return NextResponse.json(
@@ -118,7 +118,7 @@ export async function PUT(request: NextRequest) {
     const body = await request.json();
 
     // Validate required fields
-    const requiredFields = ['primaryPhone', 'whatsappNumber', 'email', 'address', 'city', 'state', 'postcode', 'country', 'pageTitle', 'pageDescription', 'officeTitle', 'officeDescription'];
+    const requiredFields = ['primaryPhone', 'whatsappNumber', 'email', 'address', 'city', 'state', 'postcode', 'country'];
     for (const field of requiredFields) {
       if (!body[field] || body[field].trim() === '') {
         return NextResponse.json(
