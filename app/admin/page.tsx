@@ -40,6 +40,8 @@ interface DashboardMetrics {
   totalServices: number;
   activeServices: number;
   totalServiceViews: number;
+  totalProducts: number;
+  activeProducts: number;
   totalPortfolio: number;
   activePortfolio: number;
   totalPortfolioViews: number;
@@ -64,9 +66,15 @@ interface DashboardData {
   };
 }
 
+interface VisitorData {
+  activeUsers: number;
+  pageViews: number;
+}
+
 export default function AdminDashboard() {
   const { toast } = useToast();
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
+  const [visitorData, setVisitorData] = useState<VisitorData | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -79,8 +87,12 @@ export default function AdminDashboard() {
       if (showRefreshToast) setRefreshing(true);
       else setLoading(true);
 
-      const response = await fetch("/api/admin/dashboard");
-      const result = await response.json();
+      const [dashRes, analyticsRes] = await Promise.all([
+        fetch("/api/admin/dashboard"),
+        fetch("/api/admin/analytics?period=30").catch(() => null),
+      ]);
+
+      const result = await dashRes.json();
 
       if (result.success) {
         setDashboardData(result.data);
@@ -92,6 +104,16 @@ export default function AdminDashboard() {
         }
       } else {
         throw new Error(result.message || "Failed to fetch dashboard data");
+      }
+
+      if (analyticsRes) {
+        const analyticsResult = await analyticsRes.json();
+        if (analyticsResult.success) {
+          setVisitorData({
+            activeUsers: analyticsResult.data.overview.activeUsers,
+            pageViews: analyticsResult.data.overview.pageViews,
+          });
+        }
       }
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
@@ -141,8 +163,8 @@ export default function AdminDashboard() {
   const stats = [
     { title: "Total Leads", value: metrics.totalLeads, change: `${metrics.leadsGrowth >= 0 ? "+" : ""}${metrics.leadsGrowth}%`, icon: Users },
     { title: "Pending Leads", value: metrics.pendingLeads, change: `${metrics.newLeads} new`, icon: TrendingUp },
-    { title: "Service Views", value: metrics.totalServiceViews, change: `${metrics.activeServices} active`, icon: Eye },
-    { title: "Products", value: metrics.totalServices, change: `${metrics.activeServices} active`, icon: Briefcase },
+    { title: "Website Visitors", value: visitorData?.activeUsers ?? "—", change: visitorData ? `${visitorData.pageViews} views` : "30 days", icon: Globe },
+    { title: "Products", value: metrics.totalProducts, change: `${metrics.activeProducts} active`, icon: Briefcase },
   ];
 
   const formatDate = (date: string) => {

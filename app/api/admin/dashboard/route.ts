@@ -4,6 +4,7 @@ import Lead from "@/config/utils/admin/lead/leadSchema";
 import Feedback from "@/config/utils/admin/feedback/feedbackSchema";
 import Testimonial from "@/config/utils/admin/testimonial/testimonialSchema";
 import Service from "@/config/utils/admin/services/serviceSchema";
+import Product from "@/config/utils/admin/products/productSchema";
 import Portfolio from "@/config/utils/admin/portfolio/portfolioSchema";
 
 export async function GET() {
@@ -46,6 +47,10 @@ export async function GET() {
       totalServices,
       activeServices,
       totalServiceViews,
+
+      // Product metrics
+      totalProducts,
+      activeProducts,
 
       // Portfolio metrics
       totalPortfolio,
@@ -90,6 +95,10 @@ export async function GET() {
         { $match: { isDeleted: { $ne: true } } },
         { $group: { _id: null, totalViews: { $sum: "$views" } } }
       ]),
+
+      // Product queries
+      Product.countDocuments({ isDeleted: { $ne: true } }),
+      Product.countDocuments({ status: "active", isDeleted: { $ne: true } }),
 
       // Portfolio queries
       Portfolio.countDocuments({ isDeleted: { $ne: true } }),
@@ -147,6 +156,10 @@ export async function GET() {
         totalServices,
         activeServices,
         totalServiceViews: totalServiceViews[0]?.totalViews || 0,
+
+        // Product metrics
+        totalProducts,
+        activeProducts,
 
         // Portfolio metrics
         totalPortfolio,
