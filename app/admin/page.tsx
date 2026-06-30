@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { adminFetch } from "@/lib/admin-fetch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -88,8 +89,8 @@ export default function AdminDashboard() {
       else setLoading(true);
 
       const [dashRes, analyticsRes] = await Promise.all([
-        fetch("/api/admin/dashboard"),
-        fetch("/api/admin/analytics?period=30").catch(() => null),
+        adminFetch("/api/admin/dashboard"),
+        adminFetch("/api/admin/analytics?period=30").catch(() => null),
       ]);
 
       const result = await dashRes.json();

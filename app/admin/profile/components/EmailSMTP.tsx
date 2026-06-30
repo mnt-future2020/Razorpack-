@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { adminFetch } from "@/lib/admin-fetch";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -65,7 +66,7 @@ export default function EmailSMTP() {
   const fetchSMTPSettings = async () => {
     try {
       setLoading(true);
-      const response = await fetch("/api/admin/EmailSmtp");
+      const response = await adminFetch("/api/admin/EmailSmtp");
       const data = await response.json();
 
       if (data.success) {
@@ -120,7 +121,7 @@ export default function EmailSMTP() {
 
     try {
       setLoading(true);
-      const response = await fetch("/api/admin/EmailSmtp", {
+      const response = await adminFetch("/api/admin/EmailSmtp", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -159,7 +160,7 @@ export default function EmailSMTP() {
     setIsTestingConnection(true);
 
     try {
-      const response = await fetch("/api/admin/EmailSmtp", {
+      const response = await adminFetch("/api/admin/EmailSmtp", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -229,7 +230,7 @@ export default function EmailSMTP() {
     setIsSendingTestEmail(true);
 
     try {
-      const response = await fetch("/api/admin/EmailSmtp", {
+      const response = await adminFetch("/api/admin/EmailSmtp", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

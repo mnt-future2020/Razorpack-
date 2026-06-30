@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { adminFetch } from "@/lib/admin-fetch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -64,7 +65,7 @@ export default function ContactPage() {
   useEffect(() => {
     const fetchContactInfo = async () => {
       try {
-        const response = await fetch("/api/admin/contact");
+        const response = await adminFetch("/api/admin/contact");
         const result = await response.json();
 
         if (result.success && result.data) {
@@ -95,7 +96,7 @@ export default function ContactPage() {
     try {
       setIsSaving(true);
 
-      const response = await fetch("/api/admin/contact", {
+      const response = await adminFetch("/api/admin/contact", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

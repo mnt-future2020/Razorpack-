@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import SEO from "@/config/utils/admin/seo/seoSchema";
 import { uploadToCloudinary, deleteByUrl } from "@/config/utils/cloudinary";
 import connectDB from "@/config/models/connectDB";
+import { verifyAdmin } from "@/lib/admin-auth";
 
 // GET - Fetch all SEO data
 export async function GET() {
@@ -113,6 +114,9 @@ export async function GET() {
 
 // PUT - Update SEO data (supports both JSON and multipart/form-data)
 export async function PUT(request: NextRequest) {
+  const auth = verifyAdmin(request);
+  if (!auth.ok) return auth.error!;
+
   try {
     await connectDB();
 

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { adminFetch } from "@/lib/admin-fetch"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -47,7 +48,7 @@ export default function SEOManagerPage() {
   const fetchSEOData = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/admin/seo');
+      const response = await adminFetch('/api/admin/seo');
       const result = await response.json();
       
       if (result.success) {
@@ -113,7 +114,7 @@ export default function SEOManagerPage() {
           submitData.append("removeOgImage", "true");
         }
 
-        const response = await fetch('/api/admin/seo', {
+        const response = await adminFetch('/api/admin/seo', {
           method: 'PUT',
           body: submitData,
         });

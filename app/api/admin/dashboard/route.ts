@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/config/models/connectDB";
+import { verifyAdmin } from "@/lib/admin-auth";
 import Lead from "@/config/utils/admin/lead/leadSchema";
 import Feedback from "@/config/utils/admin/feedback/feedbackSchema";
 import Testimonial from "@/config/utils/admin/testimonial/testimonialSchema";
@@ -7,7 +8,10 @@ import Service from "@/config/utils/admin/services/serviceSchema";
 import Product from "@/config/utils/admin/products/productSchema";
 import Portfolio from "@/config/utils/admin/portfolio/portfolioSchema";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const auth = verifyAdmin(request);
+  if (!auth.ok) return auth.error!;
+
   try {
     await connectDB();
 

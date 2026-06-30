@@ -1,22 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/config/models/connectDB";
 import Category from "@/config/utils/admin/category/categorySchema";
+import { verifyAdmin } from "@/lib/admin-auth";
 
 // PUT: Update category
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const auth = verifyAdmin(request);
+  if (!auth.ok) return auth.error!;
+
   try {
     await connectDB();
-
-    const token = request.headers.get("authorization")?.split(" ")[1];
-    if (!token) {
-      return NextResponse.json(
-        { success: false, message: "Unauthorized" },
-        { status: 401 }
-      );
-    }
 
     const { id } = await params;
     const body = await request.json();
@@ -71,16 +67,11 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const auth = verifyAdmin(request);
+  if (!auth.ok) return auth.error!;
+
   try {
     await connectDB();
-
-    const token = request.headers.get("authorization")?.split(" ")[1];
-    if (!token) {
-      return NextResponse.json(
-        { success: false, message: "Unauthorized" },
-        { status: 401 }
-      );
-    }
 
     const { id } = await params;
 

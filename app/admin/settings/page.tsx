@@ -2,6 +2,7 @@
 
 import type React from "react";
 import { useState, useEffect } from "react";
+import { adminFetch } from "@/lib/admin-fetch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,7 +44,7 @@ export default function SettingsPage() {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const response = await fetch("/api/admin/settings");
+        const response = await adminFetch("/api/admin/settings");
         const result = await response.json();
 
         if (result.success && result.data) {
@@ -72,7 +73,7 @@ export default function SettingsPage() {
     setLoading(true);
 
     try {
-      const response = await fetch("/api/admin/settings", {
+      const response = await adminFetch("/api/admin/settings", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -120,7 +121,7 @@ export default function SettingsPage() {
     setLoading(true);
 
     try {
-      const response = await fetch("/api/admin/settings", {
+      const response = await adminFetch("/api/admin/settings", {
         method: "POST",
       });
 

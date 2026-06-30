@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import Lead from "@/config/utils/admin/lead/leadSchema";
 import connectDB from "@/config/models/connectDB";
+import { verifyAdmin } from "@/lib/admin-auth";
 
 // GET - Fetch leads with pagination
 export async function GET(request: NextRequest) {
+  const auth = verifyAdmin(request);
+  if (!auth.ok) return auth.error!;
+
   try {
     await connectDB();
 
@@ -199,6 +203,9 @@ async function sendLeadEmails(lead: any) {
 
 // PUT - Update lead
 export async function PUT(request: NextRequest) {
+  const auth = verifyAdmin(request);
+  if (!auth.ok) return auth.error!;
+
   try {
     await connectDB();
     const body = await request.json();
@@ -263,6 +270,9 @@ export async function PUT(request: NextRequest) {
 
 // DELETE - Delete lead
 export async function DELETE(request: NextRequest) {
+  const auth = verifyAdmin(request);
+  if (!auth.ok) return auth.error!;
+
   try {
     await connectDB();
     const { searchParams } = new URL(request.url);

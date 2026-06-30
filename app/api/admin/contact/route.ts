@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/config/models/connectDB";
 import Contact from "@/config/utils/admin/contact/ContactSchema";
+import { verifyAdmin } from "@/lib/admin-auth";
 
 // GET - Fetch contact information
 export async function GET(request: NextRequest) {
+  const auth = verifyAdmin(request);
+  if (!auth.ok) return auth.error!;
+
   try {
     await connectDB();
 
@@ -60,6 +64,9 @@ export async function GET(request: NextRequest) {
 
 // POST - Create or update contact information
 export async function POST(request: NextRequest) {
+  const auth = verifyAdmin(request);
+  if (!auth.ok) return auth.error!;
+
   try {
     await connectDB();
 
@@ -112,6 +119,9 @@ export async function POST(request: NextRequest) {
 
 // PUT - Update contact information
 export async function PUT(request: NextRequest) {
+  const auth = verifyAdmin(request);
+  if (!auth.ok) return auth.error!;
+
   try {
     await connectDB();
 

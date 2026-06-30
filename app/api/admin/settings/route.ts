@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/config/models/connectDB";
 import Settings from "@/config/utils/admin/settings/settingsSchema";
 import { uploadToCloudinary, deleteByUrl } from "@/config/utils/cloudinary";
+import { verifyAdmin } from "@/lib/admin-auth";
 
 // GET - Fetch site settings
 export async function GET() {
@@ -71,6 +72,9 @@ async function uploadBase64Image(
 
 // PUT - Update site settings
 export async function PUT(request: NextRequest) {
+  const auth = verifyAdmin(request);
+  if (!auth.ok) return auth.error!;
+
   try {
     await connectDB();
 
@@ -161,7 +165,10 @@ export async function PUT(request: NextRequest) {
 }
 
 // POST - Reset settings to default
-export async function POST() {
+export async function POST(request: NextRequest) {
+  const auth = verifyAdmin(request);
+  if (!auth.ok) return auth.error!;
+
   try {
     await connectDB();
 

@@ -2,8 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { BetaAnalyticsDataClient } from "@google-analytics/data";
 import connectDB from "@/config/models/connectDB";
 import Settings from "@/config/utils/admin/settings/settingsSchema";
+import { verifyAdmin } from "@/lib/admin-auth";
 
 export async function GET(request: NextRequest) {
+  const auth = verifyAdmin(request);
+  if (!auth.ok) return auth.error!;
+
   try {
     await connectDB();
 

@@ -2,9 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/config/models/connectDB";
 import EmailSMTP from "@/config/utils/admin/smtp/emailSMTPSchema";
 import { testSMTPConnection, sendTestEmail } from "@/config/models/connectSMTP";
+import { verifyAdmin } from "@/lib/admin-auth";
 
 // GET - Fetch SMTP settings
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const auth = verifyAdmin(request);
+  if (!auth.ok) return auth.error!;
+
   try {
     await connectDB();
 
@@ -46,6 +50,9 @@ export async function GET() {
 
 // PUT - Update SMTP settings
 export async function PUT(request: NextRequest) {
+  const auth = verifyAdmin(request);
+  if (!auth.ok) return auth.error!;
+
   try {
     await connectDB();
 
@@ -137,6 +144,9 @@ export async function PUT(request: NextRequest) {
 
 // POST - Test SMTP connection or send test email
 export async function POST(request: NextRequest) {
+  const auth = verifyAdmin(request);
+  if (!auth.ok) return auth.error!;
+
   try {
     await connectDB();
 

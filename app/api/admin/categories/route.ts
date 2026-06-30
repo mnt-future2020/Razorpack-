@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/config/models/connectDB";
 import Category from "@/config/utils/admin/category/categorySchema";
+import { verifyAdmin } from "@/lib/admin-auth";
 
 // GET: Fetch all categories
 export async function GET(request: NextRequest) {
@@ -31,16 +32,11 @@ export async function GET(request: NextRequest) {
 
 // POST: Create new category
 export async function POST(request: NextRequest) {
+  const auth = verifyAdmin(request);
+  if (!auth.ok) return auth.error!;
+
   try {
     await connectDB();
-
-    const token = request.headers.get("authorization")?.split(" ")[1];
-    if (!token) {
-      return NextResponse.json(
-        { success: false, message: "Unauthorized" },
-        { status: 401 }
-      );
-    }
 
     const body = await request.json();
     const { name } = body;

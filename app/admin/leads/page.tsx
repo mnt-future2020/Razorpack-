@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { adminFetch } from "@/lib/admin-fetch"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -203,7 +204,7 @@ export default function LeadManager() {
   const confirmDeleteLead = async () => {
     if (!leadToDelete) return
     try {
-      const response = await fetch(`/api/admin/leads?id=${leadToDelete._id}`, { method: 'DELETE' })
+      const response = await adminFetch(`/api/admin/leads?id=${leadToDelete._id}`, { method: 'DELETE' })
       const result = await response.json()
       if (result.success) {
         mutate()
@@ -228,7 +229,7 @@ export default function LeadManager() {
     }
     setIsSaving(true)
     try {
-      const response = await fetch('/api/admin/leads', {
+      const response = await adminFetch('/api/admin/leads', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
@@ -255,7 +256,7 @@ export default function LeadManager() {
     if (!selectedLead) return
     setIsSaving(true)
     try {
-      const response = await fetch('/api/admin/leads', {
+      const response = await adminFetch('/api/admin/leads', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
