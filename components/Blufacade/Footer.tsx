@@ -2,6 +2,7 @@
 
 import React, { useRef } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { MapPin, Phone, Mail } from "lucide-react";
 import { useSettings } from "@/hooks/use-settings";
 import { useContact } from "@/hooks/use-contact";
@@ -14,6 +15,7 @@ gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 export function Footer() {
   const containerRef = useRef<HTMLElement>(null);
+  const pathname = usePathname();
   const { settings } = useSettings();
   const { contactInfo } = useContact();
 
@@ -25,38 +27,37 @@ export function Footer() {
     const pContent = section.querySelector(".parallax-content");
     if (!pContainer || !pContent) return;
 
-    const initAnimation = () => {
-      gsap.fromTo(pContent,
-        { yPercent: -100 },
-        {
-          yPercent: 0,
-          ease: "none",
-          scrollTrigger: {
-            trigger: pContainer,
-            start: "top bottom",
-            end: "bottom bottom",
-            scrub: true,
-            invalidateOnRefresh: true,
-          }
+    // Create animation synchronously so useGSAP tracks and cleans it up automatically
+    gsap.fromTo(pContent,
+      { yPercent: -100 },
+      {
+        yPercent: 0,
+        ease: "none",
+        force3D: true, // Hardware acceleration for smooth mobile rendering
+        scrollTrigger: {
+          trigger: pContainer,
+          start: "top bottom",
+          end: "bottom bottom",
+          scrub: 1,
+          invalidateOnRefresh: true,
+          refreshPriority: -1
         }
-      );
-      ScrollTrigger.refresh();
-    };
+      }
+    );
 
-    // Wait for page to be fully ready — images, fonts, dynamic content
-    if (document.readyState === "complete") {
-      // Page already loaded, small delay for any GSAP pinned sections
-      setTimeout(initAnimation, 500);
-    } else {
-      // Wait for full page load
-      window.addEventListener("load", () => setTimeout(initAnimation, 300), { once: true });
-    }
+    // Refresh ScrollTrigger after a short delay to account for new page DOM rendering height
+    const timeout = setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 100);
 
     // Also refresh on resize (handles layout shifts)
     const onResize = () => ScrollTrigger.refresh();
     window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, { scope: containerRef });
+    return () => {
+      clearTimeout(timeout);
+      window.removeEventListener("resize", onResize);
+    };
+  }, { scope: containerRef, dependencies: [pathname] });
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -151,7 +152,7 @@ export function Footer() {
 
       {/* ─── BLACK PARALLAX REVEAL SECTION ─── */}
       <div className="parallax-container relative w-full overflow-hidden z-0 bg-[#0a1118]">
-        <div className="parallax-content relative w-full flex flex-col justify-end p-6 md:p-8 lg:p-12 pb-12 md:pb-16 pt-16 md:pt-24 lg:pt-32">
+        <div className="parallax-content relative w-full flex flex-col justify-end p-6 md:p-8 lg:p-12 pb-12 md:pb-16 pt-16 md:pt-24 lg:pt-32 will-change-transform">
           
           {/* Stationary Background Image */}
           <div 

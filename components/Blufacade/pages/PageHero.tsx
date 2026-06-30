@@ -226,7 +226,7 @@ export function PageHero({
         </h1>
 
         <p
-          className={`hero-desc mt-4 md:mt-8 border-l-2 border-[var(--brand-blue)]/40 pl-4 md:pl-5 text-xs md:text-[15px] leading-relaxed max-w-[55vw] md:max-w-[450px] font-light ${isDark ? "text-gray-300" : "text-gray-600"}`}
+          className={`hero-desc mt-4 md:mt-8 border-l-2 border-[var(--brand-blue)]/40 pl-4 md:pl-5 text-sm md:text-[15px] leading-relaxed max-w-[85vw] md:max-w-[450px] font-light ${isDark ? "text-gray-300" : "text-gray-600"}`}
         >
           {description}
         </p>
