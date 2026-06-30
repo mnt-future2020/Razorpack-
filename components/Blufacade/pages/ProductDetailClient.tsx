@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { QuoteModal } from "@/components/Blufacade/QuoteModal";
@@ -65,6 +65,13 @@ export function ProductDetailClient({ product }: { product: ProductData }) {
   const sectionRef = useRef<HTMLElement>(null);
   const [selectedImage, setSelectedImage] = useState(0);
   const [quoteOpen, setQuoteOpen] = useState(false);
+
+  useEffect(() => {
+    const key = `viewed_${product.slug}`;
+    if (sessionStorage.getItem(key)) return;
+    sessionStorage.setItem(key, "1");
+    fetch(`/api/products/${product.slug}/view`, { method: "POST" }).catch(() => {});
+  }, [product.slug]);
 
   // ── Background color transition: white → dark on scroll ──
   useGSAP(
