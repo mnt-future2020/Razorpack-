@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import mongoose from 'mongoose';
 import connectDB from '@/config/models/connectDB';
 import ClientLogo from '@/config/utils/admin/clientLogo/clientLogoSchema';
 import { uploadToCloudinary, deleteByUrl } from '@/config/utils/cloudinary';
@@ -58,6 +59,18 @@ export async function GET(
     await connectDB();
     const { id } = await params;
 
+    // Reject malformed ids up front — otherwise Mongoose throws a CastError
+    // that surfaces as a 500 with the internal error text instead of a 404.
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: 'Client logo not found',
+        },
+        { status: 404 }
+      );
+    }
+
     const clientLogo = await ClientLogo.findById(id);
 
     if (!clientLogo) {
@@ -80,7 +93,6 @@ export async function GET(
       {
         success: false,
         message: 'Failed to fetch client logo',
-        error: error.message,
       },
       { status: 500 }
     );
@@ -98,6 +110,18 @@ export async function PUT(
   try {
     await connectDB();
     const { id } = await params;
+
+    // Reject malformed ids up front — otherwise Mongoose throws a CastError
+    // that surfaces as a 500 with the internal error text instead of a 404.
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: 'Client logo not found',
+        },
+        { status: 404 }
+      );
+    }
 
     const formData = await request.formData();
     const name = formData.get('name') as string || 'Client Logo';
@@ -133,6 +157,11 @@ export async function PUT(
     const oldLogoUrl = existingClientLogo.logo;
     let logoUrl = existingLogo || existingClientLogo.logo;
 
+    // Collect the superseded asset to delete only AFTER the DB update succeeds.
+    // If we delete first and the update then fails, the asset is gone from
+    // Cloudinary but the record still points at it.
+    const urlsToDeleteAfterSave: string[] = [];
+
     // Upload new logo if provided
     if (logoFile) {
       const logoBytes = await logoFile.arrayBuffer();
@@ -142,9 +171,8 @@ export async function PUT(
         `client-logos/${name.toLowerCase().replace(/\s+/g, '-')}`
       );
       logoUrl = logoResult.secure_url;
-      // Delete old logo from Cloudinary if it was replaced
       if (oldLogoUrl && oldLogoUrl !== logoUrl) {
-        await deleteByUrl(oldLogoUrl);
+        urlsToDeleteAfterSave.push(oldLogoUrl);
       }
     }
 
@@ -159,6 +187,9 @@ export async function PUT(
       { new: true, runValidators: true }
     );
 
+    // Update succeeded — now it is safe to remove the superseded asset.
+    await Promise.all(urlsToDeleteAfterSave.map((url) => deleteByUrl(url)));
+
     return NextResponse.json({
       success: true,
       message: 'Client logo updated successfully',
@@ -170,7 +201,6 @@ export async function PUT(
       {
         success: false,
         message: 'Failed to update client logo',
-        error: error.message,
       },
       { status: 500 }
     );
@@ -189,6 +219,16 @@ export async function DELETE(
     await connectDB();
     const { id } = await params;
 
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: 'Client logo not found',
+        },
+        { status: 404 }
+      );
+    }
+
     const clientLogo = await ClientLogo.findById(id);
 
     if (!clientLogo) {
@@ -201,12 +241,13 @@ export async function DELETE(
       );
     }
 
-    // Delete logo from Cloudinary before removing the record
+    // Remove the record first, then clean up the asset. (A failed asset delete
+    // must not leave an undeletable client logo behind.)
+    await ClientLogo.findByIdAndDelete(id);
+
     if (clientLogo.logo) {
       await deleteByUrl(clientLogo.logo);
     }
-
-    await ClientLogo.findByIdAndDelete(id);
 
     return NextResponse.json({
       success: true,
@@ -218,7 +259,6 @@ export async function DELETE(
       {
         success: false,
         message: 'Failed to delete client logo',
-        error: error.message,
       },
       { status: 500 }
     );

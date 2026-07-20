@@ -13,6 +13,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Token and new password are required" }, { status: 400 });
     }
 
+    // Guard against NoSQL operator injection: token/newPassword must be plain
+    // strings. Without this, {"token":{"$gt":""}} matches any live reset token
+    // and lets an attacker reset an admin password without the email.
+    if (typeof token !== "string" || typeof newPassword !== "string") {
+      return NextResponse.json({ error: "Invalid token or password" }, { status: 400 });
+    }
+
     // Find admin with valid reset token
     const admin = await Admin.findOne({
       resetPasswordToken: token,
@@ -52,35 +59,15 @@ export async function POST(request: Request) {
     
     console.log('Password hashed successfully');
 
-    // Update password and clear reset token
-    try {
-      // Explicitly set the password field
-      await Admin.findByIdAndUpdate(admin._id, {
-        $set: {
-          password: hashedPassword,
-          resetPasswordToken: null,
-          resetPasswordExpires: null
-        }
-      }, { new: true });
-      
-      console.log('Password updated in database');
-    } catch (error) {
-      console.error('Error updating password:', error);
-      throw new Error('Failed to update password in database');
-    }
-    
-    // Save and wait for confirmation
-    try {
-      const savedAdmin = await admin.save();
-      console.log('Password updated successfully for admin:', admin.email);
-      
-      // Verify the new password can be compared
-      const testCompare = await bcrypt.compare(newPassword, savedAdmin.password);
-      console.log('Password verification test:', testCompare ? 'successful' : 'failed');
-    } catch (error) {
-      console.error('Error saving new password:', error);
-      throw error;
-    }
+    // Update password and clear the reset token atomically. (Password is hashed
+    // here rather than via the pre-save hook because we use findByIdAndUpdate.)
+    await Admin.findByIdAndUpdate(admin._id, {
+      $set: {
+        password: hashedPassword,
+        resetPasswordToken: null,
+        resetPasswordExpires: null,
+      },
+    });
 
     return NextResponse.json({
       success: true,

@@ -37,13 +37,15 @@ export function WordRotate({
   return (
     <div className="overflow-hidden py-2">
       <AnimatePresence mode="wait">
-        <motion.h1
+        {/* A rotating decorative word is not a page heading. This was a
+            motion.h1, which put a second <h1> on the homepage. */}
+        <motion.span
           key={words[index]}
-          className={cn(className)}
+          className={cn("block", className)}
           {...motionProps}
         >
           {words[index]}
-        </motion.h1>
+        </motion.span>
       </AnimatePresence>
     </div>
   )

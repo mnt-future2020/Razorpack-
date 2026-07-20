@@ -44,11 +44,7 @@ export async function GET(
   } catch (error) {
     console.error("Error fetching service:", error);
     return NextResponse.json(
-      {
-        success: false,
-        message: "Failed to fetch service",
-        error: error instanceof Error ? error.message : "Unknown error",
-      },
+      { success: false, message: "Failed to fetch service" },
       { status: 500 }
     );
   }

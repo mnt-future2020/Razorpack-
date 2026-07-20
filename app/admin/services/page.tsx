@@ -78,7 +78,33 @@ interface Service {
   seoTitle?: string;
   seoDescription?: string;
   seoKeywords?: string;
+  ogImage?: string;
 }
+
+// Single source of truth for a blank service form. Every reset MUST go through
+// this — divergent inline literals were dropping whyChooseUs/highlights/
+// processSteps/technicalSpecs/ogImage, which crashed "Add New Service" on save
+// (formData.whyChooseUs.split was called on undefined).
+const createEmptyServiceForm = (order = 0) => ({
+  serviceName: "",
+  category: "",
+  shortDescription: "",
+  description: "",
+  features: "",
+  technicalSpecs: [] as Array<{ label: string; value: string }>,
+  applications: [] as string[],
+  processSteps: [] as Array<{ title: string; description: string }>,
+  whyChooseUs: "",
+  highlights: "",
+  image: "",
+  gallery: [] as string[],
+  status: "active",
+  order,
+  seoTitle: "",
+  seoDescription: "",
+  seoKeywords: "",
+  ogImage: "",
+});
 
 interface PaginationData {
   currentPage: number;
@@ -109,26 +135,7 @@ export default function ServicesPage() {
     null
   );
 
-  const [formData, setFormData] = useState({
-    serviceName: "",
-    category: "",
-    shortDescription: "",
-    description: "",
-    features: "",
-    technicalSpecs: [] as Array<{ label: string; value: string }>,
-    applications: [] as string[],
-    processSteps: [] as Array<{ title: string; description: string }>,
-    whyChooseUs: "",
-    highlights: "",
-    image: "",
-    gallery: [] as string[],
-    status: "active",
-    order: 0,
-    seoTitle: "",
-    seoDescription: "",
-    seoKeywords: "",
-    ogImage: "",
-  });
+  const [formData, setFormData] = useState(createEmptyServiceForm());
 
   const [selectedFiles, setSelectedFiles] = useState<{
     image: File | null;
@@ -389,29 +396,14 @@ export default function ServicesPage() {
   const handleCancel = () => {
     setIsAddModalOpen(false);
     setEditingId(null);
-    setFormData({
-      serviceName: "",
-      category: "",
-      shortDescription: "",
-      description: "",
-      features: "",
-      technicalSpecs: [],
-      applications: [],
-      processSteps: [],
-      whyChooseUs: "",
-      highlights: "",
-      image: "",
-      gallery: [],
-      status: "active",
-      order: 0,
-      seoTitle: "",
-      seoDescription: "",
-      seoKeywords: "",
-    });
+    setFormData(createEmptyServiceForm());
     setSelectedFiles({
       image: null,
       galleryImages: [],
     });
+    // Reset OG state too, so a picked OG file doesn't leak onto the next service.
+    setOgImageFile(null);
+    setOgImagePreview("");
   };
 
   const handleImageUpload = () => {
@@ -642,25 +634,13 @@ export default function ServicesPage() {
         <Button
           onClick={() => {
             setEditingId(null);
-            setFormData({
-              serviceName: "",
-              category: "",
-              shortDescription: "",
-              description: "",
-              features: "",
-              applications: [],
-              image: "",
-              gallery: [],
-              status: "active",
-              order: 0,
-              seoTitle: "",
-              seoDescription: "",
-              seoKeywords: "",
-            });
+            setFormData(createEmptyServiceForm());
             setSelectedFiles({
               image: null,
               galleryImages: [],
             });
+            setOgImageFile(null);
+            setOgImagePreview("");
             setIsAddModalOpen(true);
           }}
           className="bg-[#221E1F] hover:bg-[#333] text-white"
@@ -685,25 +665,13 @@ export default function ServicesPage() {
           <Button
             onClick={() => {
               setEditingId(null);
-              setFormData({
-                serviceName: "",
-                category: "",
-                shortDescription: "",
-                description: "",
-                features: "",
-                applications: [],
-                image: "",
-                gallery: [],
-                status: "active",
-                order: 0,
-                seoTitle: "",
-                seoDescription: "",
-                seoKeywords: "",
-              });
+              setFormData(createEmptyServiceForm());
               setSelectedFiles({
                 image: null,
                 galleryImages: [],
               });
+              setOgImageFile(null);
+              setOgImagePreview("");
               setIsAddModalOpen(true);
             }}
             className="bg-[#221E1F] hover:bg-[#333] text-white"
@@ -1004,7 +972,7 @@ export default function ServicesPage() {
                 <div className="space-y-3">
                   {formData.processSteps?.map((step, index) => (
                     <div
-                      key={`step-${step.title}-${index}`}
+                      key={`step-${index}`}
                       className="flex items-start gap-3 p-4 border rounded-md bg-white relative group"
                     >
                       <div className="flex-1 space-y-3">
@@ -1013,7 +981,7 @@ export default function ServicesPage() {
                           value={step.title}
                           onChange={(e) => {
                             const newSteps = [...(formData.processSteps || [])];
-                            newSteps[index].title = e.target.value;
+                            newSteps[index] = { ...newSteps[index], title: e.target.value };
                             setFormData({ ...formData, processSteps: newSteps });
                           }}
                         />
@@ -1022,7 +990,7 @@ export default function ServicesPage() {
                           value={step.description}
                           onChange={(e) => {
                             const newSteps = [...(formData.processSteps || [])];
-                            newSteps[index].description = e.target.value;
+                            newSteps[index] = { ...newSteps[index], description: e.target.value };
                             setFormData({ ...formData, processSteps: newSteps });
                           }}
                           rows={2}
@@ -1106,12 +1074,12 @@ export default function ServicesPage() {
               ) : (
                 <div className="space-y-2">
                   {formData.technicalSpecs?.map((spec, index) => (
-                    <div key={`spec-${spec.label}-${index}`} className="flex gap-2 items-start">
+                    <div key={`spec-${index}`} className="flex gap-2 items-start">
                       <Input
                         value={spec.label || ""}
                         onChange={(e) => {
                           const newSpecs = [...(formData.technicalSpecs || [])];
-                          newSpecs[index].label = e.target.value;
+                          newSpecs[index] = { ...newSpecs[index], label: e.target.value };
                           setFormData({ ...formData, technicalSpecs: newSpecs });
                         }}
                         placeholder="Label (e.g., Thickness)"
@@ -1121,7 +1089,7 @@ export default function ServicesPage() {
                         value={spec.value || ""}
                         onChange={(e) => {
                           const newSpecs = [...(formData.technicalSpecs || [])];
-                          newSpecs[index].value = e.target.value;
+                          newSpecs[index] = { ...newSpecs[index], value: e.target.value };
                           setFormData({ ...formData, technicalSpecs: newSpecs });
                         }}
                         placeholder="Value (e.g., 50 - 200 µ)"

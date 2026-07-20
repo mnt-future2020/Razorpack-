@@ -169,35 +169,39 @@ adminSchema.statics.findByCredentials = async function (email, password) {
   return admin
 }
 
-// Static method to create initial admin
+// Static method to seed an initial admin. Intentionally NOT run automatically
+// on DB connect — invoke it manually from a one-off script when bootstrapping a
+// new environment. The password comes from INITIAL_ADMIN_PASSWORD; there is no
+// hardcoded fallback, so a deleted admin is never silently recreated.
 adminSchema.statics.createInitialAdmin = async function () {
-  try {
-    const existingAdmin = await this.findOne({ email: "admin@rayzorpack.com" })
+  const email = process.env.INITIAL_ADMIN_EMAIL
+  const password = process.env.INITIAL_ADMIN_PASSWORD
 
-    if (!existingAdmin) {
-      const initialAdmin = new this({
-        firstName: "Rayzorpack",
-        lastName: "Admin",
-        email: "admin@rayzorpack.com",
-        password: "Rayzorpack@2025",
-        phone: "9994162996",
-        location: "Chennai, India",
-        role: "Super Admin",
-        emailVerified: true,
-        isActive: true,
-      })
-
-      await initialAdmin.save()
-      console.log("Initial admin created successfully for Rayzorpack")
-      return initialAdmin
-    } else {
-      console.log("Initial admin already exists")
-      return existingAdmin
-    }
-  } catch (error) {
-    console.error("Error creating initial admin:", error)
-    throw error
+  if (!email || !password) {
+    throw new Error(
+      "INITIAL_ADMIN_EMAIL and INITIAL_ADMIN_PASSWORD must be set to seed an admin",
+    )
   }
+
+  const existingAdmin = await this.findOne({ email })
+  if (existingAdmin) {
+    console.log("Initial admin already exists")
+    return existingAdmin
+  }
+
+  const initialAdmin = new this({
+    firstName: process.env.INITIAL_ADMIN_FIRST_NAME || "Admin",
+    lastName: process.env.INITIAL_ADMIN_LAST_NAME || "User",
+    email,
+    password,
+    role: "Super Admin",
+    emailVerified: true,
+    isActive: true,
+  })
+
+  await initialAdmin.save()
+  console.log("Initial admin created successfully")
+  return initialAdmin
 }
 
 const Admin = mongoose.models.Admin || mongoose.model("Admin", adminSchema)

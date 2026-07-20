@@ -10,34 +10,48 @@ import Banner from "@/config/utils/admin/banner/bannerSchema";
 import Service from "@/config/utils/admin/services/serviceSchema";
 import Product from "@/config/utils/admin/products/productSchema";
 import Contact from "@/config/utils/admin/contact/ContactSchema";
-import Settings from "@/config/utils/admin/settings/settingsSchema";
+import {
+  SITE_URL,
+  DEFAULT_OG_IMAGE,
+  absoluteTitle,
+  getSiteSettings,
+} from "@/lib/site-config";
 
 export const dynamic = "force-dynamic";
 
+const HOME_FALLBACK_TITLE =
+  "Rayzor Industrial Packaging Pvt Ltd | Premium Packaging Solutions & LDPE Films";
+const HOME_FALLBACK_DESCRIPTION =
+  "Rayzor Industrial Packaging manufactures VCI and LDPE films, pouches, bags and shrink wraps, with contract packaging and export palletisation from Madurai, India.";
+
 export async function generateMetadata(): Promise<Metadata> {
   const seo = await getSEO("home");
-  const title = seo?.title || { absolute: "Rayzor Industrial Packaging Pvt Ltd | Premium Packaging Solutions & LDPE Films" };
-  const description = seo?.description || "";
+  // Plain string used for OG/Twitter, which have no title template to apply.
+  const plainTitle = seo?.title || HOME_FALLBACK_TITLE;
+  const description = seo?.description || HOME_FALLBACK_DESCRIPTION;
+  const ogImage = seo?.ogImage || DEFAULT_OG_IMAGE.url;
 
   return {
-    title,
+    // DB titles are already brand-inclusive; `absolute` stops the root layout
+    // template from appending the brand a second time.
+    title: absoluteTitle(plainTitle),
     description,
-    keywords: seo?.keywords || "",
+    keywords: seo?.keywords || undefined,
     alternates: { canonical: "/" },
     openGraph: {
-      title: typeof title === "string" ? title : undefined,
+      title: plainTitle,
       description,
-      url: "https://www.rayzorpack.com",
+      url: SITE_URL,
       siteName: "Rayzor Industrial Packaging Pvt Ltd",
       type: "website",
       locale: "en_IN",
-      ...(seo?.ogImage && { images: [{ url: seo.ogImage, width: 1200, height: 630, alt: typeof title === "string" ? title : "Rayzor Industrial Packaging" }] }),
+      images: [{ url: ogImage, width: 1200, height: 630, alt: plainTitle }],
     },
     twitter: {
       card: "summary_large_image",
-      title: typeof title === "string" ? title : undefined,
+      title: plainTitle,
       description,
-      ...(seo?.ogImage && { images: [seo.ogImage] }),
+      images: [ogImage],
     },
   };
 }
@@ -46,7 +60,7 @@ async function getHomeData() {
   try {
     await connectDB();
 
-    const [banner, services, products, settings, contact] = await Promise.all([
+    const [banner, services, products, siteSettings, contact] = await Promise.all([
       Banner.findOne({ pageKey: "home" }).lean(),
       Service.find({ status: "active", isDeleted: false })
         .sort({ order: 1, createdAt: -1 })
@@ -56,7 +70,9 @@ async function getHomeData() {
         .sort({ order: 1, createdAt: -1 })
         .limit(10)
         .lean(),
-      Settings.findOne({ id: "default" }).lean(),
+      // `getSiteSettings()` queries by `isActive: true`, matching what the
+      // admin API writes — the old `{ id: "default" }` filter never matched.
+      getSiteSettings(),
       Contact.findOne({}).lean(),
     ]);
 
@@ -90,11 +106,11 @@ async function getHomeData() {
     }));
 
     // Build JSON-LD data
-    const s = settings as any;
+    const s = siteSettings;
     const c = contact as any;
-    const siteName = s?.siteName || "";
-    const siteUrl = s?.siteUrl || "https://www.rayzorpack.com";
-    const logoUrl = s?.logo
+    const siteName = s.siteName;
+    const siteUrl = s.siteUrl || SITE_URL;
+    const logoUrl = s.logo
       ? (s.logo.startsWith("http") ? s.logo : `${siteUrl}${s.logo}`)
       : "";
     const socialLinks = c
@@ -107,7 +123,7 @@ async function getHomeData() {
       name: siteName,
       url: siteUrl,
       ...(logoUrl && { logo: logoUrl }),
-      description: s?.siteTagline || "",
+      description: s.siteTagline || "",
       ...(c && {
         address: {
           "@type": "PostalAddress",
@@ -127,15 +143,29 @@ async function getHomeData() {
       ...(socialLinks.length > 0 && { sameAs: socialLinks }),
     };
 
-    return { heroSlides, services: servicesList, products: productsList, jsonLd };
+    const websiteJsonLd = {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      name: siteName,
+      url: siteUrl,
+      ...(s.siteTagline && { description: s.siteTagline }),
+    };
+
+    return {
+      heroSlides,
+      services: servicesList,
+      products: productsList,
+      jsonLd,
+      websiteJsonLd,
+    };
   } catch (error) {
     console.error("Failed to fetch home page data:", error);
-    return { heroSlides: [], services: [], products: [], jsonLd: null };
+    return { heroSlides: [], services: [], products: [], jsonLd: null, websiteJsonLd: null };
   }
 }
 
 export default async function Home() {
-  const { heroSlides, services, products, jsonLd } = await getHomeData();
+  const { heroSlides, services, products, jsonLd, websiteJsonLd } = await getHomeData();
 
   return (
     <>
@@ -143,6 +173,12 @@ export default async function Home() {
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      )}
+      {websiteJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
         />
       )}
       <main className="relative w-full overflow-x-hidden">

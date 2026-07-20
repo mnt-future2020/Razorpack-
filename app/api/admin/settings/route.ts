@@ -38,11 +38,12 @@ export async function GET() {
     );
   } catch (error) {
     console.error("Error fetching site settings:", error);
+    // This GET is intentionally public — the storefront reads siteName, logo,
+    // favicon and the GA id from it. Internal error text must not ride along.
     return NextResponse.json(
       {
         success: false,
         message: "Failed to fetch site settings",
-        error: error instanceof Error ? error.message : "Unknown error",
       },
       { status: 500 }
     );

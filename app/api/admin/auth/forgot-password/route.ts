@@ -4,7 +4,7 @@ import connectDB from "../../../../../config/models/connectDB";
 import Admin from "../../../../../config/utils/admin/login/loginSchema";
 import EmailSMTP from "../../../../../config/utils/admin/smtp/emailSMTPSchema";
 import Settings from "../../../../../config/utils/admin/settings/settingsSchema";
-import nodemailer from "nodemailer";
+import { createSMTPTransporter } from "../../../../../config/models/connectSMTP";
 
 export async function POST(request: Request) {
   try {
@@ -25,22 +25,20 @@ export async function POST(request: Request) {
       }, { status: 400 });
     }
 
+    // Neutral response returned for all outcomes so an attacker cannot
+    // distinguish registered/active accounts from unknown/inactive ones.
+    const neutralResponse = NextResponse.json({
+      success: true,
+      message:
+        "If an account exists with this email, you will receive password reset instructions.",
+    });
+
     // Find admin by email
     const admin = await Admin.findOne({ email });
 
-    if (!admin) {
-      return NextResponse.json({ 
-        success: false, 
-        error: "The email address you entered is not registered as an admin account." 
-      }, { status: 401 });
-    }
-
-    // Check if account is active
-    if (!admin.isActive) {
-      return NextResponse.json({ 
-        success: false, 
-        error: "Your admin account is currently inactive. Please contact support." 
-      }, { status: 403 });
+    // Unknown email or inactive account: skip sending, return neutral response.
+    if (!admin || !admin.isActive) {
+      return neutralResponse;
     }
 
     // Generate reset token
@@ -59,15 +57,7 @@ export async function POST(request: Request) {
     }
 
     // Create transporter
-    const transporter = nodemailer.createTransport({
-      host: smtpSettings.smtpHost,
-      port: parseInt(smtpSettings.smtpPort),
-      secure: smtpSettings.smtpPort === "465",
-      auth: {
-        user: smtpSettings.smtpUser,
-        pass: smtpSettings.smtpPassword,
-      },
-    });
+    const transporter = createSMTPTransporter(smtpSettings);
 
     // Reset link (replace with your actual frontend URL)
     const resetLink = `${process.env.APP_URL}/login/reset-password?token=${resetToken}`;
@@ -115,13 +105,19 @@ export async function POST(request: Request) {
       console.log('Email sent successfully:', info.messageId);
     } catch (error: any) {
       console.error('Error sending email:', error);
-      throw new Error(`Failed to send email: ${error.message}`);
+      // Email failed to send: invalidate the reset token so it can't be used.
+      admin.resetPasswordToken = null;
+      admin.resetPasswordExpires = null;
+      try {
+        await admin.save();
+      } catch (saveError) {
+        console.error('Error clearing reset token after email failure:', saveError);
+      }
+      // Do not leak the send failure to the client; return the neutral response.
+      return neutralResponse;
     }
 
-    return NextResponse.json({
-      success: true,
-      message: "If an account exists with this email, you will receive password reset instructions.",
-    });
+    return neutralResponse;
   } catch (error: any) {
     console.error("Forgot password error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

@@ -8,7 +8,7 @@ export function Preloader() {
   const { settings } = useSettings();
   const [progress, setProgress] = useState(0);
   const preloaderRef = useRef<HTMLDivElement>(null);
-  const textRef = useRef<HTMLHeadingElement>(null);
+  const textRef = useRef<HTMLDivElement>(null);
   const barRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -86,9 +86,10 @@ export function Preloader() {
 
       {/* Center Massive Logo Text */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full px-6">
-         <h1 
+         <div
            ref={textRef}
-           className="text-[12vw] lg:text-[13vw] font-black tracking-[-0.06em] leading-none w-full text-center" 
+           aria-hidden="true"
+           className="font-heading text-[12vw] lg:text-[13vw] font-black tracking-[-0.06em] leading-none w-full text-center"
            style={{ transform: "scaleY(1.2)" }}
          >
            {(() => {
@@ -103,7 +104,7 @@ export function Preloader() {
              }
              return <span className="text-white">{name}</span>;
            })()}
-         </h1>
+         </div>
       </div>
 
       {/* Bottom Progress Line */}

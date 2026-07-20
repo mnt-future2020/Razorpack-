@@ -36,7 +36,13 @@ interface ServicesResponse {
 export function useServices(page: number = 1, limit: number = 20) {
   const { data, error, isLoading } = useSWR<ServicesResponse>(
     `/api/services?page=${page}&limit=${limit}`,
-    (url) => fetch(url).then((r) => r.json()),
+    async (url) => {
+      const res = await fetch(url);
+      if (!res.ok) {
+        throw new Error(`Request failed with status ${res.status}`);
+      }
+      return res.json();
+    },
     {
       revalidateOnFocus: false,
       revalidateIfStale: false,

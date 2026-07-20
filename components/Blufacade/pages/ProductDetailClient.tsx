@@ -225,9 +225,9 @@ export function ProductDetailClient({ product }: { product: ProductData }) {
             </span>
 
             {/* Product Name */}
-            <h1 className="pdt-heading font-heading font-extrabold text-[var(--brand-dark)] text-2xl md:text-3xl lg:text-[2.1rem] xl:text-4xl tracking-tight leading-[1.15] mb-5">
+            <h2 className="pdt-heading font-heading font-extrabold text-[var(--brand-dark)] text-2xl md:text-3xl lg:text-[2.1rem] xl:text-4xl tracking-tight leading-[1.15] mb-5">
               {product.productName}
-            </h1>
+            </h2>
 
             {/* Quick specs pills */}
             <div className="flex flex-wrap gap-2 mb-6">

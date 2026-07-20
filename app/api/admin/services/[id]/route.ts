@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import mongoose from "mongoose";
 import connectDB from "@/config/models/connectDB";
 import Service from "@/config/utils/admin/services/serviceSchema";
 import { uploadToCloudinary, deleteByUrl } from "@/config/utils/cloudinary";
@@ -65,6 +66,15 @@ export async function PUT(
   try {
     await connectDB();
     const { id } = await params;
+
+    // Reject malformed ids up front — otherwise Mongoose throws a CastError
+    // that surfaces as a 500 with the internal error text instead of a 404.
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json(
+        { success: false, message: "Service not found" },
+        { status: 404 }
+      );
+    }
 
     const service = await Service.findOne({ _id: id, isDeleted: false });
     if (!service) {
@@ -142,6 +152,11 @@ export async function PUT(
       }
     }
 
+    // Collect old asset URLs to delete only AFTER the DB save succeeds. If we
+    // delete first and the save then fails (duplicate slug, validation, …) the
+    // images are gone from Cloudinary but the record still points at them.
+    const urlsToDeleteAfterSave: string[] = [];
+
     // Handle image upload
     const oldImageUrl = service.image;
     let imageUrl = existingImage || service.image;
@@ -153,20 +168,17 @@ export async function PUT(
         `services/${newSlug}/main`
       );
       imageUrl = imageResult.secure_url;
-      // Delete old image from Cloudinary if it was replaced
       if (oldImageUrl && oldImageUrl !== imageUrl) {
-        await deleteByUrl(oldImageUrl);
+        urlsToDeleteAfterSave.push(oldImageUrl);
       }
     }
 
-    // Delete removed gallery images from Cloudinary
+    // Queue removed gallery images for deletion after save
     const oldGalleryUrls: string[] = service.gallery || [];
     const removedGalleryUrls = oldGalleryUrls.filter(
       (url: string) => url && !existingGallery.includes(url)
     );
-    for (const url of removedGalleryUrls) {
-      await deleteByUrl(url);
-    }
+    urlsToDeleteAfterSave.push(...removedGalleryUrls);
 
     // Handle gallery images
     const galleryUrls: string[] = [...existingGallery];
@@ -205,8 +217,8 @@ export async function PUT(
     service.seoDescription = seoDescription;
     service.seoKeywords = seoKeywords;
     // Handle OG image upload
+    const oldOgImageUrl = service.ogImage;
     if (ogImageFile && ogImageFile.size > 0) {
-      if (service.ogImage) await deleteByUrl(service.ogImage).catch(() => {});
       const ogBytes = await ogImageFile.arrayBuffer();
       const ogBuffer = Buffer.from(ogBytes);
       const ogResult = await uploadToCloudinary(ogBuffer, `services/${newSlug}/og`);
@@ -214,8 +226,15 @@ export async function PUT(
     } else {
       service.ogImage = ogImage || "";
     }
+    // If the OG image changed or was cleared, delete the old asset after save.
+    if (oldOgImageUrl && oldOgImageUrl !== service.ogImage) {
+      urlsToDeleteAfterSave.push(oldOgImageUrl);
+    }
 
     await service.save();
+
+    // Save succeeded — now it is safe to remove the superseded assets.
+    await Promise.all(urlsToDeleteAfterSave.map((url) => deleteByUrl(url)));
 
     return NextResponse.json({
       success: true,
@@ -225,10 +244,7 @@ export async function PUT(
   } catch (error: any) {
     console.error("Error updating service:", error);
     return NextResponse.json(
-      {
-        success: false,
-        message: error.message || "Failed to update service",
-      },
+      { success: false, message: "Failed to update service" },
       { status: 500 }
     );
   }
@@ -246,6 +262,13 @@ export async function DELETE(
     await connectDB();
     const { id } = await params;
 
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json(
+        { success: false, message: "Service not found" },
+        { status: 404 }
+      );
+    }
+
     const service = await Service.findOne({ _id: id, isDeleted: false });
     if (!service) {
       return NextResponse.json(
@@ -254,18 +277,16 @@ export async function DELETE(
       );
     }
 
-    // Delete images from Cloudinary before removing the record
-    if (service.image) {
-      await deleteByUrl(service.image);
-    }
-    if (service.gallery && service.gallery.length > 0) {
-      for (const url of service.gallery) {
-        if (url) await deleteByUrl(url);
-      }
-    }
-
-    // Hard delete - permanently remove from database
+    // Remove the record first, then clean up assets. (A failed asset delete
+    // must not leave an undeletable service behind.)
     await Service.findByIdAndDelete(id);
+
+    const assetUrls = [
+      service.image,
+      service.ogImage,
+      ...(service.gallery || []),
+    ].filter(Boolean);
+    await Promise.all(assetUrls.map((url: string) => deleteByUrl(url)));
 
     return NextResponse.json({
       success: true,

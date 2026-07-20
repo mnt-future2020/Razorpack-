@@ -58,77 +58,85 @@ export function ServicesGrid({ initialServices }: { initialServices: ServiceData
         );
       }
 
-      setTimeout(() => {
-        const tl = gsap.timeline({
-          scrollTrigger: {
-            trigger: section,
-            start: "top 70%",
-            end: "top 20%",
-            scrub: 1,
-          },
-        });
+      // Create the scrubbed timeline synchronously so useGSAP tracks it and
+      // auto-reverts it (killing the ScrollTrigger) on unmount / re-run.
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: section,
+          start: "top 70%",
+          end: "top 20%",
+          scrub: 1,
+        },
+      });
 
-        tl.fromTo(
-          section,
-          { backgroundColor: "#ffffff" },
-          { backgroundColor: "#0f1117", ease: "none" },
-          0,
-        );
-        tl.fromTo(
-          section.querySelectorAll(".svc-heading-dark"),
-          { color: "#36312d" },
-          { color: "#ffffff", ease: "none" },
-          0,
-        );
-        tl.fromTo(
-          section.querySelectorAll(".svc-card"),
-          { backgroundColor: "#ffffff" },
-          { backgroundColor: "#0f1117", ease: "none" },
-          0,
-        );
-        tl.fromTo(
-          section.querySelectorAll(".svc-card"),
-          { borderColor: "rgba(54,49,45,0.06)" },
-          { borderColor: "rgba(255,255,255,0.06)", ease: "none" },
-          0,
-        );
-        tl.fromTo(
-          section.querySelectorAll(".svc-num"),
-          { color: "rgba(240,232,223,1)" },
-          { color: "rgba(68,184,232,0.15)", ease: "none" },
-          0,
-        );
-        tl.fromTo(
-          section.querySelectorAll(".svc-title"),
-          { color: "#36312d" },
-          { color: "#ffffff", ease: "none" },
-          0,
-        );
-        tl.fromTo(
-          section.querySelectorAll(".svc-desc"),
-          { color: "#8c827a" },
-          { color: "rgba(255,255,255,0.5)", ease: "none" },
-          0,
-        );
-        tl.fromTo(
-          section.querySelectorAll(".svc-feature"),
-          { color: "#8c827a" },
-          { color: "rgba(255,255,255,0.45)", ease: "none" },
-          0,
-        );
-        tl.fromTo(
-          section.querySelectorAll(".svc-cta"),
-          { color: "#36312d", borderColor: "rgba(54,49,45,0.3)" },
-          {
-            color: "var(--brand-blue)",
-            borderColor: "rgba(68,184,232,0.3)",
-            ease: "none",
-          },
-          0,
-        );
+      tl.fromTo(
+        section,
+        { backgroundColor: "#ffffff" },
+        { backgroundColor: "#0f1117", ease: "none" },
+        0,
+      );
+      tl.fromTo(
+        section.querySelectorAll(".svc-heading-dark"),
+        { color: "#36312d" },
+        { color: "#ffffff", ease: "none" },
+        0,
+      );
+      tl.fromTo(
+        section.querySelectorAll(".svc-card"),
+        { backgroundColor: "#ffffff" },
+        { backgroundColor: "#0f1117", ease: "none" },
+        0,
+      );
+      tl.fromTo(
+        section.querySelectorAll(".svc-card"),
+        { borderColor: "rgba(54,49,45,0.06)" },
+        { borderColor: "rgba(255,255,255,0.06)", ease: "none" },
+        0,
+      );
+      tl.fromTo(
+        section.querySelectorAll(".svc-num"),
+        { color: "rgba(240,232,223,1)" },
+        { color: "rgba(68,184,232,0.15)", ease: "none" },
+        0,
+      );
+      tl.fromTo(
+        section.querySelectorAll(".svc-title"),
+        { color: "#36312d" },
+        { color: "#ffffff", ease: "none" },
+        0,
+      );
+      tl.fromTo(
+        section.querySelectorAll(".svc-desc"),
+        { color: "#8c827a" },
+        { color: "rgba(255,255,255,0.5)", ease: "none" },
+        0,
+      );
+      tl.fromTo(
+        section.querySelectorAll(".svc-feature"),
+        { color: "#8c827a" },
+        { color: "rgba(255,255,255,0.45)", ease: "none" },
+        0,
+      );
+      tl.fromTo(
+        section.querySelectorAll(".svc-cta"),
+        { color: "#36312d", borderColor: "rgba(54,49,45,0.3)" },
+        {
+          color: "var(--brand-blue)",
+          borderColor: "rgba(68,184,232,0.3)",
+          ease: "none",
+        },
+        0,
+      );
 
+      // Refresh after a short delay to account for layout shifts once the
+      // cards have rendered. Cleared on cleanup so it can't fire post-unmount.
+      const refreshTimer = setTimeout(() => {
         ScrollTrigger.refresh();
       }, 500);
+
+      return () => {
+        clearTimeout(refreshTimer);
+      };
     },
     { scope: sectionRef, dependencies: [displayServices.length] },
   );

@@ -23,7 +23,7 @@ export const uploadToCloudinary = async (buffer: Buffer, folder: string) => {
             ]
           },
           (error, result) => {
-            if (error) reject(error);
+            if (error) return reject(error);
             resolve(result);
           }
         )
@@ -57,16 +57,21 @@ export const getPublicIdFromUrl = (url: string): string | null => {
   }
 };
 
-// Delete a Cloudinary image by its URL
-export const deleteByUrl = async (url: string) => {
+// Delete a Cloudinary image by its URL. Returns true if the asset was deleted,
+// false if the URL could not be parsed or the delete failed — callers can log
+// the orphan instead of assuming success.
+export const deleteByUrl = async (url: string): Promise<boolean> => {
   const publicId = getPublicIdFromUrl(url);
-  if (publicId) {
-    try {
-      await cloudinary.uploader.destroy(publicId);
-      console.log(`✅ Deleted from Cloudinary: ${publicId}`);
-    } catch (error) {
-      console.error(`❌ Failed to delete from Cloudinary: ${publicId}`, error);
-    }
+  if (!publicId) {
+    console.warn(`⚠️ Could not parse Cloudinary public_id from URL, skipping delete: ${url}`);
+    return false;
+  }
+  try {
+    await cloudinary.uploader.destroy(publicId);
+    return true;
+  } catch (error) {
+    console.error(`❌ Failed to delete from Cloudinary: ${publicId}`, error);
+    return false;
   }
 };
 

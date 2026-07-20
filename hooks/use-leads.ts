@@ -22,7 +22,13 @@ export interface Lead {
   lastUpdated: string;
 }
 
-const fetcher = (url: string) => adminFetch(url).then((res) => res.json());
+const fetcher = async (url: string) => {
+  const res = await adminFetch(url);
+  if (!res.ok) {
+    throw new Error(`Request failed with status ${res.status}`);
+  }
+  return res.json();
+};
 
 export interface PaginationData {
   currentPage: number;

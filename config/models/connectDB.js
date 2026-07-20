@@ -1,29 +1,40 @@
 import mongoose from 'mongoose';
-import Admin from '../utils/admin/login/loginSchema.js';
+
+// Cache the connection across hot-reloads (dev) and warm lambda invocations
+// (prod) so we never open more than one connection per process.
+let cached = globalThis._mongoose;
+if (!cached) {
+  cached = globalThis._mongoose = { conn: null, promise: null };
+}
 
 const connectDB = async () => {
-  try {
-    // Check if already connected
-    if (mongoose.connections[0].readyState) {
-      console.log('Already connected to MongoDB');
-      return;
-    }
-
-    // Connect to MongoDB
-    const conn = await mongoose.connect(process.env.MONGO_URL);
-    console.log(`MongoDB Connected: ${conn.connection.host}`);
-
-    // Create initial admin after successful connection
-    try {
-      await Admin.createInitialAdmin();
-    } catch (adminError) {
-      console.error('Error creating initial admin:', adminError.message);
-    }
-
-  } catch (error) {
-    console.error('Error connecting to MongoDB:', error.message);
-    process.exit(1);
+  // 1 === connected. readyState 2 ("connecting") must NOT be treated as ready,
+  // otherwise a concurrent request queries a half-open connection.
+  if (cached.conn && mongoose.connection.readyState === 1) {
+    return cached.conn;
   }
+
+  if (!process.env.MONGO_URL) {
+    throw new Error('MONGO_URL is not configured');
+  }
+
+  if (!cached.promise) {
+    cached.promise = mongoose
+      .connect(process.env.MONGO_URL, { bufferCommands: false })
+      .then((m) => m);
+  }
+
+  try {
+    cached.conn = await cached.promise;
+  } catch (error) {
+    // Reset so the next request retries instead of reusing a rejected promise.
+    cached.promise = null;
+    // Throw — never process.exit(); one transient Atlas blip must not kill the
+    // whole Next.js server.
+    throw error;
+  }
+
+  return cached.conn;
 };
 
 export default connectDB;

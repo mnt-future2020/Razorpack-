@@ -7,7 +7,7 @@
     "build": "next build",
     "dev": "next dev",
     "lint": "eslint .",
-    "start": "next start -p $PORT"
+    "start": "next start"
   },
   "dependencies": {
     "@google-analytics/data": "^6.1.0",
@@ -41,7 +41,7 @@
     "@radix-ui/react-toggle-group": "1.1.1",
     "@radix-ui/react-tooltip": "1.1.6",
     "@tailwindcss/postcss": "^4.1.9",
-    "@vercel/analytics": "latest",
+    "@vercel/analytics": "^2.0.1",
     "autoprefixer": "^10.4.20",
     "axios": "^1.13.2",
     "bcryptjs": "^3.0.3",

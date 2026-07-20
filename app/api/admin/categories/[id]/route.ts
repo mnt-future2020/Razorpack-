@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import mongoose from "mongoose";
 import connectDB from "@/config/models/connectDB";
 import Category from "@/config/utils/admin/category/categorySchema";
 import { verifyAdmin } from "@/lib/admin-auth";
@@ -17,6 +18,15 @@ export async function PUT(
     const { id } = await params;
     const body = await request.json();
     const { name } = body;
+
+    // Reject malformed ids up front — otherwise Mongoose throws a CastError
+    // that surfaces as a 500 with the internal error text instead of a 404.
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json(
+        { success: false, message: "Category not found" },
+        { status: 404 }
+      );
+    }
 
     // Check if category exists
     const category = await Category.findById(id);
@@ -55,8 +65,9 @@ export async function PUT(
       category: updatedCategory,
     });
   } catch (error: any) {
+    console.error("Error updating category:", error);
     return NextResponse.json(
-      { success: false, message: error.message },
+      { success: false, message: "Failed to update category" },
       { status: 500 }
     );
   }
@@ -75,6 +86,13 @@ export async function DELETE(
 
     const { id } = await params;
 
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json(
+        { success: false, message: "Category not found" },
+        { status: 404 }
+      );
+    }
+
     const category = await Category.findById(id);
     if (!category) {
       return NextResponse.json(
@@ -90,8 +108,9 @@ export async function DELETE(
       message: "Category deleted successfully",
     });
   } catch (error: any) {
+    console.error("Error deleting category:", error);
     return NextResponse.json(
-      { success: false, message: error.message },
+      { success: false, message: "Failed to delete category" },
       { status: 500 }
     );
   }

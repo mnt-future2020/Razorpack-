@@ -1,6 +1,14 @@
-"use client";
-
+import type { Metadata } from "next";
 import Link from "next/link";
+
+// Static content with no hooks, state or event handlers — rendering on the
+// server lets the page export metadata.
+export const metadata: Metadata = {
+  title: "Terms & Conditions",
+  description:
+    "The terms governing use of the Rayzor Industrial Packaging Pvt Ltd website, covering intellectual property, accuracy of information, liability and governing law.",
+  alternates: { canonical: "/terms-conditions" },
+};
 
 export default function TermsConditions() {
   return (

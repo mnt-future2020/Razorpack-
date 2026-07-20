@@ -125,12 +125,16 @@ const productSchema = new mongoose.Schema(
 
 // Indexes for better performance
 productSchema.index({ status: 1, order: 1 });
+// The admin list queries { isDeleted: false } sorted by { order, createdAt }.
+productSchema.index({ isDeleted: 1, order: 1, createdAt: -1 });
 productSchema.index({ productName: "text", description: "text" });
 
-// Instance method to increment views
-productSchema.methods.incrementViews = function () {
-  this.views += 1;
-  return this.save();
+// Instance method to increment views. Uses an atomic $inc rather than a
+// read-modify-write save() so concurrent views don't overwrite each other.
+productSchema.methods.incrementViews = async function () {
+  await this.constructor.updateOne({ _id: this._id }, { $inc: { views: 1 } });
+  this.views = (this.views || 0) + 1;
+  return this;
 };
 
 // Static method to get active products with pagination

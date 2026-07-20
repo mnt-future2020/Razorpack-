@@ -153,9 +153,9 @@ export function ContactContent() {
             
             {/* Left Side: Headings */}
             <div className="lg:col-span-5 pt-4">
-              <h1 className="text-[clamp(4rem,7vw,7rem)] font-medium text-white leading-[0.9] tracking-tight mb-8">
+              <h2 className="text-[clamp(4rem,7vw,7rem)] font-medium text-white leading-[0.9] tracking-tight mb-8">
                 Contact Us
-              </h1>
+              </h2>
               <p className="text-lg md:text-xl text-white/90 font-medium max-w-md leading-relaxed">
                 We're here to serve you, Please get in touch...
               </p>

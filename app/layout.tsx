@@ -8,6 +8,7 @@ import { DynamicMetadata } from "@/components/DynamicMetadata";
 import FloatingContactButtons from "@/components/FloatingContactButtons";
 import { DynamicGoogleAnalytics } from "@/components/DynamicGoogleAnalytics";
 import { cn } from "@/lib/utils";
+import { SITE_URL, DEFAULT_OG_IMAGE, getSiteSettings } from "@/lib/site-config";
 
 const jost = Jost({
   subsets: ["latin", "latin-ext"],
@@ -21,22 +22,32 @@ const ibmPlexMono = IBM_Plex_Mono({
   variable: "--font-ibm-plex-mono",
 });
 
-export const metadata: Metadata = {
+export async function generateMetadata(): Promise<Metadata> {
+  // siteName / siteTagline / favicon come from the admin Settings record, the
+  // same values DynamicMetadata used to apply client-side. Resolving them here
+  // means they reach the server-rendered HTML without stomping per-page titles.
+  const settings = await getSiteSettings();
+
+  return {
   title: {
-    template: "%s | Rayzor Industrial Packaging Pvt Ltd",
-    default: "Rayzor Industrial Packaging Pvt Ltd | Premium Packaging Solutions & LDPE Films",
+    template: `%s | ${settings.siteName}`,
+    default: `${settings.siteName} | ${settings.siteTagline}`,
   },
   description:
     "Rayzor Industrial Packaging Pvt Ltd is the leading manufacturer of premium packaging materials, LDPE Film Rolls, and Poly Bags in Madurai, Tamil Nadu.",
   generator: "Next.js",
   icons: {
-    icon: [{ url: "/favicon.ico", sizes: "any" }],
+    icon: [{ url: settings.favicon || "/favicon.ico", sizes: "any" }],
+    apple: settings.favicon || undefined,
   },
   manifest: "/site.webmanifest",
-  metadataBase: new URL("https://www.rayzorpack.com"),
-  alternates: {
-    canonical: "/",
-  },
+  metadataBase: new URL(SITE_URL),
+  // No `alternates.canonical` here on purpose: a canonical set on the root
+  // layout is inherited by every route that doesn't override it, which made
+  // pages without their own metadata self-canonicalize to "/".
+  verification: process.env.GOOGLE_SITE_VERIFICATION
+    ? { google: process.env.GOOGLE_SITE_VERIFICATION }
+    : undefined,
   robots: {
     index: true,
     follow: true,
@@ -49,21 +60,24 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "Rayzor Industrial Packaging Pvt Ltd | Premium Packaging Solutions",
+    title: `${settings.siteName} | ${settings.siteTagline}`,
     description:
       "Leading manufacturer of premium packaging materials, LDPE Film Rolls, and Poly Bags.",
-    url: "https://www.rayzorpack.com",
-    siteName: "Rayzor Industrial Packaging Pvt Ltd",
+    url: SITE_URL,
+    siteName: settings.siteName,
     type: "website",
     locale: "en_IN",
+    images: [settings.logo || DEFAULT_OG_IMAGE.url],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Rayzor Industrial Packaging Pvt Ltd | Premium Packaging Solutions",
+    title: `${settings.siteName} | ${settings.siteTagline}`,
     description:
       "Leading manufacturer of premium packaging materials, LDPE Film Rolls, and Poly Bags.",
+    images: [settings.logo || DEFAULT_OG_IMAGE.url],
   },
-};
+  };
+}
 
 export default function RootLayout({
   children,

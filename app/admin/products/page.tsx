@@ -68,6 +68,8 @@ interface Product {
   features: string[];
   technicalSpecs?: Array<{ label: string; value: string }>;
   applications?: string[];
+  tags?: string[];
+  deliveryInfo?: string[];
   slug: string;
   status: string;
   order: number;
@@ -75,6 +77,7 @@ interface Product {
   seoTitle?: string;
   seoDescription?: string;
   seoKeywords?: string;
+  ogImage?: string;
 }
 
 interface PaginationData {
@@ -86,11 +89,35 @@ interface PaginationData {
   hasPrevPage: boolean;
 }
 
+// Single source of truth for a blank product form. Using this everywhere a
+// form is reset guarantees every field is present — divergent inline literals
+// were silently dropping technicalSpecs/tags/deliveryInfo/ogImage.
+const createEmptyProductForm = (order = 0) => ({
+  productName: "",
+  category: "",
+  shortDescription: "",
+  description: "",
+  features: "",
+  technicalSpecs: [] as Array<{ label: string; value: string }>,
+  applications: [] as string[],
+  tags: [] as string[],
+  deliveryInfo: [] as string[],
+  image: "",
+  gallery: [] as string[],
+  status: "active",
+  order,
+  seoTitle: "",
+  seoDescription: "",
+  seoKeywords: "",
+  ogImage: "",
+});
+
 export default function ProductsPage() {
   const { toast } = useToast();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
+  const [nextOrder, setNextOrder] = useState(1);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState<PaginationData>({
@@ -106,25 +133,7 @@ export default function ProductsPage() {
     null
   );
 
-  const [formData, setFormData] = useState({
-    productName: "",
-    category: "",
-    shortDescription: "",
-    description: "",
-    features: "",
-    technicalSpecs: [] as Array<{ label: string; value: string }>,
-    applications: [] as string[],
-    tags: [] as string[],
-    deliveryInfo: [] as string[],
-    image: "",
-    gallery: [] as string[],
-    status: "active",
-    order: 0,
-    seoTitle: "",
-    seoDescription: "",
-    seoKeywords: "",
-    ogImage: "",
-  });
+  const [formData, setFormData] = useState(createEmptyProductForm());
 
   const [selectedFiles, setSelectedFiles] = useState<{
     image: File | null;
@@ -160,6 +169,9 @@ export default function ProductsPage() {
         setProducts(response.data.data);
         if (response.data.pagination) {
           setPagination(response.data.pagination);
+        }
+        if (typeof response.data.nextOrder === "number") {
+          setNextOrder(response.data.nextOrder);
         }
         setCurrentPage(page);
       }
@@ -257,10 +269,10 @@ export default function ProductsPage() {
             .filter((f) => f)
         )
       );
-      submitFormData.append("technicalSpecs", JSON.stringify(formData.technicalSpecs));
-      submitFormData.append("applications", JSON.stringify(formData.applications));
-      submitFormData.append("tags", JSON.stringify(formData.tags));
-      submitFormData.append("deliveryInfo", JSON.stringify(formData.deliveryInfo));
+      submitFormData.append("technicalSpecs", JSON.stringify(formData.technicalSpecs || []));
+      submitFormData.append("applications", JSON.stringify(formData.applications || []));
+      submitFormData.append("tags", JSON.stringify(formData.tags || []));
+      submitFormData.append("deliveryInfo", JSON.stringify(formData.deliveryInfo || []));
       submitFormData.append("seoTitle", formData.seoTitle.trim());
       submitFormData.append("seoDescription", formData.seoDescription.trim());
       submitFormData.append("seoKeywords", formData.seoKeywords.trim());
@@ -367,27 +379,15 @@ export default function ProductsPage() {
   const handleCancel = () => {
     setIsAddModalOpen(false);
     setEditingId(null);
-    setFormData({
-      productName: "",
-      category: "",
-      shortDescription: "",
-      description: "",
-      features: "",
-      technicalSpecs: [],
-      applications: [],
-      tags: [],
-      image: "",
-      gallery: [],
-      status: "active",
-      order: 0,
-      seoTitle: "",
-      seoDescription: "",
-      seoKeywords: "",
-    });
+    setFormData(createEmptyProductForm(nextOrder));
     setSelectedFiles({
       image: null,
       galleryImages: [],
     });
+    // Reset OG state too — otherwise a previously-picked OG file leaks onto the
+    // next product opened in the form.
+    setOgImageFile(null);
+    setOgImagePreview("");
   };
 
   const handleImageUpload = () => {
@@ -618,25 +618,13 @@ export default function ProductsPage() {
         <Button
           onClick={() => {
             setEditingId(null);
-            setFormData({
-              productName: "",
-              category: "",
-              shortDescription: "",
-              description: "",
-              features: "",
-              applications: [],
-              image: "",
-              gallery: [],
-              status: "active",
-              order: 0,
-              seoTitle: "",
-              seoDescription: "",
-              seoKeywords: "",
-            });
+            setFormData(createEmptyProductForm(nextOrder));
             setSelectedFiles({
               image: null,
               galleryImages: [],
             });
+            setOgImageFile(null);
+            setOgImagePreview("");
             setIsAddModalOpen(true);
           }}
           className="bg-[#221E1F] hover:bg-[#333] text-white"
@@ -661,25 +649,13 @@ export default function ProductsPage() {
           <Button
             onClick={() => {
               setEditingId(null);
-              setFormData({
-                productName: "",
-                category: "",
-                shortDescription: "",
-                description: "",
-                features: "",
-                applications: [],
-                image: "",
-                gallery: [],
-                status: "active",
-                order: 0,
-                seoTitle: "",
-                seoDescription: "",
-                seoKeywords: "",
-              });
+              setFormData(createEmptyProductForm(nextOrder));
               setSelectedFiles({
                 image: null,
                 galleryImages: [],
               });
+              setOgImageFile(null);
+              setOgImagePreview("");
               setIsAddModalOpen(true);
             }}
             className="bg-[#221E1F] hover:bg-[#333] text-white"
@@ -886,6 +862,11 @@ export default function ProductsPage() {
                     }
                     className="mt-2"
                   />
+                  {!editingId && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      Auto-filled — change it to reposition the product
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -1014,12 +995,12 @@ export default function ProductsPage() {
               ) : (
                 <div className="space-y-2">
                   {formData.technicalSpecs?.map((spec, index) => (
-                    <div key={`spec-${spec.label}-${index}`} className="flex gap-2 items-start">
+                    <div key={`spec-${index}`} className="flex gap-2 items-start">
                       <Input
                         value={spec.label || ""}
                         onChange={(e) => {
                           const newSpecs = [...(formData.technicalSpecs || [])];
-                          newSpecs[index].label = e.target.value;
+                          newSpecs[index] = { ...newSpecs[index], label: e.target.value };
                           setFormData({ ...formData, technicalSpecs: newSpecs });
                         }}
                         placeholder="Label (e.g., Thickness)"
@@ -1029,7 +1010,7 @@ export default function ProductsPage() {
                         value={spec.value || ""}
                         onChange={(e) => {
                           const newSpecs = [...(formData.technicalSpecs || [])];
-                          newSpecs[index].value = e.target.value;
+                          newSpecs[index] = { ...newSpecs[index], value: e.target.value };
                           setFormData({ ...formData, technicalSpecs: newSpecs });
                         }}
                         placeholder="Value (e.g., 50 - 200 µ)"

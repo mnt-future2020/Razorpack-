@@ -20,6 +20,7 @@ import {
   ExternalLink,
   CheckCircle2,
   Circle,
+  BookOpen,
 } from "lucide-react";
 
 export default function SettingsPage() {
@@ -38,6 +39,9 @@ export default function SettingsPage() {
   const [ga4ServiceAccountKey, setGa4ServiceAccountKey] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [fetchLoading, setFetchLoading] = useState(true);
+  // True when the initial load failed. Saving is blocked in that state so we
+  // don't overwrite the real settings with the hardcoded default values.
+  const [loadFailed, setLoadFailed] = useState(false);
   const [setupGuideOpen, setSetupGuideOpen] = useState(false);
 
   // Fetch settings on mount
@@ -48,6 +52,7 @@ export default function SettingsPage() {
         const result = await response.json();
 
         if (result.success && result.data) {
+          setLoadFailed(false);
           setSiteName(result.data.siteName || "Rayzor Industrial Packaging Pvt Ltd");
           setSiteNameAccent(result.data.siteNameAccent || "PACK");
           setSiteTagline(result.data.siteTagline || "Premium Packaging Solutions & LDPE Films");
@@ -61,6 +66,7 @@ export default function SettingsPage() {
         }
       } catch (error) {
         console.error("Error fetching settings:", error);
+        setLoadFailed(true);
       } finally {
         setFetchLoading(false);
       }
@@ -70,6 +76,18 @@ export default function SettingsPage() {
   }, []);
 
   const saveSettings = async () => {
+    // Guard: if the initial load failed, the form still holds default values —
+    // saving would clobber the real settings in the DB. Refuse and tell the user.
+    if (loadFailed) {
+      toast({
+        title: "Cannot save",
+        description:
+          "Settings could not be loaded, so saving is disabled to avoid overwriting your existing settings. Please refresh and try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -481,7 +499,7 @@ export default function SettingsPage() {
               className="w-full flex items-center justify-between p-4 bg-[#26A8E0]/5 hover:bg-[#26A8E0]/10 transition-colors text-left"
             >
               <div className="flex items-center gap-2">
-                <span className="text-lg">📖</span>
+                <BookOpen className="h-4 w-4 text-[#26A8E0]" />
                 <span className="text-sm font-semibold text-[#221E1F]">
                   Setup Guide — How to Configure Google Analytics
                 </span>
@@ -681,9 +699,10 @@ export default function SettingsPage() {
               <textarea
                 value={ga4ServiceAccountKey}
                 onChange={(e) => setGa4ServiceAccountKey(e.target.value)}
-                onFocus={(e) => {
-                  if (e.target.value === "********") e.target.value = "";
-                  setGa4ServiceAccountKey("");
+                onFocus={() => {
+                  // Only clear the masked placeholder — never wipe a real key
+                  // the user has already started typing.
+                  if (ga4ServiceAccountKey === "********") setGa4ServiceAccountKey("");
                 }}
                 placeholder='{"type":"service_account","project_id":"...","private_key":"..."}'
                 className="w-full font-mono text-xs p-3 border border-gray-300 rounded-lg min-h-[100px] resize-y focus:outline-none focus:ring-2 focus:ring-[#26A8E0]/50"
