@@ -31,12 +31,9 @@ export function DynamicMetadata() {
       appleLink.href = settings.favicon
     }
 
-    // Update document title with siteName and siteTagline
-    if (settings?.siteName || settings?.siteTagline) {
-      const siteName = settings.siteName || "Rayzor Industrial Packaging Pvt Ltd"
-      const tagline = settings.siteTagline || "Premium Packaging Solutions & LDPE Films"
-      document.title = `${siteName} | ${tagline}`
-    }
+    // Deliberately does NOT touch document.title. Each page sets its own title
+    // via generateMetadata; overwriting it here replaced every per-page title
+    // with the generic site name right after hydration.
   }, [settings])
 
   return null

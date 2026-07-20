@@ -12,7 +12,8 @@ export async function GET(request: NextRequest) {
   try {
     await connectDB();
 
-    const smtpSettings = await EmailSMTP.findOne({ isActive: true }).lean();
+    // Read the SAME document PUT/POST operate on (keyed by id: "default").
+    const smtpSettings = await EmailSMTP.findOne({ id: "default" }).lean();
 
     if (!smtpSettings) {
       return NextResponse.json(
@@ -41,7 +42,6 @@ export async function GET(request: NextRequest) {
       {
         success: false,
         message: "Failed to fetch SMTP settings",
-        error: error instanceof Error ? error.message : "Unknown error",
       },
       { status: 500 }
     );
@@ -57,8 +57,11 @@ export async function PUT(request: NextRequest) {
     await connectDB();
 
     const body = await request.json();
-    const { smtpHost, smtpPort, smtpUser, smtpPassword, fromEmail, fromName } =
-      body;
+    const { smtpHost, smtpPort, smtpUser, fromEmail, fromName } = body;
+
+    // Gmail shows app passwords as "abcd efgh ijkl mnop"; SMTP auth only
+    // accepts them with the spaces removed.
+    const smtpPassword = body.smtpPassword?.replace(/\s+/g, "");
 
     // Validate required fields
     if (
@@ -134,8 +137,7 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        message: "Failed to update SMTP settings",
-        error: error instanceof Error ? error.message : "Unknown error",
+        message: "Failed to save SMTP settings",
       },
       { status: 500 }
     );
@@ -249,7 +251,6 @@ export async function POST(request: NextRequest) {
       {
         success: false,
         message: "Failed to perform SMTP test",
-        error: error instanceof Error ? error.message : "Unknown error",
       },
       { status: 500 }
     );

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/config/models/connectDB";
 import Service from "@/config/utils/admin/services/serviceSchema";
-import { uploadToCloudinary } from "@/config/utils/cloudinary";
+import { uploadToCloudinary, deleteByUrl } from "@/config/utils/cloudinary";
 import jwt from "jsonwebtoken";
 
 interface DecodedToken {
@@ -158,14 +158,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if slug already exists
-    const existingService = await Service.findOne({ slug, isDeleted: false });
+    // Check if slug already exists. Not filtered by isDeleted: the unique index
+    // on `slug` spans soft-deleted docs too, so an unfiltered check here is what
+    // matches the constraint the DB will actually enforce on save().
+    const existingService = await Service.findOne({ slug });
     if (existingService) {
       return NextResponse.json(
         { success: false, message: "A service with this name already exists" },
         { status: 400 }
       );
     }
+
+    // Track everything uploaded so we can clean up if the save fails.
+    const uploadedUrls: string[] = [];
 
     // Upload image
     const imageBytes = await imageFile.arrayBuffer();
@@ -174,6 +179,7 @@ export async function POST(request: NextRequest) {
       imageBuffer,
       `services/${slug}/main`
     );
+    uploadedUrls.push(imageResult.secure_url);
 
     // Upload gallery images
     const galleryUrls: string[] = [];
@@ -188,6 +194,7 @@ export async function POST(request: NextRequest) {
             `services/${slug}/gallery`
           );
           galleryUrls.push(result.secure_url);
+          uploadedUrls.push(result.secure_url);
         }
       }
     }
@@ -221,9 +228,16 @@ export async function POST(request: NextRequest) {
       const ogBuffer = Buffer.from(ogBytes);
       const ogResult = await uploadToCloudinary(ogBuffer, `services/${slug}/og`);
       service.ogImage = (ogResult as any).secure_url;
+      uploadedUrls.push(service.ogImage);
     }
 
-    await service.save();
+    try {
+      await service.save();
+    } catch (saveError) {
+      // Save failed — remove the now-orphaned uploads before bubbling up.
+      await Promise.all(uploadedUrls.map((url) => deleteByUrl(url)));
+      throw saveError;
+    }
 
     return NextResponse.json({
       success: true,
@@ -233,10 +247,7 @@ export async function POST(request: NextRequest) {
   } catch (error: any) {
     console.error("Error creating service:", error);
     return NextResponse.json(
-      {
-        success: false,
-        message: error.message || "Failed to create service",
-      },
+      { success: false, message: "Failed to create service" },
       { status: 500 }
     );
   }

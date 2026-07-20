@@ -7,6 +7,8 @@ import connectDB from "@/config/models/connectDB";
 import Product from "@/config/utils/admin/products/productSchema";
 import { Metadata } from "next";
 import { cache } from "react";
+import { SITE_URL, absoluteTitle, getSiteSettings } from "@/lib/site-config";
+import { absoluteUrl, breadcrumbList, plainText } from "@/lib/jsonld";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -15,7 +17,13 @@ export const revalidate = 0;
 const getProductBySlug = cache(async (slug: string) => {
   try {
     await connectDB();
-    const product = await Product.findOne({ slug, isDeleted: false }).lean();
+    // `status: "active"` mirrors sitemap.ts / the products listing query, so an
+    // inactive (draft) item is not publicly reachable or crawlable.
+    const product = await Product.findOne({
+      slug,
+      status: "active",
+      isDeleted: false,
+    }).lean();
     if (product) return JSON.parse(JSON.stringify(product));
   } catch (error) {
     console.error("Failed to fetch product from DB:", error);
@@ -39,25 +47,32 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
 
-  const title = productData.seoTitle || productData.productName;
+  // An admin-authored seoTitle is already a complete, brand-inclusive title, so
+  // it is marked absolute to stop the root template appending the brand twice.
+  // A bare product name still flows through the template.
+  const title = productData.seoTitle
+    ? absoluteTitle(productData.seoTitle)
+    : productData.productName;
+  const ogTitle = productData.seoTitle || productData.productName;
   const description = productData.seoDescription || productData.shortDescription || productData.description?.replace(/<[^>]+>/g, "").substring(0, 160);
   const ogImg = productData.ogImage || productData.image || "";
+  const canonicalPath = `/products/${resolvedParams.slug}`;
 
   return {
     title,
     description,
     keywords: productData.seoKeywords || `${productData.productName}, ${productData.category || "industrial packaging"}`,
-    alternates: { canonical: `/products/${resolvedParams.slug}` },
+    alternates: { canonical: canonicalPath },
     openGraph: {
-      title,
+      title: ogTitle,
       description,
-      url: `/products/${resolvedParams.slug}`,
+      url: `${SITE_URL}${canonicalPath}`,
       type: "article",
       ...(ogImg && { images: [{ url: ogImg, width: 1200, height: 630, alt: productData.productName }] }),
     },
     twitter: {
       card: "summary_large_image",
-      title,
+      title: ogTitle,
       description,
       ...(ogImg && { images: [ogImg] }),
     },
@@ -77,8 +92,47 @@ export default async function ProductDetailPage({ params }: PageProps) {
   const headingLine1 = words.slice(0, half).join(" ") || "INDUSTRIAL";
   const headingLine2 = words.slice(half).join(" ") || "PRODUCT";
 
+  const settings = await getSiteSettings();
+  const productUrl = `${SITE_URL}/products/${resolvedParams.slug}`;
+  const productImage = absoluteUrl(productData.image || productData.ogImage);
+  const productDescription =
+    productData.seoDescription ||
+    productData.shortDescription ||
+    plainText(productData.description, 500);
+
+  // No price/offer/rating data exists on the product schema, so those keys are
+  // deliberately omitted rather than fabricated.
+  const productJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: productData.productName,
+    ...(productDescription && { description: productDescription }),
+    ...(productImage && { image: productImage }),
+    ...(productData.category && { category: productData.category }),
+    brand: {
+      "@type": "Organization",
+      name: settings.siteName,
+      url: SITE_URL,
+    },
+    url: productUrl,
+  };
+
+  const breadcrumbJsonLd = breadcrumbList([
+    { name: "Home", path: "/" },
+    { name: "Products", path: "/products" },
+    { name: productData.productName, path: `/products/${resolvedParams.slug}` },
+  ]);
+
   return (
     <main className="min-h-screen">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <PageHero
         label={productData.category || "Product Details"}
         headingLine1={headingLine1}

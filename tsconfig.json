@@ -36,6 +36,24 @@
     ".next/dev/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    // Unused template UI components (0 importers) importing npm packages never
+    // added to package.json. Quarantined from the type-check so real code is
+    // checked at build time. Delete them, or install their deps and remove from
+    // this list, to bring them back.
+    "components/providers/google-auth-provider.tsx",
+    "components/ui/google-sign-in-button.tsx",
+    "components/ui/calendar.tsx",
+    "components/ui/card-spotlight.tsx",
+    "components/ui/category-selector.tsx",
+    "components/ui/chart.tsx",
+    "components/ui/command.tsx",
+    "components/ui/drawer.tsx",
+    "components/ui/form.tsx",
+    "components/ui/input-otp.tsx",
+    "components/ui/magic-card.tsx",
+    "components/ui/resizable.tsx",
+    "components/ui/sonner.tsx",
+    "components/ui/sparkles.tsx"
   ]
 }

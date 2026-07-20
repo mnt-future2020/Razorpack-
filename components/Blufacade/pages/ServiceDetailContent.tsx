@@ -23,7 +23,10 @@ interface ServiceData {
   status?: string;
   category?: string;
   applications?: string[];
-  technicalSpecs?: { label: string; value: string }[];
+  technicalSpecs?: { _id?: string; label: string; value: string }[];
+  highlights?: string[];
+  processSteps?: { title: string; description: string }[];
+  whyChooseUs?: string[];
 }
 
 interface AccordionItemProps {
@@ -218,9 +221,9 @@ export function ServiceDetailContent({ serviceData }: { serviceData: ServiceData
             </span>
 
             {/* Service Name */}
-            <h1 className="sdt-heading font-heading font-extrabold text-[var(--brand-dark)] text-2xl md:text-3xl lg:text-[2.1rem] xl:text-4xl tracking-tight leading-[1.15] mb-5">
+            <h2 className="sdt-heading font-heading font-extrabold text-[var(--brand-dark)] text-2xl md:text-3xl lg:text-[2.1rem] xl:text-4xl tracking-tight leading-[1.15] mb-5">
               {serviceData.serviceName}
-            </h1>
+            </h2>
 
             {/* Quick info pills */}
             <div className="flex flex-wrap gap-2 mb-6">

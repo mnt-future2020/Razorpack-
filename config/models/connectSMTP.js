@@ -1,20 +1,58 @@
 import nodemailer from 'nodemailer';
 
+// Cache of pooled transporters keyed by unique SMTP config so repeated
+// identical configs reuse a single pooled connection instead of leaking
+// a new SMTP socket per call.
+const transporterCache = new Map();
+
 // Create SMTP transporter
 export const createSMTPTransporter = (smtpConfig) => {
   try {
-    const transporter = nodemailer.createTransport({
-      host: smtpConfig.smtpHost,
-      port: parseInt(smtpConfig.smtpPort),
-      secure: parseInt(smtpConfig.smtpPort) === 465, // true for 465, false for other ports
-      auth: {
-        user: smtpConfig.smtpUser,
-        pass: smtpConfig.smtpPassword,
-      },
-      tls: {
-        rejectUnauthorized: false // Allow self-signed certificates
+    const host = smtpConfig.smtpHost;
+    const port = parseInt(smtpConfig.smtpPort);
+    const user = smtpConfig.smtpUser?.trim();
+    // Gmail displays app passwords as "abcd efgh ijkl mnop" but the SMTP
+    // server only accepts them without the spaces.
+    const pass = smtpConfig.smtpPassword?.replace(/\s+/g, '');
+
+    const cacheKey = `${host}:${port}:${user}`;
+
+    // Reuse an existing pooled transporter for this exact config.
+    const cached = transporterCache.get(cacheKey);
+    if (cached && cached.pass === pass) {
+      return cached.transporter;
+    }
+
+    // If the config changed for this key (e.g. rotated password), close the
+    // stale transporter before creating a new one.
+    if (cached) {
+      try {
+        cached.transporter.close();
+      } catch (closeError) {
+        console.error('Error closing stale SMTP transporter:', closeError);
       }
+      transporterCache.delete(cacheKey);
+    }
+
+    // Validate certificates by default. Only relax verification when the
+    // operator explicitly opts in for self-signed dev servers.
+    const allowInsecureTls = process.env.SMTP_ALLOW_INSECURE_TLS === 'true';
+
+    const transporter = nodemailer.createTransport({
+      host,
+      port,
+      secure: port === 465, // true for 465, false for other ports
+      pool: true, // reuse a pool of connections
+      auth: {
+        user,
+        pass,
+      },
+      ...(allowInsecureTls
+        ? { tls: { rejectUnauthorized: false } }
+        : {}),
     });
+
+    transporterCache.set(cacheKey, { transporter, pass });
 
     return transporter;
   } catch (error) {

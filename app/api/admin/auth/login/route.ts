@@ -10,72 +10,57 @@ export async function POST(request : Request) {
 
     const { email, password } = await request.json()
 
-    // Validate input
-    if (!email || !password) {
+    // Validate input. Reject non-string values to prevent NoSQL operator
+    // injection (e.g. {"email":{"$ne":null}}) from reaching the query.
+    if (typeof email !== "string" || typeof password !== "string" || !email || !password) {
       return NextResponse.json({ error: "Email and password are required" }, { status: 400 })
     }
 
     // Find admin by email
     let admin = await Admin.findOne({ email })
-    
-    console.log('Login attempt for email:', email);
-    
+
     if (!admin) {
-      console.log('Login attempt failed: Admin not found for email:', email);
       return NextResponse.json({ error: "Invalid email or password" }, { status: 401 })
     }
 
-    console.log('Found admin account:', {
-      email: admin.email,
-      hasPassword: !!admin.password,
-      isActive: admin.isActive,
-      lastLogin: admin.lastLogin
-    });
+    // Enforce account lockout after repeated failed attempts.
+    if (admin.isLocked()) {
+      return NextResponse.json(
+        { error: "Account temporarily locked due to too many failed attempts. Try again later." },
+        { status: 429 },
+      )
+    }
+
+    // Google-only account with no password set.
+    if (!admin.password) {
+      return NextResponse.json({
+        error: "Please use Google Sign-In or reset your password to set one up",
+        code: "NO_PASSWORD_SET",
+      }, { status: 401 });
+    }
 
     // Verify password
+    let isPasswordValid = false;
     try {
-      // Check if the user has a password set
-      if (!admin.password) {
-        console.log('Account has no password set. Possibly a Google-only account');
-        return NextResponse.json({ 
-          error: "Please use Google Sign-In or reset your password to set one up",
-          code: "NO_PASSWORD_SET"
-        }, { status: 401 });
-      }
-
-      // Log password info (length only, not the actual password)
-      console.log('Attempting password verification:', {
-        providedPasswordLength: password.length,
-        storedPasswordLength: admin.password?.length
-      });
-
-      const isPasswordValid = await compare(password, admin.password);
-      
-      if (!isPasswordValid) {
-        console.log('Login attempt failed: Invalid password for email:', email);
-        // Refresh admin data to ensure we have the latest password
-        const refreshedAdmin = await Admin.findById(admin._id);
-        if (refreshedAdmin && refreshedAdmin.password !== admin.password) {
-          console.log('Password in database has changed, retrying verification');
-          const retryValid = await compare(password, refreshedAdmin.password);
-          if (!retryValid) {
-            return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
-          }
-          admin = refreshedAdmin;
-        } else {
-          return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
-        }
-      }
-      
-      console.log('Password verification successful for:', email);
+      isPasswordValid = await compare(password, admin.password);
     } catch (error) {
-      console.error('Password comparison error:', error);
+      console.error('Password comparison error');
       return NextResponse.json({ error: "Error verifying credentials" }, { status: 500 })
+    }
+
+    if (!isPasswordValid) {
+      await admin.incLoginAttempts();
+      return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
     }
 
     // Check if account is active
     if (!admin.isActive) {
       return NextResponse.json({ error: "Account is inactive" }, { status: 403 })
+    }
+
+    // Successful auth — clear any accumulated failed attempts.
+    if (admin.loginAttempts > 0 || admin.lockUntil) {
+      await admin.resetLoginAttempts();
     }
 
     // Ensure JWT_SECRET exists

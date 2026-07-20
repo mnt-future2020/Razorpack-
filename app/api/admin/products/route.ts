@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/config/models/connectDB";
 import Product from "@/config/utils/admin/products/productSchema";
-import { uploadToCloudinary } from "@/config/utils/cloudinary";
+import { uploadToCloudinary, deleteByUrl } from "@/config/utils/cloudinary";
 import jwt from "jsonwebtoken";
 
 interface DecodedToken {
@@ -72,18 +72,22 @@ export async function GET(request: NextRequest) {
 
     const skip = (page - 1) * limit;
 
-    const [products, total] = await Promise.all([
+    const [products, total, lastOrdered] = await Promise.all([
       Product.find(query)
         .sort({ order: 1, createdAt: -1 })
         .skip(skip)
         .limit(limit)
         .lean(),
       Product.countDocuments(query),
+      // Highest order across ALL products, not just this page — the Add form
+      // prefills from this so the new product lands at the end.
+      Product.findOne({ isDeleted: false }).sort({ order: -1 }).select("order").lean(),
     ]);
 
     return NextResponse.json({
       success: true,
       data: products,
+      nextOrder: ((lastOrdered as { order?: number } | null)?.order ?? 0) + 1,
       pagination: {
         currentPage: page,
         totalPages: Math.ceil(total / limit),
@@ -116,12 +120,35 @@ export async function POST(request: NextRequest) {
     const shortDescription = formData.get("shortDescription") as string;
     const description = formData.get("description") as string;
     const status = formData.get("status") as string;
-    const order = Number.parseInt(formData.get("order") as string) || 0;
-    const features = JSON.parse(formData.get("features") as string || "[]");
-    const technicalSpecs = JSON.parse(formData.get("technicalSpecs") as string || "[]");
-    const applications = JSON.parse(formData.get("applications") as string || "[]");
-    const tags = JSON.parse(formData.get("tags") as string || "[]");
-    const deliveryInfo = JSON.parse(formData.get("deliveryInfo") as string || "[]");
+    // 0 / blank means "auto": put the product at the end of the list. Computed
+    // server-side because the admin list is paginated, so the client only ever
+    // sees one page worth of orders.
+    let order = Number.parseInt(formData.get("order") as string) || 0;
+    if (order === 0) {
+      const last = await Product.findOne({ isDeleted: false })
+        .sort({ order: -1 })
+        .select("order")
+        .lean();
+      order = ((last as { order?: number } | null)?.order ?? 0) + 1;
+    }
+    // FormData stringifies a missing value to the literal "undefined", which
+    // slips past a plain `|| "[]"` fallback and then blows up in JSON.parse.
+    const parseArray = (key: string) => {
+      const raw = formData.get(key) as string | null;
+      if (!raw || raw === "undefined" || raw === "null") return [];
+      try {
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    };
+
+    const features = parseArray("features");
+    const technicalSpecs = parseArray("technicalSpecs");
+    const applications = parseArray("applications");
+    const tags = parseArray("tags");
+    const deliveryInfo = parseArray("deliveryInfo");
     const seoTitle = formData.get("seoTitle") as string;
     const seoDescription = formData.get("seoDescription") as string;
     const seoKeywords = formData.get("seoKeywords") as string;
@@ -157,14 +184,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if slug already exists
-    const existingProduct = await Product.findOne({ slug, isDeleted: false });
+    // Check if slug already exists. Not filtered by isDeleted: the unique index
+    // on `slug` spans soft-deleted docs too, so an unfiltered check here is what
+    // matches the constraint the DB will actually enforce on save().
+    const existingProduct = await Product.findOne({ slug });
     if (existingProduct) {
       return NextResponse.json(
         { success: false, message: "A product with this name already exists" },
         { status: 400 }
       );
     }
+
+    // Track everything uploaded so we can clean up if the save fails.
+    const uploadedUrls: string[] = [];
 
     // Upload image
     const imageBytes = await imageFile.arrayBuffer();
@@ -173,6 +205,7 @@ export async function POST(request: NextRequest) {
       imageBuffer,
       `products/${slug}/main`
     );
+    uploadedUrls.push(imageResult.secure_url);
 
     // Upload gallery images
     const galleryUrls: string[] = [];
@@ -187,6 +220,7 @@ export async function POST(request: NextRequest) {
             `products/${slug}/gallery`
           );
           galleryUrls.push(result.secure_url);
+          uploadedUrls.push(result.secure_url);
         }
       }
     }
@@ -198,6 +232,7 @@ export async function POST(request: NextRequest) {
       const ogBuffer = Buffer.from(ogBytes);
       const ogResult = await uploadToCloudinary(ogBuffer, `products/${slug}/og`);
       ogImageUrl = (ogResult as any).secure_url;
+      uploadedUrls.push(ogImageUrl);
     }
 
     // Create product
@@ -222,7 +257,13 @@ export async function POST(request: NextRequest) {
       ogImage: ogImageUrl,
     });
 
-    await product.save();
+    try {
+      await product.save();
+    } catch (saveError) {
+      // Save failed — remove the now-orphaned uploads before bubbling up.
+      await Promise.all(uploadedUrls.map((url) => deleteByUrl(url)));
+      throw saveError;
+    }
 
     return NextResponse.json({
       success: true,
@@ -232,10 +273,7 @@ export async function POST(request: NextRequest) {
   } catch (error: any) {
     console.error("Error creating product:", error);
     return NextResponse.json(
-      {
-        success: false,
-        message: error.message || "Failed to create product",
-      },
+      { success: false, message: "Failed to create product" },
       { status: 500 }
     );
   }

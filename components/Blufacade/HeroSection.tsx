@@ -207,7 +207,10 @@ export function HeroSection({ initialSlides }: HeroSectionProps) {
                         <div className="max-w-full sm:max-w-[85%] md:max-w-[65%] lg:max-w-[55%] 2xl:max-w-[50%]">
                           <div className="hero-text-wrapper">
                             {/* Title: first line lighter, highlight bold */}
-                            <h1 className="font-heading text-white drop-shadow-[0_4px_24px_rgba(0,0,0,0.6)]">
+                            {(() => {
+                              const HeadingTag = index === 0 ? "h1" : "h2";
+                              return (
+                            <HeadingTag className="font-heading text-white drop-shadow-[0_4px_24px_rgba(0,0,0,0.6)]">
                               <div className="overflow-hidden pb-1 -mb-1">
                                 <span
                                   className="block leading-[1.05] tracking-[-0.02em] hero-text-line origin-left opacity-0"
@@ -237,7 +240,9 @@ export function HeroSection({ initialSlides }: HeroSectionProps) {
                                   </div>
                                 ))}
                               </div>
-                            </h1>
+                            </HeadingTag>
+                              );
+                            })()}
 
                             {/* Description */}
                             <p className="hero-desc-line opacity-0 mt-3 sm:mt-5 md:mt-6 text-white/60 text-xs sm:text-sm md:text-base max-w-[90%] sm:max-w-md leading-relaxed">

@@ -5,31 +5,39 @@ import { ServicesGrid } from "@/components/Blufacade/pages/ServicesGrid";
 import connectDB from "@/config/models/connectDB";
 import Banner from "@/config/utils/admin/banner/bannerSchema";
 import Service from "@/config/utils/admin/services/serviceSchema";
+import { DEFAULT_OG_IMAGE, absoluteTitle } from "@/lib/site-config";
 
 export const dynamic = "force-dynamic";
 
+const FALLBACK_DESCRIPTION =
+  "From contract packaging and export palletisation to vacuum sealing and VCI protection — explore Rayzor's end-to-end industrial packaging services.";
+
 export async function generateMetadata(): Promise<Metadata> {
   const seo = await getSEO("services");
-  const title = seo?.title || "Our Services";
-  const description = seo?.description || "";
+  // Plain string for OG/Twitter, which have no title template to apply.
+  const plainTitle = seo?.title || "Our Services";
+  const description = seo?.description || FALLBACK_DESCRIPTION;
+  const ogImage = seo?.ogImage || DEFAULT_OG_IMAGE.url;
 
   return {
-    title,
+    // DB titles already include the brand; the hardcoded fallback does not, so
+    // only the DB branch bypasses the root layout's title template.
+    title: seo?.title ? absoluteTitle(seo.title) : "Our Services",
     description,
-    keywords: seo?.keywords || "",
+    keywords: seo?.keywords || undefined,
     alternates: { canonical: "/services" },
     openGraph: {
-      title,
+      title: plainTitle,
       description,
       url: "/services",
       type: "website",
-      ...(seo?.ogImage && { images: [{ url: seo.ogImage, width: 1200, height: 630 }] }),
+      images: [{ url: ogImage, width: 1200, height: 630 }],
     },
     twitter: {
       card: "summary_large_image",
-      title,
+      title: plainTitle,
       description,
-      ...(seo?.ogImage && { images: [seo.ogImage] }),
+      images: [ogImage],
     },
   };
 }

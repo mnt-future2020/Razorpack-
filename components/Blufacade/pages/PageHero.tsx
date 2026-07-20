@@ -9,15 +9,18 @@ import { useGSAP } from "@gsap/react";
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 interface PageHeroProps {
-  label: string;
-  headingLine1: string;
-  headingLine2: string;
-  description: string;
+  // Optional because these are populated from a DB banner record whose fields
+  // may be partially filled; defaults below keep the hero from rendering
+  // `undefined` into the DOM.
+  label?: string;
+  headingLine1?: string;
+  headingLine2?: string;
+  description?: string;
   /**
    * The background image URL or path for the hero.
    * Recommended image size: 1600 × 1000px (landscape, 16:10 ratio).
    */
-  image: string;
+  image?: string;
   imageAlt?: string;
   showPlayButton?: boolean;
   theme?: "light" | "dark";
@@ -28,11 +31,11 @@ interface PageHeroProps {
 }
 
 export function PageHero({
-  label,
-  headingLine1,
-  headingLine2,
-  description,
-  image,
+  label = "",
+  headingLine1 = "",
+  headingLine2 = "",
+  description = "",
+  image = "",
   imageAlt = "",
   showPlayButton = false,
   theme = "light",
@@ -263,14 +266,16 @@ export function PageHero({
         ref={imageWrapperRef}
         className="absolute overflow-hidden w-[92vw] md:w-[48vw] h-[40vh] md:h-[60vh] bottom-0 md:bottom-[-5vh] right-0 rounded-tl-md md:rounded-none"
       >
-        <Image
-          src={image}
-          alt={imageAlt}
-          fill
-          className={`hero-img-contain z-10 ${imageFit === "contain" ? "object-contain" : "object-cover"}`}
-          priority
-          sizes="100vw"
-        />
+        {image && (
+          <Image
+            src={image}
+            alt={imageAlt}
+            fill
+            className={`hero-img-contain z-10 ${imageFit === "contain" ? "object-contain" : "object-cover"}`}
+            priority
+            sizes="100vw"
+          />
+        )}
 
         {showPlayButton && (
           <div className="absolute bottom-6 right-6 w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center cursor-pointer hover:bg-white transition-colors z-20 shadow-lg">

@@ -9,14 +9,39 @@ export async function POST(request: Request) {
 
     const { credential } = await request.json();
 
-    if (!credential) {
+    if (!credential || typeof credential !== "string") {
       return NextResponse.json(
         { error: "Google credential is required" },
         { status: 400 },
       );
     }
 
-    // Get user info from Google using the access token
+    const expectedClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+    if (!expectedClientId) {
+      throw new Error("NEXT_PUBLIC_GOOGLE_CLIENT_ID is not configured");
+    }
+
+    // Validate the access token AND its audience. Without the `aud` check any
+    // Google token that can read userinfo — including one minted for a totally
+    // different app — would be accepted and exchanged for an admin JWT.
+    const tokenInfoResponse = await fetch(
+      `https://oauth2.googleapis.com/tokeninfo?access_token=${encodeURIComponent(credential)}`,
+    );
+
+    if (!tokenInfoResponse.ok) {
+      return NextResponse.json({ error: "Invalid Google token" }, { status: 401 });
+    }
+
+    const tokenInfo = await tokenInfoResponse.json();
+    // `aud` (access token) / `azp` names the client the token was issued to.
+    if (tokenInfo.aud !== expectedClientId && tokenInfo.azp !== expectedClientId) {
+      return NextResponse.json(
+        { error: "Token was not issued for this application" },
+        { status: 401 },
+      );
+    }
+
+    // Get user info from Google using the (now-verified) access token
     const userInfoResponse = await fetch(
       "https://www.googleapis.com/oauth2/v3/userinfo",
       {
@@ -39,6 +64,14 @@ export async function POST(request: Request) {
       picture,
       email_verified,
     } = userInfo;
+
+    // Only trust verified Google emails — the email is our account key.
+    if (email_verified !== true && email_verified !== "true") {
+      return NextResponse.json(
+        { error: "Google email is not verified" },
+        { status: 401 },
+      );
+    }
 
     // Check if admin exists with this email
     let admin = await Admin.findOne({ email });

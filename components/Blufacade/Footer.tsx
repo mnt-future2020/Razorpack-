@@ -163,7 +163,7 @@ export function Footer() {
           <div className="absolute inset-0 w-full h-full bg-[#0a1118]/85 -z-10" />
 
              {/* Massive Typography matching Logo Colors */}
-             <h1 className="text-[12vw] lg:text-[13vw] font-black tracking-[-0.06em] leading-none w-full text-center opacity-95 mb-1 uppercase" style={{ transform: "scaleY(1.2)" }}>
+             <div aria-hidden="true" className="font-heading text-[12vw] lg:text-[13vw] font-black tracking-[-0.06em] leading-none w-full text-center opacity-95 mb-1 uppercase" style={{ transform: "scaleY(1.2)" }}>
                {(() => {
                  const name = settings?.siteName || "RAYZORPACK";
                  const accent = settings?.siteNameAccent || "PACK";
@@ -180,7 +180,7 @@ export function Footer() {
                  }
                  return <span className="text-white">{upperName}</span>;
                })()}
-             </h1>
+             </div>
 
           {/* Very Bottom Copyright Links */}
           <div className="relative z-10 w-full flex flex-col md:flex-row justify-between items-center text-[#a1a1aa] text-xs md:text-sm gap-4 pb-16 md:pb-0 md:pr-24">

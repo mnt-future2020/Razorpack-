@@ -1,6 +1,14 @@
-"use client";
-
+import type { Metadata } from "next";
 import Link from "next/link";
+
+// Static content with no hooks, state or event handlers — rendering on the
+// server lets the page export metadata.
+export const metadata: Metadata = {
+  title: "Privacy Policy",
+  description:
+    "How Rayzor Industrial Packaging Pvt Ltd collects, uses, protects and shares the personal information you submit through our website, including our cookie practices.",
+  alternates: { canonical: "/privacy-policy" },
+};
 
 export default function PrivacyPolicy() {
   return (

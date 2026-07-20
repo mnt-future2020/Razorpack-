@@ -2,6 +2,9 @@ import { notFound } from "next/navigation";
 import { PageHero } from "@/components/Blufacade/pages/PageHero";
 import { ServiceDetailContent } from "@/components/Blufacade/pages/ServiceDetailContent";
 import { OtherServicesAnimation } from "@/components/Blufacade/pages/OtherServicesAnimation";
+import type { Metadata } from "next";
+import { SITE_URL, absoluteTitle, getSiteSettings } from "@/lib/site-config";
+import { absoluteUrl, breadcrumbList, plainText } from "@/lib/jsonld";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -82,7 +85,7 @@ async function getAllServices() {
   }
 }
 
-export async function generateMetadata({ params }: PageProps) {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const resolvedParams = await params;
   const serviceData = await getServiceBySlug(resolvedParams.slug);
 
@@ -93,25 +96,32 @@ export async function generateMetadata({ params }: PageProps) {
     };
   }
 
-  const title = serviceData.seoTitle || serviceData.serviceName;
+  // An admin-authored seoTitle is already a complete, brand-inclusive title, so
+  // it is marked absolute to stop the root template appending the brand twice.
+  // A bare service name still flows through the template.
+  const title = serviceData.seoTitle
+    ? absoluteTitle(serviceData.seoTitle)
+    : serviceData.serviceName;
+  const ogTitle = serviceData.seoTitle || serviceData.serviceName;
   const description = serviceData.seoDescription || serviceData.description?.replace(/<[^>]+>/g, "").substring(0, 160) || "";
   const ogImg = serviceData.ogImage || serviceData.image || "";
+  const canonicalPath = `/services/${resolvedParams.slug}`;
 
   return {
     title,
     description,
     keywords: serviceData.seoKeywords || `${serviceData.serviceName}, industrial packaging`,
-    alternates: { canonical: `/services/${resolvedParams.slug}` },
+    alternates: { canonical: canonicalPath },
     openGraph: {
-      title,
+      title: ogTitle,
       description,
-      url: `/services/${resolvedParams.slug}`,
+      url: `${SITE_URL}${canonicalPath}`,
       type: "article",
       ...(ogImg && { images: [{ url: ogImg, width: 1200, height: 630, alt: serviceData.serviceName }] }),
     },
     twitter: {
       card: "summary_large_image",
-      title,
+      title: ogTitle,
       description,
       ...(ogImg && { images: [ogImg] }),
     },
@@ -137,8 +147,47 @@ export default async function ServiceDetailPage({ params }: PageProps) {
   // Fetch all services for the animation section
   const allServices = await getAllServices();
 
+  const settings = await getSiteSettings();
+  const serviceUrl = `${SITE_URL}/services/${resolvedParams.slug}`;
+  const serviceImage = absoluteUrl(serviceData.image || serviceData.ogImage);
+  const serviceDescription =
+    serviceData.seoDescription ||
+    serviceData.shortDescription ||
+    plainText(serviceData.description, 500);
+
+  // The service schema has no areaServed / offer / rating fields, so those keys
+  // are deliberately omitted rather than fabricated.
+  const serviceJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: serviceData.serviceName,
+    ...(serviceDescription && { description: serviceDescription }),
+    ...(serviceImage && { image: serviceImage }),
+    ...(serviceData.category && { serviceType: serviceData.category }),
+    provider: {
+      "@type": "Organization",
+      name: settings.siteName,
+      url: SITE_URL,
+    },
+    url: serviceUrl,
+  };
+
+  const breadcrumbJsonLd = breadcrumbList([
+    { name: "Home", path: "/" },
+    { name: "Services", path: "/services" },
+    { name: serviceData.serviceName, path: `/services/${resolvedParams.slug}` },
+  ]);
+
   return (
     <main className="min-h-screen">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <PageHero
         label={serviceData.category || "Service Details"}
         headingLine1={headingLine1}

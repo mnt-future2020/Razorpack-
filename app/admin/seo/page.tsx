@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { useToast } from "@/hooks/use-toast"
-import { Save, Search, Edit, Loader2, ImageIcon, X } from "lucide-react"
+import { Save, Search, Edit, Loader2, ImageIcon, X, Check } from "lucide-react"
 import Image from "next/image"
 
 interface SEOPage {
@@ -405,7 +405,7 @@ export default function SEOManagerPage() {
                       <span className="text-sm font-medium text-gray-700">OG Image: </span>
                       <span className="text-sm text-gray-600">{page.ogImage ? "Set" : "Not set"}</span>
                       {page.ogImage && (
-                        <span className="text-green-500 text-xs ml-1">✓</span>
+                        <Check className="inline h-3 w-3 text-green-500 ml-1" />
                       )}
                     </div>
                     <div className="text-xs text-gray-500">Last updated: {new Date(page.lastUpdated).toLocaleDateString()}</div>

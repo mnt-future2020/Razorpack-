@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import mongoose from "mongoose";
 import Lead from "@/config/utils/admin/lead/leadSchema";
 import connectDB from "@/config/models/connectDB";
 import { verifyAdmin } from "@/lib/admin-auth";
@@ -218,6 +219,15 @@ export async function PUT(request: NextRequest) {
       );
     }
 
+    // Reject malformed ids up front — otherwise Mongoose throws a CastError
+    // that surfaces as a 500 with the internal error text instead of a 404.
+    if (!mongoose.Types.ObjectId.isValid(_id)) {
+      return NextResponse.json(
+        { success: false, error: "Lead not found" },
+        { status: 404 },
+      );
+    }
+
     // Get the current lead to check status change
     const currentLead = await Lead.findById(_id);
     if (!currentLead) {
@@ -282,6 +292,13 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json(
         { success: false, error: "Lead ID is required" },
         { status: 400 },
+      );
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(leadId)) {
+      return NextResponse.json(
+        { success: false, error: "Lead not found" },
+        { status: 404 },
       );
     }
 

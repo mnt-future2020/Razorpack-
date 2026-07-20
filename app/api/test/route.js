@@ -1,4 +1,8 @@
 export async function GET() {
+  // Diagnostic endpoint — never expose stack/config state in production.
+  if (process.env.NODE_ENV === "production") {
+    return new Response("Not found", { status: 404 });
+  }
   return Response.json({
     message: "Backend working",
     env_status: {

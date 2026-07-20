@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import mongoose from "mongoose";
 import connectDB from "@/config/models/connectDB";
 import Product from "@/config/utils/admin/products/productSchema";
 import { uploadToCloudinary, deleteByUrl } from "@/config/utils/cloudinary";
@@ -66,6 +67,15 @@ export async function PUT(
     await connectDB();
     const { id } = await params;
 
+    // Reject malformed ids up front — otherwise Mongoose throws a CastError
+    // that surfaces as a 500 with the internal error text instead of a 404.
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json(
+        { success: false, message: "Product not found" },
+        { status: 404 }
+      );
+    }
+
     const product = await Product.findOne({ _id: id, isDeleted: false });
     if (!product) {
       return NextResponse.json(
@@ -81,11 +91,24 @@ export async function PUT(
     const description = formData.get("description") as string;
     const status = formData.get("status") as string;
     const order = Number.parseInt(formData.get("order") as string) || 0;
-    const features = JSON.parse(formData.get("features") as string || "[]");
-    const technicalSpecs = JSON.parse(formData.get("technicalSpecs") as string || "[]");
-    const applications = JSON.parse(formData.get("applications") as string || "[]");
-    const tags = JSON.parse(formData.get("tags") as string || "[]");
-    const deliveryInfo = JSON.parse(formData.get("deliveryInfo") as string || "[]");
+    // FormData stringifies a missing value to the literal "undefined", which
+    // slips past a plain `|| "[]"` fallback and then blows up in JSON.parse.
+    const parseArray = (key: string) => {
+      const raw = formData.get(key) as string | null;
+      if (!raw || raw === "undefined" || raw === "null") return [];
+      try {
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    };
+
+    const features = parseArray("features");
+    const technicalSpecs = parseArray("technicalSpecs");
+    const applications = parseArray("applications");
+    const tags = parseArray("tags");
+    const deliveryInfo = parseArray("deliveryInfo");
     const seoTitle = formData.get("seoTitle") as string;
     const seoDescription = formData.get("seoDescription") as string;
     const seoKeywords = formData.get("seoKeywords") as string;
@@ -141,6 +164,11 @@ export async function PUT(
       }
     }
 
+    // Collect old asset URLs to delete only AFTER the DB save succeeds. If we
+    // delete first and the save then fails (duplicate slug, validation, …) the
+    // images are gone from Cloudinary but the record still points at them.
+    const urlsToDeleteAfterSave: string[] = [];
+
     // Handle image upload
     const oldImageUrl = product.image;
     let imageUrl = existingImage || product.image;
@@ -152,20 +180,17 @@ export async function PUT(
         `products/${newSlug}/main`
       );
       imageUrl = imageResult.secure_url;
-      // Delete old image from Cloudinary if it was replaced
       if (oldImageUrl && oldImageUrl !== imageUrl) {
-        await deleteByUrl(oldImageUrl);
+        urlsToDeleteAfterSave.push(oldImageUrl);
       }
     }
 
-    // Delete removed gallery images from Cloudinary
+    // Queue removed gallery images for deletion after save
     const oldGalleryUrls: string[] = product.gallery || [];
     const removedGalleryUrls = oldGalleryUrls.filter(
       (url: string) => url && !existingGallery.includes(url)
     );
-    for (const url of removedGalleryUrls) {
-      await deleteByUrl(url);
-    }
+    urlsToDeleteAfterSave.push(...removedGalleryUrls);
 
     // Handle gallery images
     const galleryUrls: string[] = [...existingGallery];
@@ -203,8 +228,8 @@ export async function PUT(
     product.seoDescription = seoDescription;
     product.seoKeywords = seoKeywords;
     // Handle OG image upload
+    const oldOgImageUrl = product.ogImage;
     if (ogImageFile && ogImageFile.size > 0) {
-      if (product.ogImage) await deleteByUrl(product.ogImage).catch(() => {});
       const ogBytes = await ogImageFile.arrayBuffer();
       const ogBuffer = Buffer.from(ogBytes);
       const ogResult = await uploadToCloudinary(ogBuffer, `products/${newSlug}/og`);
@@ -212,8 +237,15 @@ export async function PUT(
     } else {
       product.ogImage = ogImage || "";
     }
+    // If the OG image changed or was cleared, delete the old asset after save.
+    if (oldOgImageUrl && oldOgImageUrl !== product.ogImage) {
+      urlsToDeleteAfterSave.push(oldOgImageUrl);
+    }
 
     await product.save();
+
+    // Save succeeded — now it is safe to remove the superseded assets.
+    await Promise.all(urlsToDeleteAfterSave.map((url) => deleteByUrl(url)));
 
     return NextResponse.json({
       success: true,
@@ -223,10 +255,7 @@ export async function PUT(
   } catch (error: any) {
     console.error("Error updating product:", error);
     return NextResponse.json(
-      {
-        success: false,
-        message: error.message || "Failed to update product",
-      },
+      { success: false, message: "Failed to update product" },
       { status: 500 }
     );
   }
@@ -244,6 +273,13 @@ export async function DELETE(
     await connectDB();
     const { id } = await params;
 
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json(
+        { success: false, message: "Product not found" },
+        { status: 404 }
+      );
+    }
+
     const product = await Product.findOne({ _id: id, isDeleted: false });
     if (!product) {
       return NextResponse.json(
@@ -252,18 +288,16 @@ export async function DELETE(
       );
     }
 
-    // Delete images from Cloudinary before removing the record
-    if (product.image) {
-      await deleteByUrl(product.image);
-    }
-    if (product.gallery && product.gallery.length > 0) {
-      for (const url of product.gallery) {
-        if (url) await deleteByUrl(url);
-      }
-    }
-
-    // Hard delete - permanently remove from database
+    // Remove the record first, then clean up assets. (A failed asset delete
+    // must not leave an undeletable product behind.)
     await Product.findByIdAndDelete(id);
+
+    const assetUrls = [
+      product.image,
+      product.ogImage,
+      ...(product.gallery || []),
+    ].filter(Boolean);
+    await Promise.all(assetUrls.map((url: string) => deleteByUrl(url)));
 
     return NextResponse.json({
       success: true,
