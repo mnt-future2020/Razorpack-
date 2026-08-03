@@ -107,11 +107,16 @@ export function Footer() {
                 </p>
               </div>
 
-              <div className="flex gap-4 items-center">
-                <Phone size={18} className="text-[#1b1c19] shrink-0" />
-                <a href={`tel:${contactInfo?.primaryPhone || "+919087787879"}`} className="text-[#1b1c19] font-medium text-sm md:text-base hover:text-[var(--brand-blue)] transition-colors">
-                  {contactInfo?.primaryPhone || "+91 90877 87879"}
-                </a>
+              <div className="flex gap-4">
+                <Phone size={18} className="text-[#1b1c19] shrink-0 mt-0.5" />
+                <div className="flex flex-col gap-1">
+                  <a href={`tel:${contactInfo?.primaryPhone || "+919087787879"}`} className="text-[#1b1c19] font-medium text-sm md:text-base hover:text-[var(--brand-blue)] transition-colors">
+                    {contactInfo?.primaryPhone || "+91 90877 87879"}
+                  </a>
+                  <a href={`tel:${(contactInfo?.secondaryPhone || "+91 90877 87875").replace(/\s/g, "")}`} className="text-[#1b1c19] font-medium text-sm md:text-base hover:text-[var(--brand-blue)] transition-colors">
+                    {contactInfo?.secondaryPhone || "+91 90877 87875"}
+                  </a>
+                </div>
               </div>
 
               <div className="flex gap-4 items-center">
