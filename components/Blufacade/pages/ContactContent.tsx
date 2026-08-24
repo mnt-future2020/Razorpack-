@@ -359,6 +359,7 @@ export function ContactContent() {
                     <p className="text-[#8c827a] font-medium">
                       {contactInfo?.primaryPhone || "+91 90877 87879"}
                       {contactInfo?.secondaryPhone && <><br/>{contactInfo.secondaryPhone}</>}
+                      {contactInfo?.tertiaryPhone && <><br/>{contactInfo.tertiaryPhone}</>}
                       {/* {contactInfo?.whatsappNumber && contactInfo.whatsappNumber !== contactInfo.primaryPhone && <><br/>{contactInfo.whatsappNumber}</>} */}
                     </p>
                   </div>

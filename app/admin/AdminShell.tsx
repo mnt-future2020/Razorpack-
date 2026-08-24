@@ -31,6 +31,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Toaster } from "@/components/ui/toaster"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import axios from "axios"
+import { installAdminAxios } from "@/lib/admin-axios"
 
 interface AdminProfile {
   firstName: string
@@ -79,45 +80,53 @@ export default function AdminShell({
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  const fetchAdminProfile = async () => {
-    try {
-      const token = localStorage.getItem("admin_token")
-      if (!token) return
+  const publicPaths = ["/login", "/login/forgot-password", "/login/reset-password"]
+  const isPublicPath = publicPaths.some((path) => pathname.startsWith(path))
 
-      const response = await axios.get("/api/admin/auth/verify", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+  // Lets the interceptor callback below read the *current* path without being
+  // re-registered on every navigation.
+  const publicPathsRef = useRef(isPublicPath)
+  publicPathsRef.current = isPublicPath
 
-      if (response.data.success) {
-        setAdminProfile(response.data.admin)
-      }
-    } catch (error) {
-      console.error("Failed to fetch admin profile:", error)
-    }
-  }
+  // Any 401 from an admin endpoint means the stored token is no longer good.
+  // installAdminAxios has already cleared it by the time this runs.
+  useEffect(() => {
+    installAdminAxios(() => {
+      setIsAuthenticated(false)
+      setAdminProfile(null)
+      if (!publicPathsRef.current) router.push("/login")
+    })
+  }, [router])
 
   useEffect(() => {
+    // A token in localStorage proves nothing — it may be expired or signed with
+    // an older JWT_SECRET. Ask the server before rendering the admin UI.
     const checkAuth = async () => {
       const token = localStorage.getItem("admin_token")
-      const publicPaths = ["/login", "/login/forgot-password", "/login/reset-password"]
 
-      if (token) {
-        setIsAuthenticated(true)
-        await fetchAdminProfile()
-      } else {
+      if (!token) {
         setIsAuthenticated(false)
-        if (!publicPaths.some(path => pathname.startsWith(path))) {
-          router.push("/login")
-        }
+        setIsLoading(false)
+        if (!isPublicPath) router.push("/login")
+        return
       }
-      setIsLoading(false)
+
+      try {
+        const response = await axios.get("/api/admin/auth/verify")
+        if (!response.data.success) throw new Error("Token rejected")
+        setAdminProfile(response.data.admin)
+        setIsAuthenticated(true)
+      } catch {
+        localStorage.removeItem("admin_token")
+        setIsAuthenticated(false)
+        if (!isPublicPath) router.push("/login")
+      } finally {
+        setIsLoading(false)
+      }
     }
 
-    const timer = setTimeout(checkAuth, 100)
-    return () => clearTimeout(timer)
-  }, [pathname, router])
+    checkAuth()
+  }, [pathname, router, isPublicPath])
 
   const handleLogout = async () => {
     try {
@@ -199,13 +208,11 @@ export default function AdminShell({
     )
   }
 
-  const publicPaths = ["/login", "/login/forgot-password", "/login/reset-password"]
-
-  if (!isAuthenticated && !publicPaths.some(path => pathname.startsWith(path))) {
+  if (!isAuthenticated && !isPublicPath) {
     return null
   }
 
-  if (publicPaths.some(path => pathname.startsWith(path))) {
+  if (isPublicPath) {
     return children
   }
 

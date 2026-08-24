@@ -116,6 +116,11 @@ export function Footer() {
                   <a href={`tel:${(contactInfo?.secondaryPhone || "+91 90877 87875").replace(/\s/g, "")}`} className="text-[#1b1c19] font-medium text-sm md:text-base hover:text-[var(--brand-blue)] transition-colors">
                     {contactInfo?.secondaryPhone || "+91 90877 87875"}
                   </a>
+                  {contactInfo?.tertiaryPhone && (
+                    <a href={`tel:${contactInfo.tertiaryPhone.replace(/\s/g, "")}`} className="text-[#1b1c19] font-medium text-sm md:text-base hover:text-[var(--brand-blue)] transition-colors">
+                      {contactInfo.tertiaryPhone}
+                    </a>
+                  )}
                 </div>
               </div>
 

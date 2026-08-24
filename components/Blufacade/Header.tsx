@@ -376,12 +376,13 @@ export function Header() {
 
               {/* Download Profile */}
               <a
-                href={settings?.companyProfile || "/about"}
-                target={settings?.companyProfile ? "_blank" : undefined}
+                href={
+                  settings?.companyProfile ? "/api/company-profile" : "/about"
+                }
+                download={settings?.companyProfile ? true : undefined}
                 rel={
                   settings?.companyProfile ? "noopener noreferrer" : undefined
                 }
-                download={settings?.companyProfile ? true : undefined}
                 className="flex items-center gap-1 text-[9px] lg:text-[10px] xl:text-[12px] font-semibold uppercase tracking-wider text-[var(--brand-dark)] border border-[var(--brand-dark)] px-2.5 lg:px-3 xl:px-4 py-1.5 xl:py-2 whitespace-nowrap hover:bg-gray-50 transition-colors"
               >
                 <svg

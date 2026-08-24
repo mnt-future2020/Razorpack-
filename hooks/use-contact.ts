@@ -5,6 +5,7 @@ import useSWR from "swr"
 interface ContactInfo {
   primaryPhone: string
   secondaryPhone?: string
+  tertiaryPhone?: string
   whatsappNumber: string
   email: string
   address: string

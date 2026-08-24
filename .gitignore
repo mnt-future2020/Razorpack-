@@ -37,3 +37,4 @@ next-env.d.ts
 # local MCP config (contains API key)
 mcp.json
 .mcp.json
+.playwright-mcp/
