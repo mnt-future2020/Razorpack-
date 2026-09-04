@@ -71,10 +71,10 @@ export function Footer() {
         
         <div className="max-w-[1600px] mx-auto w-full">
           
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-8 mb-20 lg:mb-28">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 md:gap-x-8 md:gap-y-12 lg:gap-8 mb-16 md:mb-20 lg:mb-28">
             
             {/* Left Column: Contact Us */}
-            <div className="md:col-span-6 lg:col-span-5">
+            <div className="md:col-span-2 lg:col-span-5">
               <h3 className="text-[#a1a1aa] text-3xl md:text-5xl lg:text-6xl font-medium tracking-tight mb-2 md:mb-4">
                 Talk to us about your project
               </h3>
@@ -87,7 +87,7 @@ export function Footer() {
             </div>
 
             {/* Middle Column: Links */}
-            <div className="md:col-span-3 lg:col-span-3 flex flex-col gap-3 lg:gap-4 md:pl-10">
+            <div className="md:col-span-1 lg:col-span-3 flex flex-col gap-3 lg:gap-4 lg:pl-10">
               <Link href="/" className="text-[#1b1c19] text-base md:text-lg font-medium hover:text-[var(--brand-blue)] transition-colors">Home</Link>
               <Link href="/about" className="text-[#1b1c19] text-base md:text-lg font-medium hover:text-[var(--brand-blue)] transition-colors">About Us</Link>
               <Link href="/products" className="text-[#1b1c19] text-base md:text-lg font-medium hover:text-[var(--brand-blue)] transition-colors">Products</Link>
@@ -96,11 +96,11 @@ export function Footer() {
             </div>
 
             {/* Right Column: Contact Info */}
-            <div className="md:col-span-3 lg:col-span-4 flex flex-col gap-5 lg:gap-6">
+            <div className="md:col-span-1 lg:col-span-4 flex flex-col gap-5 lg:gap-6 min-w-0">
               
               <div className="flex gap-4">
                 <MapPin size={18} className="text-[#1b1c19] mt-0.5 shrink-0" />
-                <p className="text-[#1b1c19] font-medium text-sm md:text-base leading-snug">
+                <p className="text-[#1b1c19] font-medium text-sm md:text-base leading-snug min-w-0 break-words">
                   {contactInfo?.address || "No: 298 A1, M.M Nagar, Thiruppalai"}
                   {contactInfo?.city ? <><br/>{contactInfo.city} - {contactInfo.postcode || ""}</> : <><br/>Madurai - 625014</>}
                   {contactInfo?.state ? <><br/>{contactInfo.state}, {contactInfo.country || "India"}</> : <><br/>Tamil Nadu, India</>}
@@ -109,7 +109,7 @@ export function Footer() {
 
               <div className="flex gap-4">
                 <Phone size={18} className="text-[#1b1c19] shrink-0 mt-0.5" />
-                <div className="flex flex-col gap-1">
+                <div className="flex flex-col gap-1 min-w-0">
                   <a href={`tel:${contactInfo?.primaryPhone || "+919087787879"}`} className="text-[#1b1c19] font-medium text-sm md:text-base hover:text-[var(--brand-blue)] transition-colors">
                     {contactInfo?.primaryPhone || "+91 90877 87879"}
                   </a>
@@ -124,9 +124,9 @@ export function Footer() {
                 </div>
               </div>
 
-              <div className="flex gap-4 items-center">
+              <div className="flex gap-4 items-center min-w-0">
                 <Mail size={18} className="text-[#1b1c19] shrink-0" />
-                <a href={`mailto:${contactInfo?.email || "sales@rayzorpack.com"}`} className="text-[#1b1c19] font-medium text-sm md:text-base hover:text-[var(--brand-blue)] transition-colors">
+                <a href={`mailto:${contactInfo?.email || "sales@rayzorpack.com"}`} className="text-[#1b1c19] font-medium text-sm md:text-base hover:text-[var(--brand-blue)] transition-colors min-w-0 break-all">
                   {contactInfo?.email || "sales@rayzorpack.com"}
                 </a>
               </div>
@@ -136,13 +136,13 @@ export function Footer() {
           </div>
 
           {/* Bottom Row of White Section */}
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6 border-t border-[#e4e4e7] pt-8 lg:pt-10">
+          <div className="flex flex-col sm:flex-row flex-wrap items-center justify-between gap-x-6 gap-y-4 border-t border-[#e4e4e7] pt-8 lg:pt-10">
 
             <button onClick={scrollToTop} className="text-[#a1a1aa] font-medium text-sm md:text-base hover:text-[#1b1c19] transition-colors cursor-pointer">
               Back to top
             </button>
 
-            <div className="flex items-center gap-4">
+            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
               {(contactInfo?.instagram || siteConfig.social.instagram) && (
                 <a href={contactInfo?.instagram || siteConfig.social.instagram} target="_blank" rel="noopener noreferrer" className="text-[#1b1c19] hover:text-[var(--brand-blue)] transition-colors font-medium text-sm md:text-base">Instagram</a>
               )}
@@ -173,7 +173,7 @@ export function Footer() {
           <div className="absolute inset-0 w-full h-full bg-[#0a1118]/85 -z-10" />
 
              {/* Massive Typography matching Logo Colors */}
-             <div aria-hidden="true" className="font-heading text-[12vw] lg:text-[13vw] font-black tracking-[-0.06em] leading-none w-full text-center opacity-95 mb-1 uppercase" style={{ transform: "scaleY(1.2)" }}>
+             <div aria-hidden="true" className="font-heading text-[12vw] lg:text-[13vw] font-black tracking-[-0.06em] leading-none w-full text-center opacity-95 mb-8 sm:mb-6 md:mb-2 uppercase origin-bottom scale-y-[1.08] sm:scale-y-[1.14] md:scale-y-[1.2]">
                {(() => {
                  const name = settings?.siteName || "RAYZORPACK";
                  const accent = settings?.siteNameAccent || "PACK";
@@ -193,9 +193,10 @@ export function Footer() {
              </div>
 
           {/* Very Bottom Copyright Links */}
-          <div className="relative z-10 w-full flex flex-col md:flex-row justify-between items-center text-[#a1a1aa] text-xs md:text-sm gap-4 pb-16 md:pb-0 md:pr-24">
-            <span className="text-center">All rights reserved © {settings?.siteName || "Rayzor Industrial Packaging Pvt Ltd"} {new Date().getFullYear()}</span>
-            <a href="https://mntfuture.com/" target="_blank" rel="noopener noreferrer" className="text-white hover:text-[var(--brand-blue)] transition-colors text-center">Developed by MNT</a>
+          <div className="relative z-10 w-full flex flex-col md:flex-row flex-wrap justify-center items-center text-center text-[#a1a1aa] text-[11px] sm:text-xs md:text-sm gap-x-4 gap-y-2 md:gap-x-6 pb-12 sm:pb-16 md:pb-2">
+            <span className="max-w-full break-words leading-relaxed">All rights reserved © {settings?.siteName || "Rayzor Industrial Packaging Pvt Ltd"} {new Date().getFullYear()}</span>
+            <span aria-hidden="true" className="hidden md:inline text-[#a1a1aa]/50 mx-3 lg:mx-4">|</span>
+            <a href="https://mntfuture.com/" target="_blank" rel="noopener noreferrer" className="text-white hover:text-[var(--brand-blue)] transition-colors whitespace-nowrap mt-1 md:mt-0">Developed by MnT Future</a>
           </div>
 
         </div>
