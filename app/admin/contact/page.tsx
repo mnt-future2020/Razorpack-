@@ -32,6 +32,7 @@ export default function ContactPage() {
     // Basic Contact Information
     primaryPhone: "",
     secondaryPhone: "",
+    tertiaryPhone: "",
     whatsappNumber: "",
     email: "",
     address: "",
@@ -216,6 +217,24 @@ export default function ContactPage() {
                   handleInputChange("secondaryPhone", e.target.value)
                 }
                 placeholder="+91 9876543210"
+                className="mt-2"
+              />
+            </div>
+
+            <div>
+              <Label
+                htmlFor="tertiaryPhone"
+                className="text-base font-semibold"
+              >
+                Third Phone Number
+              </Label>
+              <Input
+                id="tertiaryPhone"
+                value={contactInfo.tertiaryPhone}
+                onChange={(e) =>
+                  handleInputChange("tertiaryPhone", e.target.value)
+                }
+                placeholder="+91 9876543211"
                 className="mt-2"
               />
             </div>

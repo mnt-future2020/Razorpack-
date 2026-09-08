@@ -1,15 +1,36 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/config/models/connectDB";
 import Settings from "@/config/utils/admin/settings/settingsSchema";
+import CompanyProfile from "@/config/utils/admin/settings/companyProfileSchema";
 import { uploadToCloudinary, deleteByUrl } from "@/config/utils/cloudinary";
 import { verifyAdmin } from "@/lib/admin-auth";
+
+// Cloudinary (and some drivers) reject with a plain object rather than an
+// Error, so `instanceof Error` alone reports "Unknown error" and hides the real
+// cause — e.g. "cloud_name is disabled" when credentials are missing.
+function describeError(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  if (typeof error === "string") return error;
+  if (error && typeof error === "object") {
+    const message = (error as { message?: unknown }).message;
+    if (typeof message === "string") return message;
+    try {
+      return JSON.stringify(error);
+    } catch {
+      return "Unserialisable error";
+    }
+  }
+  return "Unknown error";
+}
 
 // GET - Fetch site settings
 export async function GET() {
   try {
     await connectDB();
 
-    const settings = await Settings.findOne({ isActive: true }).lean();
+    // Must match the PUT filter below — reading by isActive while writing by id
+    // meant the two could resolve to different documents.
+    const settings = await Settings.findOne({ id: "default" }).lean();
 
     if (!settings) {
       return NextResponse.json(
@@ -106,18 +127,51 @@ export async function PUT(request: NextRequest) {
       faviconPath = await uploadBase64Image(favicon, "favicon");
     }
 
-    // Handle company profile PDF upload if it's base64 data
+    // Handle company profile PDF upload if it's base64 data.
+    //
+    // Stored in Mongo, not Cloudinary: Cloudinary's "restricted media types"
+    // setting denies PDF delivery (401 "deny or ACL failure") for every URL
+    // form including signed and extensionless ones, and denies server-side
+    // fetches too, so no proxy can work around it.
     let companyProfilePath = companyProfile;
     if (companyProfile && companyProfile.startsWith("data:")) {
-      if (currentSettings?.companyProfile) {
-        await deleteByUrl(currentSettings.companyProfile);
-      }
       const base64Data = companyProfile.split(";base64,").pop();
       if (base64Data) {
         const buffer = Buffer.from(base64Data, "base64");
-        const result = await uploadToCloudinary(buffer, "settings/company-profile");
-        companyProfilePath = result.secure_url;
+
+        // A BSON document is capped at 16MB; leave headroom for the rest.
+        if (buffer.byteLength > 15 * 1024 * 1024) {
+          return NextResponse.json(
+            { success: false, message: "PDF is too large — maximum 15MB" },
+            { status: 413 }
+          );
+        }
+
+        // Clean up any copy left on Cloudinary by the previous implementation.
+        if (currentSettings?.companyProfile?.startsWith("http")) {
+          await deleteByUrl(currentSettings.companyProfile);
+        }
+
+        await CompanyProfile.findOneAndUpdate(
+          { id: "default" },
+          {
+            data: buffer,
+            contentType: "application/pdf",
+            filename: "company-profile.pdf",
+            size: buffer.byteLength,
+          },
+          { upsert: true }
+        );
+
+        // Settings holds the route that serves it, not a remote URL.
+        companyProfilePath = "/api/company-profile";
       }
+    } else if (companyProfile === null && currentSettings?.companyProfile) {
+      // "Remove" in the admin UI — drop the bytes too rather than orphan them.
+      if (currentSettings.companyProfile.startsWith("http")) {
+        await deleteByUrl(currentSettings.companyProfile);
+      }
+      await CompanyProfile.deleteOne({ id: "default" });
     }
 
     // Find and update the settings
@@ -158,7 +212,7 @@ export async function PUT(request: NextRequest) {
       {
         success: false,
         message: "Failed to update site settings",
-        error: error instanceof Error ? error.message : "Unknown error",
+        error: describeError(error),
       },
       { status: 500 }
     );
@@ -222,7 +276,7 @@ export async function POST(request: NextRequest) {
       {
         success: false,
         message: "Failed to reset site settings",
-        error: error instanceof Error ? error.message : "Unknown error",
+        error: describeError(error),
       },
       { status: 500 }
     );

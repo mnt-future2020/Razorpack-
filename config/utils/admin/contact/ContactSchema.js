@@ -14,6 +14,11 @@ const contactSchema = new mongoose.Schema(
       trim: true,
       maxlength: 20,
     },
+    tertiaryPhone: {
+      type: String,
+      trim: true,
+      maxlength: 20,
+    },
     whatsappNumber: {
       type: String,
       required: true,

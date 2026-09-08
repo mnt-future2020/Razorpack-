@@ -432,7 +432,14 @@ export default function SettingsPage() {
                   <p className="text-sm font-medium text-green-800 truncate">
                     {companyProfileName || "Company Profile.pdf"}
                   </p>
-                  <a href={companyProfile} target="_blank" rel="noopener noreferrer" className="text-xs text-green-600 hover:underline">
+                  <a
+                    href={
+                      companyProfile?.startsWith("data:")
+                        ? companyProfile
+                        : "/api/company-profile?inline=1"
+                    }
+                    target="_blank"
+                    rel="noopener noreferrer" className="text-xs text-green-600 hover:underline">
                     View current PDF
                   </a>
                 </div>
