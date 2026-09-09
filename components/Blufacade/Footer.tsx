@@ -162,7 +162,7 @@ export function Footer() {
 
       {/* ─── BLACK PARALLAX REVEAL SECTION ─── */}
       <div className="parallax-container relative w-full overflow-hidden z-0 bg-[#0a1118]">
-        <div className="parallax-content relative w-full flex flex-col justify-end px-6 md:px-12 pb-12 md:pb-16 pt-8 md:pt-10 lg:pt-12 will-change-transform">
+        <div className="parallax-content relative w-full flex flex-col justify-end pb-16 md:pb-24 pt-12 md:pt-16 lg:pt-20 will-change-transform">
           
           {/* Stationary Background Image */}
           <div 
@@ -173,32 +173,32 @@ export function Footer() {
           <div className="absolute inset-0 w-full h-full bg-[#0a1118]/85 -z-10" />
 
              {/* Massive Typography matching Logo Colors */}
-             <div aria-hidden="true" className="font-heading text-[min(7.4vw,20vh)] md:text-[min(8vw,20vh)] lg:text-[min(8.4vw,20vh)] xl:text-[min(8.6vw,20vh)] 2xl:text-[min(8.8vw,20vh)] font-black tracking-[-0.06em] leading-[0.92] w-full text-center opacity-95 pt-[1em] mb-8 md:mb-12 uppercase origin-bottom scale-y-[1.2]">
+             <div aria-hidden="true" className="font-heading text-[4.65vw] md:text-[4.85vw] lg:text-[4.95vw] xl:text-[4.98vw] 2xl:text-[5vw] font-black tracking-[-0.095em] leading-[0.92] w-full text-center whitespace-nowrap px-1 md:px-2 opacity-95 pt-[1em] mb-12 md:mb-16 uppercase origin-bottom scale-y-[1.25]">
                {(() => {
                  const name = (settings?.siteName || "RAYZORPACK").toUpperCase();
                  const accent = (settings?.siteNameAccent || "PACK").toUpperCase();
                  const idx = name.lastIndexOf(accent);
-                 // Each leading word takes its own line; the accent phrase closes on the last.
-                 const lead = idx > 0 ? name.slice(0, idx).trim() : name;
-                 const tail = idx > 0 ? name.slice(idx).trim() : "";
-                 return (
-                   <>
-                     {lead.split(/\s+/).filter(Boolean).map((word, i) => (
-                       <span key={`${word}-${i}`} className="block whitespace-nowrap text-white">{word}</span>
-                     ))}
-                     {tail && <span className="block whitespace-nowrap text-[var(--brand-blue)]">{tail}</span>}
-                   </>
-                 );
+                 if (idx > 0) {
+                   return (
+                     <>
+                       <span className="text-white">{name.slice(0, idx)}</span>
+                       <span className="text-[var(--brand-blue)]">{name.slice(idx)}</span>
+                     </>
+                   );
+                 }
+                 return <span className="text-white">{name}</span>;
                })()}
              </div>
 
           {/* Very Bottom Copyright Links */}
+          <div className="px-6 md:px-12">
           <div className="max-w-[1600px] mx-auto w-full">
           <div className="relative z-10 w-full flex flex-col md:flex-row justify-between items-center border-t border-white/10 pt-6 md:pt-8 text-[#a1a1aa] text-xs md:text-sm gap-4 pb-16 md:pb-0">
             <span className="text-center">All rights reserved © {settings?.siteName || "Rayzor Industrial Packaging Pvt Ltd"} {new Date().getFullYear()}</span>
-            <a href="https://mntfuture.com/" target="_blank" rel="noopener noreferrer" className="text-white hover:text-[var(--brand-blue)] transition-colors text-center">Developed by MNT</a>
+            <a href="https://mntfuture.com/" target="_blank" rel="noopener noreferrer" className="text-white hover:text-[var(--brand-blue)] transition-colors text-center">Developed by MnT Future</a>
           </div>
 
+          </div>
           </div>
 
         </div>
